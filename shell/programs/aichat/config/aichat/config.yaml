@@ -1,0 +1,6 @@
+model: openai
+keybindings: vi
+
+clients:
+- type: openai
+  api_key: null

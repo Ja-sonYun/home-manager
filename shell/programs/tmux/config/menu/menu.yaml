@@ -1,0 +1,130 @@
+# On tmux.conf
+#
+# bind-key k run-shell "$HOME/tmux-menu/target/debug/tmux-menu show --menu $HOME/tmux-menu/examples/menu.yaml --working_dir #{pane_current_path}"
+#
+# =============================
+#
+# title: "..."
+#
+# position:  <- Optional
+#   x: ...
+#   y: ...
+#
+# items:
+#   - Seperate: {}
+#
+#   - NoDim:
+#       name: "..."
+#
+#   - Menu:
+#       name: "..."
+#       shortcut: "..."
+#       ------------------
+#
+#       next_menu: "..."
+#
+#         OR
+#
+#       command: "command %%KEY%%"
+#       background: false
+#
+#       close_after_command: true  <- Optional
+#       inputs:
+#         - KEY  <- This replace %%KEY%% on command
+#       position:  <- Optional
+#         x: ...
+#         y: ...
+#         w: ...
+#         h: ...
+
+title: " menu "
+items:
+
+  - Menu:
+      name: "git"
+      shortcut: g
+      next_menu: "./git.yaml"
+
+  - Menu:
+      name: "shell"
+      shortcut: s
+      next_menu: "./shell.yaml"
+
+  - Menu:
+      name: "docker"
+      shortcut: d
+      next_menu: "./docker.yaml"
+
+  - Menu:
+      name: "brew services"
+      shortcut: b
+      command: "$CONFIG/tmux/menu/scripts/generate_brew_services_restart.sh"
+      background: true
+
+  - Menu:
+      name: "Navi"
+      shortcut: n
+      command: navi --path=$CONFIG/navi --print | pbcopy
+      position:
+        w: 120
+        h: 40
+
+  - Menu:
+      name: "chatgpt"
+      shortcut: c
+      command: aichat --session tm --role ask
+      session: true
+      session_name: "chatgpt"
+
+      position:
+        w: 120
+        h: 70
+
+  - Menu:
+      name: "Record Meeting"
+      shortcut: R
+      command: meet-record
+      session: true
+      session_name: "meet-record"
+
+      position:
+        w: 120
+        h: 40
+
+  - Menu:
+      name: "rss"
+      shortcut: r
+      next_menu: "./rss.yaml"
+
+  - Menu:
+      name: "translate"
+      shortcut: l
+      next_menu: "./translate.yaml"
+
+  - Menu:
+      name: "management"
+      shortcut: m
+      next_menu: "./management.yaml"
+
+  - Seperate: {}
+
+  - NoDim:
+      name: "#[align=centre fg=red]-- Tmux --"
+
+  - Seperate: {}
+
+  - Menu:
+      name: "sendkey to popup"
+      shortcut: p
+      command: send-cmd-to-popup %%PWD "%%CMD%%"
+      inputs:
+        - CMD
+      position:
+        w: 3
+        h: 3
+
+  - Menu:
+      name: "clear sendkey status"
+      shortcut: P
+      command: rm -f /tmp/tmux_popup_log
+      background: true
