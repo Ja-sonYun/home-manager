@@ -1,5 +1,19 @@
 # This overlay, when applied to nixpkgs, adds the final neovim derivation to nixpkgs.
-{ inputs }:
+{
+  inputs,
+  config ? {
+    useGo = false;
+    useRust = false;
+    usePython = false;
+    useNode = false;
+    useLua = false;
+    useNix = false;
+    useTerraform = false;
+    useCxx = false;
+    useMarkdown = false;
+    useShell = false;
+  },
+}:
 final: prev:
 with final.pkgs.lib;
 let
@@ -20,14 +34,6 @@ let
   # This is the helper function that builds the Neovim derivation.
   mkNeovim = pkgs.callPackage ./mkNeovim.nix { inherit pkgs-wrapNeovim; };
 
-  # A plugin can either be a package or an attrset, such as
-  # { plugin = <plugin>; # the package, e.g. pkgs.vimPlugins.nvim-cmp
-  #   config = <config>; # String; a config that will be loaded with the plugin
-  #   # Boolean; Whether to automatically load the plugin as a 'start' plugin,
-  #   # or as an 'opt' plugin, that can be loaded with `:packadd!`
-  #   optional = <true|false>; # Default: false
-  #   ...
-  # }
   all-plugins = with pkgs.vimPlugins; [
     nvim-cmp
     cmp_luasnip
@@ -41,7 +47,6 @@ let
     vim-eunuch
     vim-commentary
     vim-tmux-navigator
-    vim-fugitive
     tagbar
     harpoon2
     rainbow-delimiters-nvim
@@ -64,7 +69,7 @@ let
     (mkNvimPlugin inputs.fidget-nvim "fidget.nvim")
   ];
 
-  extraPackages = with pkgs; [
+  commonPackages = with pkgs; [
     git
     cacert
     ripgrep
@@ -72,36 +77,124 @@ let
 
     # Required packages
     nodejs_20 # For copilot
+  ];
 
-    # Language servers
-    lua-language-server
-    nil # nix LSP
-    pyright
-    rust-analyzer
-    rustfmt
-    terraform-ls
-    typescript-language-server
-    gopls
-    bash-language-server
-    yaml-language-server
-    ccls
-    marksman
+  nodePackagesOpt =
+    if config.useNode then
+      with pkgs;
+      [
+        nodePackages.prettier
+        nodePackages.prettier-plugin-toml
+        typescript-language-server
+      ]
+    else
+      [ ];
 
-    # Formatters
-    stylua
-    nodePackages.prettier
-    python312Packages.black
-    python312Packages.isort
-    shellcheck
-    clang-tools
-    shfmt
-    markdownlint-cli2
-    nixfmt-rfc-style
+  pythonPackagesOpt =
+    if config.usePython then
+      with pkgs;
+      [
+        python312Packages.black
+        python312Packages.isort
+        pyright
+      ]
+    else
+      [ ];
 
-    # Stdlibs
-    go
-    rustPackages.cargo
-    rustPackages.rustc
+  luaPackagesOpt =
+    if config.useLua then
+      with pkgs;
+      [
+        lua-language-server
+        stylua
+      ]
+    else
+      [ ];
+
+  rustPackagesOpt =
+    if config.useRust then
+      with pkgs;
+      [
+        rust-analyzer
+        rustfmt
+        rustPackages.cargo
+        rustPackages.rustc
+      ]
+    else
+      [ ];
+
+  nixPackagesOpt =
+    if config.useNix then
+      with pkgs;
+      [
+        nixfmt-rfc-style
+        nil
+      ]
+    else
+      [ ];
+
+  terraformPackagesOpt =
+    if config.useTerraform then
+      with pkgs;
+      [
+        terraform
+        terraform-ls
+      ]
+    else
+      [ ];
+
+  goPackagesOpt =
+    if config.useGo then
+      with pkgs;
+      [
+        gopls
+        go
+      ]
+    else
+      [ ];
+
+  cxxPackagesOpt =
+    if config.useCxx then
+      with pkgs;
+      [
+        clang-tools
+        ccls
+      ]
+    else
+      [ ];
+
+  markdownPackagesOpt =
+    if config.useMarkdown then
+      with pkgs;
+      [
+        marksman
+        nodePackages.prettier
+      ]
+    else
+      [ ];
+
+  shellPackagesOpt =
+    if config.useShell then
+      with pkgs;
+      [
+        shellcheck
+        shfmt
+      ]
+    else
+      [ ];
+
+  extraPackages = pkgs.lib.concatLists [
+    commonPackages
+    nodePackagesOpt
+    pythonPackagesOpt
+    luaPackagesOpt
+    rustPackagesOpt
+    nixPackagesOpt
+    terraformPackagesOpt
+    goPackagesOpt
+    cxxPackagesOpt
+    markdownPackagesOpt
+    shellPackagesOpt
   ];
 in
 {
@@ -122,23 +215,7 @@ in
     wrapRc = false;
   };
 
-  # This can be symlinked in the devShell's shellHook
   nvim-luarc-json = final.mk-luarc-json {
     plugins = all-plugins;
   };
-
-  # You can add as many derivations as you like.
-  # Use `ignoreConfigRegexes` to filter out config
-  # files you would not like to include.
-  #
-  # For example:
-  #
-  # nvim-pkg-no-telescope = mkNeovim {
-  #   plugins = [];
-  #   ignoreConfigRegexes = [
-  #     "^plugin/telescope.lua"
-  #     "^ftplugin/.*.lua"
-  #   ];
-  #   inherit extraPackages;
-  # };
 }

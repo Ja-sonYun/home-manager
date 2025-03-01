@@ -39,6 +39,8 @@
     httpie
     wget
 
+    hwatch
+
     aider-chat
   ];
 
@@ -47,6 +49,8 @@
   };
 
   home.shellAliases = {
+    cat = "bat";
     gsed = "sed";
+    watch = "hwatch";
   };
 }

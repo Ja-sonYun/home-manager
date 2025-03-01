@@ -6,10 +6,6 @@
     jg = "jj git";
   };
 
-  # home.packages = with pkgs; [
-  #   lazyjj
-  # ];
-
   programs.jujutsu = {
     enable = true;
 

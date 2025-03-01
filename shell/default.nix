@@ -4,6 +4,8 @@
     ./zsh
     ./core
 
+    ./analysis
+
     ./programs/git
     ./programs/git/utils.nix
     ./programs/jujutsu
@@ -11,5 +13,6 @@
     ./programs/visidata
     ./programs/aichat
     ./programs/direnv
+    ./programs/weechat
   ];
 }

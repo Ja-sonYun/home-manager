@@ -92,15 +92,14 @@
 
           pkgs = import nixpkgs {
             inherit system;
-
             overlays = self.overlays;
+            config.allowUnfree = true;
           };
 
           configPaths =
             [
               # Common configurations
               ./shell
-              ./portable
             ]
             ++ (
               if system == "aarch64-darwin" then

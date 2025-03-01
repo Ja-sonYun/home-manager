@@ -70,6 +70,17 @@ items:
         h: 40
 
   - Menu:
+      name: "weechat"
+      shortcut: w
+      command: weechat
+      session: true
+      session_name: "weechat"
+
+      position:
+        w: 200
+        h: 70
+
+  - Menu:
       name: "chatgpt"
       shortcut: c
       command: aichat --session tm --role ask
