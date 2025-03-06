@@ -71,32 +71,36 @@
           configDir = "/Users/jasony/dotfiles";
           cacheDir = "/Users/jasony/.nixcache/jasony";
         };
-        "Linux" = {
+        "development-linux" = {
           system = "x86_64-linux";
-          username = "jasony";
+          username = "ubuntu";
           useremail = "jason@abex.dev";
-          hostname = "Linux";
-          userhome = "/home/jasony";
-          configDir = "/home/jasony/dotfiles";
-          cacheDir = "/Users/jasony/.nixcache/jasony";
+          hostname = "development-linux";
+          userhome = "/home/ubuntu";
+          configDir = "/home/ubuntu/dotfiles";
+          cacheDir = "/Users/ubuntu/.nixcache/jasony";
         };
       };
 
-    in
-    {
-      darwinConfigurations."Jasons-MacBook-Pro-2" =
+      mkPkgsProvider =
+        system:
+        import nixpkgs {
+          inherit system;
+          overlays = self.overlays;
+          config.allowUnfree = true;
+        };
+
+      mkHomeManagerConfig =
+        hostname:
         let
-          hostname = "Jasons-MacBook-Pro-2";
           specialArgs = specialArgsPrepared."${hostname}";
           system = specialArgs.system;
-
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = self.overlays;
-            config.allowUnfree = true;
-          };
-
-          configPaths =
+        in
+        {
+          useGlobalPkgs = true;
+          useUserPackages = false;
+          extraSpecialArgs = specialArgs;
+          users.${specialArgs.username}.imports =
             [
               # Common configurations
               ./shell
@@ -115,6 +119,16 @@
               else
                 [ ]
             );
+        };
+
+    in
+    {
+      darwinConfigurations."Jasons-MacBook-Pro-2" =
+        let
+          hostname = "Jasons-MacBook-Pro-2";
+          specialArgs = specialArgsPrepared."${hostname}";
+          system = specialArgs.system;
+          pkgs = mkPkgsProvider system;
         in
         darwin.lib.darwinSystem {
           inherit system specialArgs pkgs;
@@ -132,12 +146,7 @@
             # home manager
             home-manager.darwinModules.home-manager
             {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = false;
-                extraSpecialArgs = specialArgs;
-                users.${specialArgs.username}.imports = configPaths;
-              };
+              home-manager = mkHomeManagerConfig hostname;
             }
 
             nix-homebrew.darwinModules.nix-homebrew
@@ -154,6 +163,30 @@
             agenix.nixosModules.default
             {
               environment.systemPackages = [ agenix.packages."${system}".default ];
+            }
+          ];
+        };
+
+      homeConfigurations."development-linux" =
+        let
+          hostname = "development-linux";
+          specialArgs = specialArgsPrepared."${hostname}";
+          system = specialArgs.system;
+          pkgs = mkPkgsProvider system;
+        in
+        home-manager.lib.homeManagerConfiguration {
+          inherit system specialArgs pkgs;
+          modules = [
+            # System configurations
+            ./shell/system.nix
+
+            ./hosts/x86_64-linux/core/host-users.nix
+            ./hosts/x86_64-linux/core/nix-core.nix
+
+            # home manager
+            home-manager.modules.home-manager
+            {
+              home-manager = mkHomeManagerConfig hostname;
             }
           ];
         };

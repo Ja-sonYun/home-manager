@@ -56,6 +56,8 @@ let
     telescope-nvim
     fzf-lua
 
+    quicker-nvim
+
     (mkNvimPlugin inputs.copilot-vim "copilot.nvim")
     (mkNvimPlugin inputs.fzf-vim "fzf.vim")
     (mkNvimPlugin inputs.fzf "fzf")

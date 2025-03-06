@@ -14,7 +14,7 @@
       rizin
 
       # Cloud Infrastructure
-      checkov
+      # checkov
       trivy
 
       # API Related

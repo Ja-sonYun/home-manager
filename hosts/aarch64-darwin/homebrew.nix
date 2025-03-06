@@ -49,14 +49,13 @@ in
       "basictex"
       "openvpn-connect"
       "freecad"
-      "orbstack"
       "blender"
       "visual-studio-code"
       "obs"
+      "multipass"
 
       # TODO: Move to nix
       "macfuse"
-      "vagrant"
     ] ++ allCasks;
     taps = [
       "homebrew/bundle"

@@ -10,7 +10,9 @@ add:
 	git add .
 
 lock: add
-	nix flake lock --update-input neovim
+	nix flake lock --update-input neovim \
+		--extra-experimental-features nix-command \
+		--extra-experimental-features flakes
 
 build: add lock
 	nix build .#darwinConfigurations.$(HOSTNAME).system \

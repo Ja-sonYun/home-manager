@@ -42,6 +42,8 @@
     hwatch
 
     aider-chat
+
+    vtm
   ];
 
   home.sessionVariables = {

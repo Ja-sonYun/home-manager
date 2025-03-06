@@ -108,6 +108,8 @@
       ".venv"
       ".direnv"
       ".tmp"
+
+      ".aider*"
     ];
 
     includes = [
