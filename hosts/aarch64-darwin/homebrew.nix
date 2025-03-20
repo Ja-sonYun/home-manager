@@ -31,6 +31,7 @@ in
     };
     brews = [
       "keith/formulae/reminders-cli"
+      "qemu"
     ] ++ allBrews;
     casks = [
       "aldente"
@@ -53,6 +54,8 @@ in
       "visual-studio-code"
       "obs"
       "multipass"
+
+      "vagrant"
 
       # TODO: Move to nix
       "macfuse"

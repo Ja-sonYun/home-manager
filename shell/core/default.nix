@@ -1,4 +1,8 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  configDir,
+  ...
+}:
 {
   home.packages = with pkgs; [
     # archives
@@ -44,13 +48,20 @@
     aider-chat
 
     vtm
+
+    # My nvim config
+    nvim-pkg
   ];
 
   home.sessionVariables = {
+    EDITOR = "${pkgs.nvim-pkg}/bin/nvim";
     PAGER = "${pkgs.moar}/bin/moar";
+    FLAKE_TEMPLATES_DIR = "${configDir}/templates";
   };
 
   home.shellAliases = {
+    vi = "nvim";
+    vim = "nvim";
     cat = "bat";
     gsed = "sed";
     watch = "hwatch";

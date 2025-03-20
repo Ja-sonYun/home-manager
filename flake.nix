@@ -72,7 +72,7 @@
           cacheDir = "/Users/jasony/.nixcache/jasony";
         };
         "development-linux" = {
-          system = "x86_64-linux";
+          system = "aarch64-linux";
           username = "ubuntu";
           useremail = "jason@abex.dev";
           hostname = "development-linux";
@@ -96,30 +96,25 @@
           specialArgs = specialArgsPrepared."${hostname}";
           system = specialArgs.system;
         in
-        {
-          useGlobalPkgs = true;
-          useUserPackages = false;
-          extraSpecialArgs = specialArgs;
-          users.${specialArgs.username}.imports =
+        [
+          # Common configurations
+          ./shell
+        ]
+        ++ (
+          if system == "aarch64-darwin" then
             [
-              # Common configurations
-              ./shell
+              # Mac os specific configurations
+              ./hosts/aarch64-darwin/homemanager.nix
             ]
-            ++ (
-              if system == "aarch64-darwin" then
-                [
-                  # Mac os specific configurations
-                  ./hosts/aarch64-darwin/homemanager.nix
-                ]
-              else if system == "x86_64-linux" then
-                [
-                  # Linux specific configurations, which isn't implemented yet
-                  ./hosts/x86_64-linux/homemanager.nix
-                ]
-              else
-                [ ]
-            );
-        };
+
+          else if system == "aarch64-linux" then
+            [
+              # Linux specific configurations, which isn't implemented yet
+              ./hosts/aarch64-linux/homemanager.nix
+            ]
+          else
+            [ ]
+        );
 
     in
     {
@@ -134,7 +129,7 @@
           inherit system specialArgs pkgs;
           modules = [
             # System configurations
-            ./shell/system.nix
+            ./hosts/aarch64-darwin/shell.nix
 
             ./hosts/aarch64-darwin/core/nix-core.nix
             ./hosts/aarch64-darwin/core/system.nix
@@ -146,7 +141,12 @@
             # home manager
             home-manager.darwinModules.home-manager
             {
-              home-manager = mkHomeManagerConfig hostname;
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = false;
+                extraSpecialArgs = specialArgs;
+                users.${specialArgs.username}.imports = mkHomeManagerConfig hostname;
+              };
             }
 
             nix-homebrew.darwinModules.nix-homebrew
@@ -170,25 +170,17 @@
       homeConfigurations."development-linux" =
         let
           hostname = "development-linux";
-          specialArgs = specialArgsPrepared."${hostname}";
-          system = specialArgs.system;
+          extraSpecialArgs = specialArgsPrepared."${hostname}";
+          system = extraSpecialArgs.system;
           pkgs = mkPkgsProvider system;
         in
         home-manager.lib.homeManagerConfiguration {
-          inherit system specialArgs pkgs;
+          inherit extraSpecialArgs pkgs;
           modules = [
             # System configurations
-            ./shell/system.nix
+            ./hosts/aarch64-linux/core/nix-core.nix
 
-            ./hosts/x86_64-linux/core/host-users.nix
-            ./hosts/x86_64-linux/core/nix-core.nix
-
-            # home manager
-            home-manager.modules.home-manager
-            {
-              home-manager = mkHomeManagerConfig hostname;
-            }
-          ];
+          ] ++ (mkHomeManagerConfig hostname);
         };
 
       overlays = builtins.attrValues (import ./overlays { inherit inputs; });

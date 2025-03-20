@@ -1,52 +1,50 @@
 { pkgs, system, ... }:
 {
-  home.packages =
-    with pkgs;
-    [
-      # Debugging
-      cargo-flamegraph
+  home.packages = with pkgs; [
+    # Debugging
+    cargo-flamegraph
 
-      # Code
-      pmd
+    # Code
+    pmd
 
-      # Binary analysis
-      radare2
-      rizin
+    # Binary analysis
+    radare2
+    rizin
 
-      # Cloud Infrastructure
-      # checkov
-      trivy
+    # Cloud Infrastructure
+    # checkov
+    trivy
 
-      # API Related
-      nmap
-      sqlmap
+    # API Related
+    nmap
+    sqlmap
 
-      # API - Fuzz
-      wfuzz
-      ffuf
-      gospider
-      arjun
+    # API - Fuzz
+    wfuzz
+    ffuf
+    gospider
+    arjun
 
-      # Network
-      trippy
+    # Network
+    trippy
 
-      # JWT
-      jwt-cli
-      jwt-hack
+    # JWT
+    jwt-cli
+    jwt-hack
 
-      # Packet
-      tcpdump
-      tshark
-      # Won't install gui version
-      # wireshark
+    # Packet
+    tcpdump
+    tshark
+    # Won't install gui version
+    # wireshark
 
-      # Password
-      stable.john
-    ]
-    ++ pkgs.lib.optional (system == "x86_64-linux") [
-      rr
-      gdb
-    ];
+    # Password
+    stable.john
+  ];
+  # ++ pkgs.lib.optional (system == "x86_64-linux") [
+  #   rr
+  #   gdb
+  # ];
 
   home.file.radare2 = {
     recursive = true;

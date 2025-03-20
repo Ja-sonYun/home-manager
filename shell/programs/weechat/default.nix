@@ -23,7 +23,7 @@
                 weechatScripts.weechat-go
               ]
               ++ [
-                (mkScript ./plugins/vimmode)
+                # (mkScript ./plugins/vimmode)
               ];
             plugins = builtins.attrValues (builtins.removeAttrs availablePlugins [ "php" ]);
           };
