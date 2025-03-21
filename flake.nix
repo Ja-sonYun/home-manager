@@ -71,14 +71,14 @@
           configDir = "/Users/jasony/dotfiles";
           cacheDir = "/Users/jasony/.nixcache/jasony";
         };
-        "development-linux" = {
-          system = "aarch64-linux";
-          username = "ubuntu";
+        "linux-devel" = {
+          system = "x86_64-linux";
+          username = "vagrant";
           useremail = "jason@abex.dev";
-          hostname = "development-linux";
-          userhome = "/home/ubuntu";
-          configDir = "/home/ubuntu/dotfiles";
-          cacheDir = "/Users/ubuntu/.nixcache/jasony";
+          hostname = "linux-devel";
+          userhome = "/home/vagrant";
+          configDir = "/home/vagrant/dotfiles";
+          cacheDir = "/Users/vagrant/.nixcache/jasony";
         };
       };
 
@@ -107,10 +107,10 @@
               ./hosts/aarch64-darwin/homemanager.nix
             ]
 
-          else if system == "aarch64-linux" then
+          else if system == "x86_64-linux" then
             [
               # Linux specific configurations, which isn't implemented yet
-              ./hosts/aarch64-linux/homemanager.nix
+              ./hosts/x86_64-linux/homemanager.nix
             ]
           else
             [ ]
@@ -167,9 +167,9 @@
           ];
         };
 
-      homeConfigurations."development-linux" =
+      homeConfigurations."linux-devel" =
         let
-          hostname = "development-linux";
+          hostname = "linux-devel";
           extraSpecialArgs = specialArgsPrepared."${hostname}";
           system = extraSpecialArgs.system;
           pkgs = mkPkgsProvider system;
@@ -178,7 +178,7 @@
           inherit extraSpecialArgs pkgs;
           modules = [
             # System configurations
-            ./hosts/aarch64-linux/core/nix-core.nix
+            ./hosts/x86_64-linux/core/nix-core.nix
 
           ] ++ (mkHomeManagerConfig hostname);
         };

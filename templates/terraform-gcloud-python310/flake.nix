@@ -1,5 +1,5 @@
 {
-  description = "A Nix-flake-based Terraform with Gcloud development environment";
+  description = "A Nix-flake-based Terraform with Gcloud and Python310 development environment";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
@@ -34,7 +34,22 @@
         { pkgs }:
         {
           default = pkgs.mkShell {
+            venvDir = ".venv";
             packages = with pkgs; [
+              python310
+
+              (with pkgs.python310Packages; [
+                venvShellHook
+              ])
+
+              # Packages manager
+              (poetry.withPlugins (
+                ps: with ps; [
+                  poetry-plugin-export
+                ]
+              ))
+              rye
+
               terraform
 
               google-cloud-sdk

@@ -1,7 +1,7 @@
 {
   description = "A Nix-flake-based Terraform 1.8.2 development environment";
 
-  inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
   inputs.nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
 
   outputs =

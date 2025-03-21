@@ -12,6 +12,7 @@
     useCxx = false;
     useMarkdown = false;
     useShell = false;
+    useRuby = false;
   },
 }:
 final: prev:
@@ -185,6 +186,17 @@ let
     else
       [ ];
 
+  rubyPackagesOpt =
+    if config.useRuby then
+      with pkgs;
+      [
+        ruby
+        ruby-lsp
+        rufo
+      ]
+    else
+      [ ];
+
   extraPackages = pkgs.lib.concatLists [
     commonPackages
     nodePackagesOpt
@@ -197,6 +209,7 @@ let
     cxxPackagesOpt
     markdownPackagesOpt
     shellPackagesOpt
+    rubyPackagesOpt
   ];
 in
 {

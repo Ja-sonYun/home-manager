@@ -34,7 +34,7 @@ M.format_with_command = function(cmd_list, opts)
 	local current_file_suffix = vim.fn.expand("%:t"):match(".+%.(.+)")
 	if opts.suffix then
 		tmpfile = tmpfile .. opts.suffix
-	else
+	elseif current_file_suffix then
 		tmpfile = tmpfile .. "." .. current_file_suffix
 	end
 

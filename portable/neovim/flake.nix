@@ -77,6 +77,7 @@
           useCxx = true;
           useMarkdown = true;
           useShell = true;
+          useRuby = true;
         };
       };
     in
