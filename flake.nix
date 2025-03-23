@@ -78,7 +78,7 @@
           hostname = "linux-devel";
           userhome = "/home/vagrant";
           configDir = "/home/vagrant/dotfiles";
-          cacheDir = "/Users/vagrant/.nixcache/jasony";
+          cacheDir = "/home/vagrant/.nixcache/jasony";
         };
       };
 

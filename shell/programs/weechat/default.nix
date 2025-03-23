@@ -15,16 +15,14 @@
         configure =
           { availablePlugins, ... }:
           {
-            scripts =
-              with pkgs.weechatScripts;
-              [
-                wee-slack
-                autosort
-                weechatScripts.weechat-go
-              ]
-              ++ [
-                (mkScript (toString ./plugins/vimmode))
-              ];
+            scripts = with pkgs.weechatScripts; [
+              wee-slack
+              autosort
+              weechatScripts.weechat-go
+            ];
+            # ++ [
+            #   (mkScript (toString ./plugins/vimmode))
+            # ];
             plugins = builtins.attrValues (builtins.removeAttrs availablePlugins [ "php" ]);
           };
       })
