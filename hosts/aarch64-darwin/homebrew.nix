@@ -35,7 +35,7 @@ in
     ] ++ allBrews;
     casks = [
       "aldente"
-      "keycastr"  # Show keystroke realtime
+      "keycastr" # Show keystroke realtime
       "chatgpt"
       "gimp"
       "sf-symbols"
@@ -56,6 +56,7 @@ in
       "multipass"
 
       "vagrant"
+      "orbstack"
 
       # TODO: Move to nix
       "macfuse"

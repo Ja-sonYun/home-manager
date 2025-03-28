@@ -1,6 +1,7 @@
 # This overlay, when applied to nixpkgs, adds the final neovim derivation to nixpkgs.
 {
   inputs,
+  neovim,
   config ? {
     useGo = false;
     useRust = false;
@@ -30,15 +31,26 @@ let
 
   # Make sure we use the pinned nixpkgs instance for wrapNeovimUnstable,
   # otherwise it could have an incompatible signature when applying this overlay.
-  pkgs-wrapNeovim = inputs.nixpkgs.legacyPackages.${pkgs.system};
+  pkgs-wrapNeovim =
+    let
+      pkgs-wrapNeovim = inputs.nixpkgs.legacyPackages.${pkgs.system};
+      neovim-unwrapped = pkgs-wrapNeovim.neovim-unwrapped.overrideAttrs (oldAttrs: rec {
+        version = neovim.version;
+        src = pkgs-wrapNeovim.fetchFromGitHub {
+          owner = "neovim";
+          repo = "neovim";
+          tag = "v${version}";
+          hash = neovim.sha256;
+        };
+        buildInputs = oldAttrs.buildInputs ++ (neovim.mkBuildInputs final);
+      });
+    in
+    pkgs-wrapNeovim // { neovim-unwrapped = neovim-unwrapped; };
 
   # This is the helper function that builds the Neovim derivation.
   mkNeovim = pkgs.callPackage ./mkNeovim.nix { inherit pkgs-wrapNeovim; };
 
   all-plugins = with pkgs.vimPlugins; [
-    nvim-cmp
-    cmp_luasnip
-    cmp-nvim-lsp
     plenary-nvim
 
     nvim-treesitter.withAllGrammars
@@ -57,8 +69,6 @@ let
     telescope-nvim
     fzf-lua
 
-    quicker-nvim
-
     (mkNvimPlugin inputs.copilot-vim "copilot.nvim")
     (mkNvimPlugin inputs.fzf-vim "fzf.vim")
     (mkNvimPlugin inputs.fzf "fzf")
@@ -70,6 +80,7 @@ let
     (mkNvimPlugin inputs.toggleterm-nvim "toggleterm.nvim")
     (mkNvimPlugin inputs.nvim-spider "nvim-spider")
     (mkNvimPlugin inputs.fidget-nvim "fidget.nvim")
+    (mkNvimPlugin inputs.quicker-nvim "quicker.nvim")
   ];
 
   commonPackages = with pkgs; [

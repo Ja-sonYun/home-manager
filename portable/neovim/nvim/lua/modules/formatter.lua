@@ -85,7 +85,6 @@ M.register_formatter = function(func, opts)
 			vim.keymap.set("n", M.key, function()
 				M.format_with_command(M._registered_formatters[key], opts)
 			end, { buffer = true, nowait = true })
-			vim.notify("Found registered formatter")
 			return
 		end
 	end
@@ -95,7 +94,6 @@ M.register_formatter = function(func, opts)
 		M._registered_formatters[opts.dir] = cmd_list
 	end
 
-	vim.notify("Registered formatter with " .. table.concat(cmd_list, " && "), "info")
 	vim.keymap.set("n", M.key, function()
 		M.format_with_command(cmd_list, opts)
 	end, { buffer = true, nowait = true })

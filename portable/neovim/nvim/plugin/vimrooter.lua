@@ -32,4 +32,6 @@ vim.g.rooter_patterns = {
 	"Makefile",
 	"makefile",
 	".terraform",
+	"flake.nix",
+	"flake.lock",
 }

@@ -1,9 +1,9 @@
-require('modules.util').set_buffer_opts { width = 2, is_code = true }
+require("modules.util").set_buffer_opts({ width = 2, is_code = true })
 
-vim.bo.comments = ':---,:--'
+vim.bo.comments = ":---,:--"
 
-require('language_server.lua').lua_language_server()
+vim.lsp.enable("lua")
 
-require('modules.formatter').register_formatter(function()
-  return { 'stylua %' }
+require("modules.formatter").register_formatter(function()
+	return { "stylua %" }
 end)

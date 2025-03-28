@@ -1,7 +1,7 @@
-require('modules.util').set_buffer_opts { width = 2, is_code = true }
+require("modules.util").set_buffer_opts({ width = 2, is_code = true })
 
-require('language_server.typescript').tsserver()
+vim.lsp.enable("typescript")
 
-require('modules.formatter').register_formatter(function()
-  return { 'prettier --write %' }
+require("modules.formatter").register_formatter(function()
+	return { "prettier --write %" }
 end)

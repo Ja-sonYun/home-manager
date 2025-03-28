@@ -45,7 +45,12 @@ M.Msg = function(msg, hl, opts)
 	})
 
 	-- mount/open the component
-	popup:mount()
+	local status, errorMsg = pcall(function()
+		popup:mount()
+	end)
+	if not status then
+		return
+	end
 
 	-- set content
 	vim.api.nvim_buf_set_lines(popup.bufnr, 0, 1, false, { msg })

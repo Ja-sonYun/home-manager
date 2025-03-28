@@ -320,3 +320,85 @@ vim.api.nvim_set_hl(0, "Search", { ctermfg = "black", ctermbg = "yellow" })
 vim.api.nvim_set_hl(0, "Pmenu", { ctermbg = 238 })
 vim.api.nvim_set_hl(0, "FloatBorder", { ctermfg = 3 })
 vim.api.nvim_set_hl(0, "MatchParen", { ctermbg = 238, ctermfg = 3, underline = true })
+
+-----------------------------------------------------------
+-- Enable LSPs
+-----------------------------------------------------------
+---[[AUTOCOMPLETION SETUP
+vim.o.completeopt = "menu,noinsert,popup,fuzzy"
+
+---[[ Setup keymaps so we can accept completion using Enter and choose items using Tab.
+local pumMaps = {
+	["<Tab>"] = "<C-n>",
+	["<S-Tab>"] = "<C-p>",
+	["<CR>"] = "<C-y>",
+}
+for insertKmap, pumKmap in pairs(pumMaps) do
+	vim.keymap.set("i", insertKmap, function()
+		return vim.fn.pumvisible() == 1 and pumKmap or insertKmap
+	end, { expr = true })
+end
+---]]
+
+local ts_utils = require("nvim-treesitter.ts_utils")
+
+vim.api.nvim_create_autocmd("LspAttach", {
+	callback = function(args)
+		local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+		client.server_capabilities.completionProvider.triggerCharacters = vim.split("qwertyuiopasdfghjklzxcvbnm. ", "")
+		vim.api.nvim_create_autocmd({ "TextChangedI" }, {
+			buffer = args.buf,
+			callback = function()
+				-- Get current node
+				local node = ts_utils.get_node_at_cursor()
+				if node and node:type() == "comment" then
+					return
+				end
+
+				-- Get current line text and cursor position
+				local line = vim.api.nvim_get_current_line()
+				local cursor = vim.api.nvim_win_get_cursor(0)
+				local col = cursor[2] + 1 -- zero-indexed column
+
+				-- Get the character under the cursor; if cursor is at end, treat as space
+				local current_char = line:sub(col, col)
+				if current_char == "" then
+					current_char = " "
+				end
+				if current_char ~= " " then
+					vim.lsp.completion.get() -- Trigger the completion
+				end
+			end,
+		})
+		vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
+
+		local _, cancel_prev = nil, function() end
+		vim.api.nvim_create_autocmd("CompleteChanged", {
+			buffer = args.buf,
+			callback = function()
+				cancel_prev()
+				local info = vim.fn.complete_info({ "selected" })
+				local completionItem = vim.tbl_get(vim.v.completed_item, "user_data", "nvim", "lsp", "completion_item")
+				if completionItem == nil then
+					return
+				end
+				_, cancel_prev = vim.lsp.buf_request(
+					args.buf,
+					vim.lsp.protocol.Methods.completionItem_resolve,
+					completionItem,
+					function(err, item, ctx)
+						if not item then
+							return
+						end
+						local docs = (item.documentation or {}).value
+						local win = vim.api.nvim__complete_set(info.selected, { info = docs })
+						if win.winid and vim.api.nvim_win_is_valid(win.winid) then
+							vim.treesitter.start(win.bufnr, "markdown")
+							vim.wo[win.winid].conceallevel = 3
+						end
+					end
+				)
+			end,
+		})
+	end,
+})
