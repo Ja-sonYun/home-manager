@@ -1,36 +1,4 @@
-local non_code = {
-	"*.so",
-	"*.o",
-	"*.obj",
-	"*.dylib",
-	"*.bin",
-	"*.dll",
-	"*.exe",
-	"*/.git/**",
-	"*/.svn/**",
-	"*/.venv/**",
-	"*/__pycache__/*",
-	"*/build/**",
-	"*.jpg",
-	"*.png",
-	"*.jpeg",
-	"*.bmp",
-	"*.gif",
-	"*.tiff",
-	"*.svg",
-	"*.ico",
-	"*.pyc",
-	"*.pkl",
-	"*.DS_Store",
-	"*.aux",
-	"*.bbl",
-	"*.blg",
-	"*.brf",
-	"*.fls",
-	"*.fdb_latexmk",
-	"*.synctex.gz",
-	"*.xdv",
-}
+local constant = require("modules.constant")
 
 -----------------------------------------------------------
 vim.g.logging_level = "info"
@@ -58,7 +26,7 @@ vim.opt.virtualedit = "block"
 -----------------------------------------------------------
 -- Ignore certain files and folders when globing
 -----------------------------------------------------------
-vim.opt.wildignore:append(non_code)
+vim.opt.wildignore:append(constant.non_code)
 vim.opt.wildignorecase = true
 
 -----------------------------------------------------------
@@ -66,7 +34,7 @@ vim.opt.wildignorecase = true
 -----------------------------------------------------------
 vim.g.backupdir = vim.fn.expand(vim.fn.stdpath("data") .. "/backup//")
 vim.opt.backupdir = vim.g.backupdir
-vim.opt.backupskip = non_code
+vim.opt.backupskip = constant.non_code
 vim.opt.backup = true
 vim.opt.backupcopy = "yes"
 
@@ -320,3 +288,84 @@ vim.api.nvim_set_hl(0, "Search", { ctermfg = "black", ctermbg = "yellow" })
 vim.api.nvim_set_hl(0, "Pmenu", { ctermbg = 238 })
 vim.api.nvim_set_hl(0, "FloatBorder", { ctermfg = 3 })
 vim.api.nvim_set_hl(0, "MatchParen", { ctermbg = 238, ctermfg = 3, underline = true })
+
+-----------------------------------------------------------
+-- Enable LSPs
+-----------------------------------------------------------
+---[[AUTOCOMPLETION SETUP
+vim.o.complete = ".,t"
+vim.o.completeopt = "menu,menuone,noselect,noinsert,popup,fuzzy"
+
+---[[ Setup keymaps so we can accept completion using Enter and choose items using Tab.
+local pumMaps = {
+	["<Tab>"] = "<C-n>",
+	["<S-Tab>"] = "<C-p>",
+	["<CR>"] = "<C-y>",
+}
+for insertKmap, pumKmap in pairs(pumMaps) do
+	vim.keymap.set("i", insertKmap, function()
+		return vim.fn.pumvisible() == 1 and pumKmap or insertKmap
+	end, { expr = true })
+end
+---]]
+
+local ts_utils = require("nvim-treesitter.ts_utils")
+
+vim.api.nvim_create_autocmd("LspAttach", {
+	callback = function(args)
+		local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+		local triggerChars = vim.split("qwertyuiopasdfghjklzxcvbnm.>:", "")
+		if client.server_capabilities.completionProvider then
+			client.server_capabilities.completionProvider.triggerCharacters = triggerChars
+		end
+		local skipTriggerNodeTypes = { "comment", "string_content", "function_definition" }
+		vim.api.nvim_create_autocmd({ "TextChangedI" }, {
+			buffer = args.buf,
+			callback = function()
+				local node = ts_utils.get_node_at_cursor()
+				if node and vim.tbl_contains(skipTriggerNodeTypes, node:type()) then
+					return
+				end
+				local _, col = unpack(vim.api.nvim_win_get_cursor(0))
+				local line = vim.api.nvim_get_current_line()
+				local char = line:sub(col, col):lower()
+				if vim.tbl_contains(triggerChars, char) then
+					vim.lsp.completion.get() -- Trigger the completion
+				end
+			end,
+		})
+		vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
+
+		local _, cancel_prev = nil, function() end
+		vim.api.nvim_create_autocmd("CompleteChanged", {
+			buffer = args.buf,
+			callback = function()
+				cancel_prev()
+				local info = vim.fn.complete_info({ "selected" })
+				local completionItem = vim.tbl_get(vim.v.completed_item, "user_data", "nvim", "lsp", "completion_item")
+				if completionItem == nil then
+					return
+				end
+				_, cancel_prev = vim.lsp.buf_request(
+					args.buf,
+					vim.lsp.protocol.Methods.completionItem_resolve,
+					completionItem,
+					function(_, item, _)
+						if not item then
+							return
+						end
+						local docs = (item.documentation or {}).value
+						local win = vim.api.nvim__complete_set(info.selected, { info = docs })
+						if win.winid and vim.api.nvim_win_is_valid(win.winid) then
+							vim.treesitter.start(win.bufnr, "markdown")
+							vim.wo[win.winid].conceallevel = 3
+						end
+					end
+				)
+			end,
+		})
+	end,
+})
+
+-- Enable all
+vim.lsp.enable(constant.lsp_servers)

@@ -51,6 +51,10 @@
       url = "github:j-hui/fidget.nvim";
       flake = false;
     };
+    quicker-nvim = {
+      url = "github:stevearc/quicker.nvim";
+      flake = false;
+    };
   };
 
   outputs =
@@ -66,6 +70,14 @@
       # This is where the Neovim derivation is built.
       neovim-overlay = import ./nix/neovim-overlay.nix {
         inherit inputs;
+        # neovim = {
+        #   version = "0.11.0";
+        #   sha256 = "sha256-UVMRHqyq3AP9sV79EkPUZnVkj0FpbS+XDPPOppp2yFE=";
+        #   mkBuildInputs =
+        #     final: with final; [
+        #       utf8proc
+        #     ];
+        # };
         config = {
           useGo = true;
           useRust = true;
