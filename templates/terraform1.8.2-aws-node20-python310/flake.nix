@@ -1,10 +1,15 @@
 {
-  description = "A Nix-flake-based Python3.12 development environment";
+  description = "A Nix-flake-based Terraform 1.8.2 with AWS and Node20 and Python3.10 development environment";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  inputs.nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
 
   outputs =
-    { self, nixpkgs }:
+    {
+      self,
+      nixpkgs,
+      nixpkgs-terraform,
+    }:
     let
       supportedSystems = [
         "x86_64-linux"
@@ -17,7 +22,15 @@
         nixpkgs.lib.genAttrs supportedSystems (
           system:
           f {
-            pkgs = import nixpkgs { inherit system; };
+            pkgs = import nixpkgs {
+              inherit system;
+              overlays = [
+                nixpkgs-terraform.overlays.default
+              ];
+              config = {
+                allowUnfree = true;
+              };
+            };
           }
         );
     in
@@ -28,8 +41,16 @@
           default = pkgs.mkShell {
             venvDir = ".venv";
             packages = with pkgs; [
-              python312
-              (with pkgs.python312Packages; [
+              terraform-versions."1.8.2"
+              awscli2
+
+              nodejs_20
+              nodePackages.pnpm
+              yarn
+
+              python310
+
+              (with pkgs.python310Packages; [
                 venvShellHook
               ])
 
@@ -39,8 +60,8 @@
                   poetry-plugin-export
                 ]
               ))
-              uv
               rye
+              uv
             ];
           };
         }

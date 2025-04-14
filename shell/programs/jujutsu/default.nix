@@ -1,4 +1,5 @@
-{ pkgs, ... }: {
+{ ... }:
+{
   home.shellAliases = {
     js = "jj st --no-pager";
     je = "jj edit";
@@ -9,7 +10,7 @@
   programs.jujutsu = {
     enable = true;
 
-    ediff = true;
+    ediff = false;
 
     settings = {
       user = {
@@ -18,7 +19,12 @@
 
       };
       ui = {
-        default-command = [ "log" "-n" "10" "--no-pager" ];
+        default-command = [
+          "log"
+          "-n"
+          "10"
+          "--no-pager"
+        ];
       };
     };
   };

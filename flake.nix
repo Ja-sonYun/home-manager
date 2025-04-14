@@ -62,14 +62,14 @@
     }:
     let
       specialArgsPrepared = {
-        "Jasons-MacBook-Pro-2" = {
+        "JasonYuns-MacBook-Pro" = {
           system = "aarch64-darwin";
-          username = "jasony";
+          username = "jasonyun";
           useremail = "jason@abex.dev";
-          hostname = "Jasons-MacBook-Pro-2";
-          userhome = "/Users/jasony";
-          configDir = "/Users/jasony/dotfiles";
-          cacheDir = "/Users/jasony/.nixcache/jasony";
+          hostname = "JasonYuns-MacBook-Pro";
+          userhome = "/Users/jasonyun";
+          configDir = "/Users/jasonyun/dotfiles";
+          cacheDir = "/Users/jasonyun/.nixcache/jasony";
         };
         "linux-devel" = {
           system = "x86_64-linux";
@@ -118,9 +118,9 @@
 
     in
     {
-      darwinConfigurations."Jasons-MacBook-Pro-2" =
+      darwinConfigurations."JasonYuns-MacBook-Pro" =
         let
-          hostname = "Jasons-MacBook-Pro-2";
+          hostname = "JasonYuns-MacBook-Pro";
           specialArgs = specialArgsPrepared."${hostname}";
           system = specialArgs.system;
           pkgs = mkPkgsProvider system;

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ configDir, ... }:
 
 ###################################################################################
 #
@@ -18,6 +18,11 @@
       /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
     '';
 
+    keyboard = {
+      enableKeyMapping = true;
+      remapCapsLockToControl = true;
+    };
+
     defaults = {
       menuExtraClock.Show24Hour = true; # show 24 hour clock
 
@@ -29,7 +34,23 @@
         AppleShowAllExtensions = true; # Show all file extensions
       };
 
+      NSGlobalDomain = {
+        InitialKeyRepeat = 17;
+        KeyRepeat = 2;
+      };
+
+      loginwindow = {
+        GuestEnabled = false;
+      };
+
+      controlcenter = {
+        FocusModes = true;
+        Sound = true;
+      };
+
       dock = {
+        autohide = true;
+
         wvous-tr-corner = 12; # Show notification center
         # Disable hot corner
         wvous-tl-corner = 1;
@@ -49,4 +70,7 @@
   programs.zsh.enable = true;
 
   # Further configurations are defined in ./shell/system.nix
+  fonts.packages = [
+    "${configDir}/misc/fonts"
+  ];
 }

@@ -26,10 +26,13 @@ let
   # Use this to create a plugin from a flake input
   mkNvimPlugin =
     src: pname:
-    pkgs.vimUtils.buildVimPlugin {
+    (pkgs.vimUtils.buildVimPlugin {
       inherit pname src;
       version = src.lastModifiedDate;
-    };
+    }).overrideAttrs
+      {
+        doCheck = false;
+      };
 
   # Make sure we use the pinned nixpkgs instance for wrapNeovimUnstable,
   # otherwise it could have an incompatible signature when applying this overlay.
@@ -75,9 +78,12 @@ let
     rainbow-delimiters-nvim
     vim-surround
 
-    octo-nvim
+    # octo-nvim
     telescope-nvim
     fzf-lua
+    avante-nvim
+
+    markdown-preview-nvim
 
     (mkNvimPlugin inputs.copilot-vim "copilot.nvim")
     (mkNvimPlugin inputs.fzf-vim "fzf.vim")
@@ -91,6 +97,7 @@ let
     (mkNvimPlugin inputs.nvim-spider "nvim-spider")
     (mkNvimPlugin inputs.fidget-nvim "fidget.nvim")
     (mkNvimPlugin inputs.quicker-nvim "quicker.nvim")
+    # (mkNvimPlugin inputs.avante-nvim "avante.nvim")
   ];
 
   commonPackages = with pkgs; [

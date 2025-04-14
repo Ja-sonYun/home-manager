@@ -39,6 +39,7 @@
                   poetry-plugin-export
                 ]
               ))
+              uv
               rye
             ];
           };

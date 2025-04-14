@@ -1,12 +1,14 @@
 {
-  description = "A Nix-flake-based Terraform with Gcloud and Python310 development environment";
+  description = "A Nix-flake-based Terraform 1.8.2 with AWS and Node20 development environment";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  inputs.nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
 
   outputs =
     {
       self,
       nixpkgs,
+      nixpkgs-terraform,
     }:
     let
       supportedSystems = [
@@ -22,6 +24,9 @@
           f {
             pkgs = import nixpkgs {
               inherit system;
+              overlays = [
+                nixpkgs-terraform.overlays.default
+              ];
               config = {
                 allowUnfree = true;
               };
@@ -34,33 +39,14 @@
         { pkgs }:
         {
           default = pkgs.mkShell {
-            venvDir = ".venv";
             packages = with pkgs; [
-              python310
+              terraform-versions."1.8.2"
 
-              (with pkgs.python310Packages; [
-                venvShellHook
-              ])
+              awscli2
 
-              # Packages manager
-              (poetry.withPlugins (
-                ps: with ps; [
-                  poetry-plugin-export
-                ]
-              ))
-              rye
-              uv
-
-              terraform
-
-              google-cloud-sdk
-              (google-cloud-sdk.withExtraComponents (
-                with google-cloud-sdk.components;
-                [
-                  gke-gcloud-auth-plugin
-                ]
-              ))
-              kubernetes-helm
+              nodejs_20
+              nodePackages.pnpm
+              yarn
             ];
           };
         }

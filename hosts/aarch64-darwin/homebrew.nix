@@ -57,14 +57,15 @@ in
 
       "vagrant"
       "orbstack"
+      "alfred"
+      "aldente"
+      "cleanshot"
+      "lm-studio"
 
       # TODO: Move to nix
       "macfuse"
     ] ++ allCasks;
     taps = [
-      "homebrew/bundle"
-      "homebrew/services"
-
       "keith/formulae"
     ] ++ allTaps;
   };

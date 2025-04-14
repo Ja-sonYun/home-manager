@@ -13,6 +13,7 @@
     ./programs/jujutsu
     ./programs/tmux
     ./programs/visidata
+    ./programs/ai
     ./programs/aichat
     ./programs/direnv
     ./programs/weechat

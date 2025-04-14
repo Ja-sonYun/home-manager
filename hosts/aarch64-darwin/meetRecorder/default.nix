@@ -13,8 +13,8 @@
             src = ./scripts;
             buildInputs = [ pkgs.python312 ];
             installPhase = ''
-              python3 -m venv $out
-              source $out/bin/activate
+              python3 -m venv $out/venv
+              source $out/venv/bin/activate
               pip install -r requirements.txt
               deactivate
             '';
@@ -22,7 +22,7 @@
         in
         ''
           export PATH=${pkgs.ffmpeg}/bin:$PATH
-          ${derivation}/bin/python ${toString ./scripts/recorder.py}
+          ${derivation}/venv/bin/python ${toString ./scripts/recorder.py}
         '';
     };
   };
