@@ -5,66 +5,62 @@
   ...
 }:
 let
-  #_llm-functions-src-derivation = pkgs.stdenv.mkDerivation {
-  #  name = "_llm-functions-src";
-  #  src = ./config/llm-functions;
-  #  installPhase = ''
-  #    mkdir -p $out/share/llm-functions
-  #    cp -r agents tools agents.txt tools.txt mcp.json $out/share/llm-functions/
-  #  '';
-  #};
+  _llm-functions-src-derivation = pkgs.stdenv.mkDerivation {
+    name = "_llm-functions-src";
+    src = ./config/llm-functions;
+    installPhase = ''
+      mkdir -p $out/share/llm-functions
+      cp -r agents tools agents.txt tools.txt mcp.json $out/share/llm-functions/
+    '';
+  };
 
-  #llm-functions-derivation = pkgs.stdenv.mkDerivation {
-  #  name = "llm-functions";
+  nodeDependencies = (pkgs.callPackage ./nix/default.nix { }).nodeDependencies;
 
-  #  src = pkgs.fetchFromGitHub {
-  #    owner = "sigoden";
-  #    repo = "llm-functions";
-  #    rev = "e5f9a9806cacd5795a25a80dac6150af818248eb";
-  #    sha256 = "sha256-orFuZvaddq1iTNFChgdk3B2cS8dZXmk6VOwR3f+0PUc=";
-  #  };
+  pythonPkgs = pkgs.python3.withPackages (
+    ps: with ps; [
+    ]
+  );
 
-  #  buildInputs = with pkgs; [
-  #    bash
-  #    jq
-  #    argc
-  #    nodejs_20
-  #    python312
-  #    _llm-functions-src-derivation
-  #  ];
+  llm-functions-derivation = pkgs.stdenv.mkDerivation {
+    name = "llm-functions";
 
-  #  installPhase = ''
-  #    mkdir -p $out/share/llm-functions $out/bin
-  #    cp -r ${_llm-functions-src-derivation}/share/llm-functions/{agents,agents.txt,tools,tools.txt,mcp.json} ./
-  #    cp -r agents agents.txt tools tools.txt mcp.json mcp utils scripts Argcfile.sh $out/share/llm-functions/
+    src = pkgs.fetchFromGitHub {
+      owner = "sigoden";
+      repo = "llm-functions";
+      rev = "e5f9a9806cacd5795a25a80dac6150af818248eb";
+      sha256 = "sha256-orFuZvaddq1iTNFChgdk3B2cS8dZXmk6VOwR3f+0PUc=";
+    };
 
-  #    export HOME=$(pwd)
-  #    npm config set strict-ssl false
-  #    (cd $out/share/llm-functions/mcp/bridge && npm install)
-  #    npm cache clean --force
+    buildInputs = with pkgs; [
+      bash
+      jq
+      argc
+      _llm-functions-src-derivation
+    ];
 
-  #    rm -f $out/share/llm-functions/mcp/bridge/package-lock.json
-  #    rm -f $out/share/llm-functions/mcp/bridge/node_modules/package-lock.json
+    installPhase = ''
+      mkdir -p $out/share/llm-functions $out/bin
+      cp -r ${_llm-functions-src-derivation}/share/llm-functions/{agents,agents.txt,tools,tools.txt,mcp.json} ./
+      cp -r agents agents.txt tools tools.txt mcp.json mcp utils scripts Argcfile.sh $out/share/llm-functions/
 
-  #    rm -f $out/share/llm-functions/mcp.json
+      argc build
 
-  #    cat > $out/bin/llm-function <<'EOF'
-  #    #!/usr/bin/env bash
-  #    # always run inside the local llm-functions directory
-  #    export PATH=${pkgs.nodejs_20}/bin:$PATH
-  #    export PATH=${pkgs.python312}/bin:$PATH
-  #    export PATH=${pkgs.jq}/bin:$PATH
-  #    export NODE_PATH=${userhome}/.config/llm-functions/mcp/bridge/node_modules
-  #    cd ${userhome}/.config/llm-functions
-  #    if [ ! -f functions.json ]; then
-  #      argc build
-  #    fi
-  #    exec argc "$@"
-  #    EOF
+      cat > $out/bin/llm-function <<'EOF'
+      #!/usr/bin/env bash
+      # always run inside the local llm-functions directory
+      export PATH=${pythonPkgs}/bin:$PATH
+      export PATH=${pkgs.jq}/bin:$PATH
+      export NODE_PATH=${nodeDependencies}/lib/node_modules:$NODE_PATH
+      cd ${userhome}/.config/llm-functions
+      if [ ! -f functions.json ]; then
+        argc build
+      fi
+      exec argc "$@"
+      EOF
 
-  #    chmod +x $out/bin/llm-function
-  #  '';
-  #};
+      chmod +x $out/bin/llm-function
+    '';
+  };
 
   aichat = pkgs.aichat.overrideAttrs (old: {
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
@@ -83,7 +79,7 @@ in
 {
   home.packages = [
     aichat
-    # llm-functions-derivation
+    llm-functions-derivation
   ];
 
   home.file.aichatconf = {
@@ -92,9 +88,9 @@ in
     source = toString ./config/aichat;
   };
 
-  # home.file.llm-functions = {
-  #   recursive = true;
-  #   target = ".config/llm-functions";
-  #   source = "${llm-functions-derivation}/share/llm-functions";
-  # };
+  home.file.llm-functions = {
+    recursive = true;
+    target = ".config/llm-functions";
+    source = "${llm-functions-derivation}/share/llm-functions";
+  };
 }
