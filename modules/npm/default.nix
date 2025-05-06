@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 with lib;
 
@@ -24,27 +29,29 @@ in
   ##########################################
   config =
     let
+      npm = "${pkgs.nodejs}/bin/npm";
+
       # Generate the activation script for adding/updating packages
-      generateInstallScript = packageName:
+      generateInstallScript =
+        packageName:
         let
           pkgConf = nodeAttrs.${packageName};
           versionArg = if pkgConf.version == null then "" else "@" + pkgConf.version;
         in
         ''
-          if npm list -g --depth=0 | grep -q "${packageName}${versionArg}"; then
+          if ${npm} list -g --depth=0 | grep -q "${packageName}${versionArg}"; then
             echo "   Skipping ${packageName}${versionArg}: already installed"
           else
             echo "   Installing ${packageName}${versionArg} globally"
-            npm install -g "${packageName}${versionArg}" || true
+            ${npm} install -g "${packageName}${versionArg}" || true
           fi
         '';
 
       # Generate the removal script for unused packages
-      generateRemoveScript = packageName:
-        ''
-          echo "   Removing unused package ${packageName}"
-          npm uninstall -g "${packageName}" || true
-        '';
+      generateRemoveScript = packageName: ''
+        echo "   Removing unused package ${packageName}"
+        ${npm} uninstall -g "${packageName}" || true
+      '';
 
       # Generate the final activation script
       generateActivationScript =
@@ -52,15 +59,15 @@ in
           definedPackages = attrNames nodeAttrs;
         in
         ''
-          if command -v npm > /dev/null; then
+          if command -v ${npm} > /dev/null; then
             echo ">> Listing installed npm packages"
-            installedPackages=$(npm list -g --depth=0 --json | jq -r '.dependencies | keys[]')
+            installedPackages=$(${npm} list -g --depth=0 --json | jq -r '.dependencies | keys[]')
 
             # Remove unused packages
             for packageName in $installedPackages; do
               if ! echo "${toString definedPackages}" | grep -q "$packageName"; then
                 echo "Removing $packageName"
-                npm uninstall -g "$packageName"
+                ${npm} uninstall -g "$packageName"
               fi
             done
 
@@ -72,9 +79,6 @@ in
         '';
     in
     {
-      # Ensure Node.js and npm are installed in the system
-      home.packages = [ pkgs.nodejs ];
-
       # Activation script for Node.js
       home.activation.node = lib.hm.dag.entryAfter [ "writeBoundary" ] generateActivationScript;
     };

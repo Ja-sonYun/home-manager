@@ -113,6 +113,7 @@ M.lsp_servers = {
 	"sh",
 	"swift",
 	"terraform",
+	"harper",
 }
 
 return M

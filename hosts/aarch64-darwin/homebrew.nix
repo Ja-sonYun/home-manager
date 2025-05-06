@@ -41,6 +41,7 @@ in
       "sf-symbols"
       "discord"
       "google-chrome"
+      "chromium"
       "slack"
       "appcleaner"
       "drawio"

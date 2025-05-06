@@ -18,7 +18,7 @@ require("avante").setup({
 	-- },
 	openai = {
 		endpoint = "https://api.openai.com/v1",
-		model = "o3-mini",
+		model = "gpt-4.1",
 		temperature = 0,
 		max_tokens = 4096,
 	},
@@ -26,7 +26,7 @@ require("avante").setup({
 		enabled = true, -- Enables the RAG service
 		host_mount = os.getenv("HOME"), -- Host mount path for the rag service
 		provider = "openai", -- The provider to use for RAG service (e.g. openai or ollama)
-		llm_model = "o3-mini", -- The LLM model to use for RAG service
+		llm_model = "gpt-4.1", -- The LLM model to use for RAG service
 		embed_model = "text-embedding-3-small", -- The embedding model to use for RAG service
 		endpoint = "https://api.openai.com/v1", -- The API endpoint for RAG service
 	},
@@ -60,13 +60,13 @@ require("avante").setup({
 	mappings = {
 		--- @class AvanteConflictMappings
 		diff = {
-			ours = "co",
-			theirs = "ct",
-			all_theirs = "ca",
-			both = "cb",
-			cursor = "cc",
-			next = "]x",
-			prev = "[x",
+			ours = "\\co",
+			theirs = "\\ct",
+			all_theirs = "\\ca",
+			both = "\\cb",
+			cursor = "\\cc",
+			next = "\\]x",
+			prev = "\\[x",
 		},
 		suggestion = {
 			accept = "<M-l>",
@@ -86,6 +86,18 @@ require("avante").setup({
 			normal = { "<C-c>", "<Esc>", "q" },
 			insert = { "<C-c>" },
 		},
+		ask = "\\aa",
+		edit = "\\ae",
+		refresh = "\\ar",
+		focus = "\\af",
+		stop = "\\aS",
+		toggle = {
+			default = "\\at",
+			debug = "\\ad",
+			hint = "\\ah",
+			suggestion = "\\as",
+			repomap = "\\aR",
+		},
 		sidebar = {
 			apply_all = "A",
 			apply_cursor = "a",
@@ -95,9 +107,15 @@ require("avante").setup({
 			reverse_switch_windows = "<S-Tab>",
 			remove_file = "d",
 			add_file = "@",
-			close = { "<Esc>", "q" },
-			close_from_input = { normal = "<C-c>", insert = "<C-c>" }
+			close = { "<Esc>", "q", "<C-c>" },
+			close_from_input = { normal = "<C-c>", insert = "<C-c>" },
 		},
+		files = {
+			add_current = "\\ac", -- Add current buffer to selected files
+			add_all_buffers = "\\aB", -- Add all buffer files to selected files
+		},
+		select_model = "\\a?", -- Select model command
+		select_history = "\\ah", -- Select history command
 	},
 	hints = { enabled = false },
 	windows = {
@@ -120,10 +138,10 @@ require("avante").setup({
 		},
 		ask = {
 			floating = false, -- Open the 'AvanteAsk' prompt in a floating window
-			start_insert = true, -- Start insert mode when opening the ask window
+			start_insert = false, -- Start insert mode when opening the ask window
 			border = "rounded",
 			---@type "ours" | "theirs"
-			focus_on_apply = "ours", -- which diff to focus after applying
+			focus_on_apply = "theirs", -- which diff to focus after applying
 		},
 	},
 	highlights = {

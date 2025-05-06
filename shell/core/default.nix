@@ -34,6 +34,7 @@
     gnupg
     flock
     gawk
+    argc
 
     # productivity
     glow # markdown previewer in terminal
@@ -45,17 +46,13 @@
 
     hwatch
 
-    aider-chat
-
-    vtm
-
     # My nvim config
     nvim-pkg
   ];
 
   home.sessionVariables = {
     EDITOR = "${pkgs.nvim-pkg}/bin/nvim";
-    PAGER = "${pkgs.moar}/bin/moar";
+    # PAGER = "${pkgs.moar}/bin/moar";
     FLAKE_TEMPLATES_DIR = "${configDir}/templates";
   };
 

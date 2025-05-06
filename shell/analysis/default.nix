@@ -39,7 +39,7 @@
     # wireshark
 
     # Password
-    stable.john
+    # stable.john
   ];
   # ++ pkgs.lib.optional (system == "x86_64-linux") [
   #   rr

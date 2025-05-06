@@ -8,8 +8,8 @@ declare -A gaps
 declare -A color
 
 # gaps["top"]="38"
-gaps["top"]="5"
-gaps["bottom"]="6"
+gaps["top"]="2"
+gaps["bottom"]="8"
 gaps["left"]="4"
 gaps["right"]="4"
 gaps["inner"]="4"
@@ -101,7 +101,7 @@ yabai -m signal --add event=window_created action="%sketchybar% --trigger window
 yabai -m signal --add event=window_destroyed action="%sketchybar% --trigger windows_on_spaces"
 
 NOTCH_UUID="37D8832A-2D66-02CA-B9F7-8F30A301B230"
-NORMAL_BAR=13
+NORMAL_BAR=20
 NOTCH_BAR=0
 
 yabai -m signal --add event=display_added action="if [[ \"\$(yabai -m query --displays | jq \".[] | select(.id == \$YABAI_DISPLAY_ID) | .uuid\")\" =~ \"$NOTCH_UUID\" ]]; then yabai -m config external_bar \"main:$NOTCH_BAR:0\"; fi"

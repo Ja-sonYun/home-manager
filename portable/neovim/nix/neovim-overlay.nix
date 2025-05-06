@@ -78,6 +78,8 @@ let
     rainbow-delimiters-nvim
     vim-surround
 
+    nvim-ts-autotag
+
     # octo-nvim
     telescope-nvim
     fzf-lua
@@ -91,13 +93,11 @@ let
     (mkNvimPlugin inputs.nui-nvim "nui.nvim")
     (mkNvimPlugin inputs.nvim-web-devicons-nvim "nvim-web-devicons")
     (mkNvimPlugin inputs.gitsigns-nvim "gitsigns.nvim")
-    (mkNvimPlugin inputs.conform-nvim "conform.nvim")
     (mkNvimPlugin inputs.vim-rooter "vim-rooter")
     (mkNvimPlugin inputs.toggleterm-nvim "toggleterm.nvim")
     (mkNvimPlugin inputs.nvim-spider "nvim-spider")
     (mkNvimPlugin inputs.fidget-nvim "fidget.nvim")
     (mkNvimPlugin inputs.quicker-nvim "quicker.nvim")
-    # (mkNvimPlugin inputs.avante-nvim "avante.nvim")
   ];
 
   commonPackages = with pkgs; [
@@ -108,6 +108,8 @@ let
 
     # Required packages
     nodejs_20 # For copilot
+
+    harper
   ];
 
   nodePackagesOpt =

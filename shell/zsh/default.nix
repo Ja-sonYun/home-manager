@@ -49,7 +49,7 @@
 
     localVariables = { };
 
-    initExtra =
+    initContent =
       let
         PS1 =
           let
@@ -61,6 +61,8 @@
           "${promptTime}${jobStatus}${directory}${symbol} ";
       in
       ''
+        set -o ignoreeof
+
         export PATH="$PATH:$HOME/.bin:$HOME/.local/bin:$HOME/go/bin"
 
         function zvm_after_init() {

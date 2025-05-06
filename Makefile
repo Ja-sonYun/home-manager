@@ -9,6 +9,10 @@ ifdef TRACE
 NIX_TRACE_ARGS := --show-trace
 endif
 
+update:
+	cd ./portable/neovim && nix flake update
+	nix flake update
+
 add:
 	git add .
 
