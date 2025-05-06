@@ -1,0 +1,51 @@
+% openssl, tls, ssl, cert
+
+# Generate RSA private key
+openssl genrsa -out <name>.key 2048
+
+# Generate password-protected RSA private key
+openssl genrsa -aes256 -out <name>.key 2048
+
+# Generate EC private key
+openssl ecparam -genkey -name <curve_name> -out <name>.key
+
+$ curve_name: echo "prime256v1 secp384r1 secp521r1" | tr ' ' '\n'
+
+# Generate certificate signing request (CSR)
+openssl req -new -key <name>.key -subj "/CN=<common_name>" -out <name>.csr
+
+# Self-sign certificate from CSR
+openssl x509 -req -in <name>.csr -signkey <name>.key -days 365 -out <name>.crt
+
+# View certificate details
+openssl x509 -in <cert_file> -text -noout
+
+# Check certificate validity period
+openssl x509 -in <cert_file> -noout -dates
+
+# Convert PEM to DER
+openssl x509 -in <cert.pem> -outform der -out <cert.der>
+
+# Convert DER to PEM
+openssl x509 -in <cert.der> -inform der -out <cert.pem>
+
+# Verify certificate chain
+openssl verify -CAfile <ca_bundle.crt> <server.crt>
+
+# Inspect remote server's SSL certificate
+openssl s_client -connect <domain>:443
+
+# Save SSL certificate from server
+openssl s_client -showcerts -connect <domain>:443 </dev/null 2>/dev/null | openssl x509 -outform PEM > <cert.pem>
+
+# Generate random hex
+openssl rand -hex <length>
+
+# Calculate SHA256 hash of a file
+openssl dgst -sha256 <file>
+
+# Encode file to base64
+openssl base64 -in <input_file> -out <output_file>
+
+# Decode file from base64
+openssl base64 -d -in <input_file> -out <output_file>

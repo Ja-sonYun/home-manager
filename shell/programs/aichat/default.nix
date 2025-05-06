@@ -2,6 +2,7 @@
   pkgs,
   userhome,
   cacheDir,
+  lib,
   ...
 }:
 let
@@ -43,8 +44,6 @@ let
       cp -r ${_llm-functions-src-derivation}/share/llm-functions/{agents,agents.txt,tools,tools.txt,mcp.json} ./
       cp -r agents agents.txt tools tools.txt mcp.json mcp utils scripts Argcfile.sh $out/share/llm-functions/
 
-      argc build
-
       cat > $out/bin/llm-function <<'EOF'
       #!/usr/bin/env bash
       # always run inside the local llm-functions directory
@@ -52,9 +51,6 @@ let
       export PATH=${pkgs.jq}/bin:$PATH
       export NODE_PATH=${nodeDependencies}/lib/node_modules:$NODE_PATH
       cd ${userhome}/.config/llm-functions
-      if [ ! -f functions.json ]; then
-        argc build
-      fi
       exec argc "$@"
       EOF
 
@@ -93,4 +89,11 @@ in
     target = ".config/llm-functions";
     source = "${llm-functions-derivation}/share/llm-functions";
   };
+
+  home.activation.llm-functions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    export PATH=${pythonPkgs}/bin:$PATH
+    export PATH=${pkgs.jq}/bin:$PATH
+    export PATH=${pkgs.argc}/bin:$PATH
+    cd ${userhome}/.config/llm-functions && argc build
+  '';
 }

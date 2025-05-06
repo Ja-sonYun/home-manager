@@ -16,6 +16,7 @@
       ./programs/visidata
       ./programs/ai
       ./programs/direnv
+      ./programs/navi
     ]
     ++ (
       if system == "aarch64-darwin" then

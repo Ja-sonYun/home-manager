@@ -1,0 +1,189 @@
+% git
+
+##############
+##BRANCH
+##############
+
+# List/show all branches, local and remote
+git branch -av
+
+# List/show local branches
+git branch
+
+# Delete/remove branch
+git branch -d <branch_name>
+
+##############
+##CHECKOUT
+##############
+
+# Create a new branch and switch
+git checkout -b <branch_name>
+
+# Checkout remote branch locally
+git checkout --track origin/<branch_name>
+
+# Checkout your own copy of <branch_name>
+git checkout -b <local_branch_name> origin/<branch_name_on_origin>
+
+##############
+##COMMIT
+##############
+
+# Amend/append to the previous commit
+git commit --amend
+
+##############
+##CONFIG
+##############
+
+# Set default editor
+git config --global core.editor <editor>
+
+# Eneble help store. Init credentials once.
+git config --global credential.helper store
+
+# Check your all git settings
+git config --list
+
+# Template for commit messages
+git config --global commit.template <path_to_dot_gitmessage_txt>
+
+# Set gitignore on global level
+git config --global core.excludesfile <path_to_gitignore_from_home>
+
+# Enable autocorrect for misstyped commands
+git config --global help.autocorrect 1
+
+# Set global/local username
+git config --<global_or_local> user.name "<your_username>"
+
+# Set global/local email address
+git config --<global_or_local> user.email "<your_email>"
+
+# Sign all commits using GPG verified
+git config --global commit.gpgsign true
+
+##############
+##CLONE
+##############
+
+# Clone a git repository
+git clone -b <branch_name> <repository> <clone_directory>
+
+# Clone repository with all submodules
+git clone --recurse-submodules --remote-submodules <repository>
+
+##############
+##LOCAL REPO
+##############
+
+# Show commits going to push
+git cherry -v
+
+##############
+##LOG
+##############
+
+# View/log commits
+git log --pretty=format:"%h - %an, %ar : %s"
+
+# View unpushed/local commits
+git log origin..
+
+##############
+##MERGE
+##############
+
+# Abort the current conflict resolution process, and try to reconstruct the pre-merge state.
+git merge --abort
+
+# Merge branch_name into current branch
+git merge <branch_name>
+
+##############
+##PULL
+##############
+
+# Force pull
+git reset --hard origin/<origin_remote_branch>
+
+##############
+##PUSH
+##############
+
+# Overwrites remote branch with local branch changes
+git push <remote_name> <branch_name> -f
+
+# Push all tags to remote
+git push origin --tags
+
+# Push via token
+git push https://<the_token>@github.com/tsologub/<repo_name>.git
+
+##############
+##REBASE
+##############
+
+# Rebase branch_name onto main
+git rebase main <branch_name>
+
+# Squash during rebase
+git rebase main <branch_name> -i
+
+##############
+##REMOTE REPO
+##############
+
+# Adds a remote for a git repository
+git remote add <remote_custom_name> <remote_url>
+
+# Renames a remote for a git repository
+git remote rename <old_remote_name> <new_remote_name>
+
+# Remove a remote for a git repository
+git remote remove <remote_name>
+
+##############
+##RESET
+##############
+
+# Reset/unstage a file. 
+git reset <filename>
+
+##############
+##REVERT
+##############
+
+# Revert a commit
+git revert <commit_id>
+
+##############
+##SUBMODULE
+##############
+
+# Update submodules.
+git submodule update --remote
+
+##############
+##TAG
+##############
+
+# List the available tags
+git tag
+
+# Create annotated tag
+git tag -a <tag_name> -m "<tagging_message>"
+
+# Create a lightweight tag
+git tag <tag_name>
+
+# Push a single tag
+git push origin <tag_name>
+
+##############
+##OTHERS
+##############
+
+# Remove local file under tracking
+git rm --cached <file_name> -f

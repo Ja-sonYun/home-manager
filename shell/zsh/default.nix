@@ -74,6 +74,8 @@
           if [[ $options[zle] = on ]]; then
             source ${pkgs.fzf}/share/fzf/completion.zsh
             source ${pkgs.fzf}/share/fzf/key-bindings.zsh
+
+            eval "$(${pkgs.navi}/bin/navi widget zsh)"
           fi
         }
 
@@ -87,7 +89,8 @@
       [ -f "$HOME/.env" ] && source "$HOME/.env"
     '';
 
-    profileExtra = '''';
+    profileExtra = ''
+    '';
   };
 
   programs.fzf = {
