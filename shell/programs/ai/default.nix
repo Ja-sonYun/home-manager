@@ -1,46 +1,9 @@
 {
   pkgs,
-  cacheDir,
   ...
 }:
-let
-  llamaindex-derivation = pkgs.stdenv.mkDerivation {
-    name = "llamaindex-venv";
-    unpackPhase = "true";
-    buildInputs = [ pkgs.python312 ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-    installPhase = ''
-      python3 -m venv $out/venv
-      source $out/venv/bin/activate
-      pip install llama-index llama-index-vector-stores-chroma
-      mkdir -p $out/bin
-      ln -s $out/venv/bin/llamaindex-cli $out/bin/llamaindex-cli
-      wrapProgram $out/bin/llamaindex-cli \
-        --set LLAMA_INDEX_CACHE_DIR ${cacheDir}/llama_index
-      deactivate
-    '';
-  };
-
-  openai-codex-derivation = pkgs.stdenv.mkDerivation {
-    name = "openai-codex-pkg";
-    unpackPhase = "true";
-    buildInputs = [ pkgs.nodejs ];
-    installPhase = ''
-      mkdir -p $out/bin
-      export HOME=$(pwd)
-      cd $out
-      npm config set strict-ssl false
-      npm install @openai/codex
-      npm cache clean --force
-      ln -s $out/node_modules/.bin/codex $out/bin/codex
-    '';
-  };
-in
 {
   home.packages = with pkgs; [
-    llamaindex-derivation
-    openai-codex-derivation
-
     aider-chat
   ];
 
