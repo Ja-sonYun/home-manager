@@ -1,21 +1,31 @@
-{ ... }:
+{ system, ... }:
 {
-  imports = [
-    ./zsh
-    ./core
+  imports =
+    [
+      ./zsh
+      ./core
 
-    ./analysis
+      ./analysis
 
-    ./programs/git
-    ./programs/git/utils.nix
-    # We'll use orbstack on macOS
-    # ./programs/docker
-    ./programs/jujutsu
-    ./programs/tmux
-    ./programs/visidata
-    ./programs/ai
-    ./programs/aichat
-    ./programs/direnv
-    ./programs/weechat
-  ];
+      ./programs/git
+      ./programs/git/utils.nix
+      # We'll use orbstack on macOS
+      # ./programs/docker
+      ./programs/jujutsu
+      ./programs/tmux
+      ./programs/visidata
+      ./programs/ai
+      ./programs/direnv
+    ]
+    ++ (
+      if system == "aarch64-darwin" then
+        [
+          ./programs/aichat
+          ./programs/weechat
+        ]
+      else if system == "x86_64-linux" then
+        [ ]
+      else
+        [ ]
+    );
 }
