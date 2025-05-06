@@ -80,6 +80,15 @@
           configDir = "/home/vagrant/dotfiles";
           cacheDir = "/home/vagrant/.nixcache/jasony";
         };
+        "jason-win" = {
+          system = "x86_64-linux";
+          username = "jasony";
+          useremail = "jason@abex.dev";
+          hostname = "jason-win";
+          userhome = "/home/jasony";
+          configDir = "/home/jasony/dotfiles";
+          cacheDir = "/home/jasony/.nixcache/jasony";
+        };
       };
 
       mkPkgsProvider =
@@ -116,6 +125,24 @@
             [ ]
         );
 
+      mkX86_63LinuxHomeConfiguration =
+        hostname:
+        opts@{
+          useNvidia ? false,
+          isVM ? false,
+        }:
+        let
+          extraSpecialArgs = specialArgsPrepared."${hostname}" // opts;
+          system = extraSpecialArgs.system;
+          pkgs = mkPkgsProvider system;
+        in
+        home-manager.lib.homeManagerConfiguration {
+          inherit extraSpecialArgs pkgs;
+          modules = [
+            # System configurations
+            ./hosts/x86_64-linux/core/nix-core.nix
+          ] ++ (mkHomeManagerConfig hostname);
+        };
     in
     {
       darwinConfigurations."JasonYuns-MacBook-Pro" =
@@ -167,21 +194,14 @@
           ];
         };
 
-      homeConfigurations."linux-devel" =
-        let
-          hostname = "linux-devel";
-          extraSpecialArgs = specialArgsPrepared."${hostname}";
-          system = extraSpecialArgs.system;
-          pkgs = mkPkgsProvider system;
-        in
-        home-manager.lib.homeManagerConfiguration {
-          inherit extraSpecialArgs pkgs;
-          modules = [
-            # System configurations
-            ./hosts/x86_64-linux/core/nix-core.nix
-
-          ] ++ (mkHomeManagerConfig hostname);
-        };
+      homeConfigurations."linux-devel" = mkX86_63LinuxHomeConfiguration "linux-devel" {
+        useNvidia = false;
+        isVM = true;
+      };
+      homeConfigurations."jason-win" = mkX86_63LinuxHomeConfiguration "jason-win" {
+        useNvidia = true;
+        isVM = false;
+      };
 
       overlays = builtins.attrValues (import ./overlays { inherit inputs; });
     };
