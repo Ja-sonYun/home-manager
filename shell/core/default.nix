@@ -48,6 +48,9 @@
 
     # My nvim config
     nvim-pkg
+
+    # Derivation generator
+    nodePackages.node2nix
   ];
 
   home.sessionVariables = {

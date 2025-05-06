@@ -5,72 +5,14 @@
   ...
 }:
 let
-  _llm-functions-src-derivation = pkgs.stdenv.mkDerivation {
-    name = "_llm-functions-src";
-    src = ./config/llm-functions;
-    installPhase = ''
-      mkdir -p $out/share/llm-functions
-      cp -r agents tools agents.txt tools.txt mcp.json $out/share/llm-functions/
-    '';
-  };
-
-  llm-functions = pkgs.buildNpmPackage rec {
-    pname = "llm-functions";
-    version = "0.1.0"; # you can set this dynamically if you want
-
-    src = pkgs.fetchFromGitHub {
-      owner = "sigoden";
-      repo = "llm-functions";
-      rev = "e5f9a9806cacd5795a25a80dac6150af818248eb";
-      sha256 = "sha256-orFuZvaddq1iTNFChgdk3B2cS8dZXmk6VOwR3f+0PUc=";
-    };
-
-    # point npm to the bridge folder so that `npm install` happens there
-    # and ensure `agents, tools, ...` are copied
-    # override the default phases:
-    phases = [
-      "unpackPhase"
-      "installPhase"
-      "fixupPhase"
-      "installCheckPhase"
-    ];
-
-    unpackPhase = ''
-      # Copy everything from our src
-      mkdir -p $sourceRoot
-      cp -r ${src}/* $sourceRoot
-    '';
-
-    installPhase = ''
-      # Install deps for the bridge
-      cd $sourceRoot/mcp/bridge
-      npm install --production
-      cd $sourceRoot
-
-      # Create final output
-      mkdir -p $out/share/llm-functions
-      cp -r agents agents.txt tools tools.txt mcp.json \
-            $out/share/llm-functions/
-
-      # Copy bridge node_modules
-      cp -r mcp/bridge/node_modules $out/share/llm-functions/mcp/bridge/
-    '';
-
-    fixupPhase = ''
-      # Remove lockfiles to slim
-      rm -f $out/share/llm-functions/mcp.json
-      rm -f $out/share/llm-functions/mcp/bridge/package-lock.json
-      rm -rf $out/share/llm-functions/mcp/bridge/node_modules/.package-lock.json
-    '';
-
-    # No tests by default
-    installCheckPhase = ''
-      # optional smoke test
-    '';
-
-    # Ensure Node.js is in PATH
-    buildInputs = [ pkgs.nodejs_20 ];
-  };
+  #_llm-functions-src-derivation = pkgs.stdenv.mkDerivation {
+  #  name = "_llm-functions-src";
+  #  src = ./config/llm-functions;
+  #  installPhase = ''
+  #    mkdir -p $out/share/llm-functions
+  #    cp -r agents tools agents.txt tools.txt mcp.json $out/share/llm-functions/
+  #  '';
+  #};
 
   #llm-functions-derivation = pkgs.stdenv.mkDerivation {
   #  name = "llm-functions";
@@ -102,7 +44,7 @@ let
   #    npm cache clean --force
 
   #    rm -f $out/share/llm-functions/mcp/bridge/package-lock.json
-  #    rm -f $out/share/llm-functions/mcp/bridge/node_modules/.package-lock.json
+  #    rm -f $out/share/llm-functions/mcp/bridge/node_modules/package-lock.json
 
   #    rm -f $out/share/llm-functions/mcp.json
 
@@ -141,7 +83,7 @@ in
 {
   home.packages = [
     aichat
-    llm-functions
+    # llm-functions-derivation
   ];
 
   home.file.aichatconf = {
@@ -150,9 +92,9 @@ in
     source = toString ./config/aichat;
   };
 
-  home.file.llm-functions = {
-    recursive = true;
-    target = ".config/llm-functions";
-    source = "${llm-functions}/share/llm-functions";
-  };
+  # home.file.llm-functions = {
+  #   recursive = true;
+  #   target = ".config/llm-functions";
+  #   source = "${llm-functions-derivation}/share/llm-functions";
+  # };
 }
