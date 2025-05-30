@@ -55,10 +55,6 @@
       url = "github:stevearc/quicker.nvim";
       flake = false;
     };
-    # avante-nvim = {
-    #   url = "github:yetone/avante.nvim";
-    #   flake = false;
-    # };
   };
 
   outputs =

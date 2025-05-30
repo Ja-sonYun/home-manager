@@ -36,6 +36,7 @@
                   with pkgs;
                   [
                     clang-tools
+                    astyle
                     cmake
                     codespell
                     conan
@@ -45,6 +46,11 @@
                     lcov
                     vcpkg
                     vcpkg-tool
+                    bear
+                    ccls
+                    ninja
+                    gcc
+                    cflow
                   ]
                   ++ (if system == "aarch64-darwin" then [ ] else [ gdb ]);
               };

@@ -1,22 +1,20 @@
 #!/bin/sh
 
-default_opts="alias.color=$LABEL_COLOR  \
-              drawing=on                \
-              padding_right=-20         \
-              padding_left=-2"
+function make_alias() {
+    local name="$1"
+    local click_script="$2"
 
-sketchybar --add alias "TextInputMenuAgent,Item-0" right \
-    --set "TextInputMenuAgent,Item-0" $default_opts \
-    click_script="open /System/Library/PreferencePanes/Keyboard.prefPane"
+    sketchybar --add alias "$1" right                                   \
+        --set "$1" alias.color=$LABEL_COLOR                             \
+                   drawing=on                                           \
+                   padding_right=-20                                    \
+                   padding_left=-2                                      \
+                   script='sketchybar --set calendar popup.drawing=off' \
+                   click_script="$click_script"                         \
+        --subscribe "$1" mouse.entered
+}
 
-sketchybar --add alias "Control Center,FocusModes" right \
-    --set "Control Center,FocusModes" $default_opts \
-    click_script="$PLUGIN_DIR/open_menubar_controlcenter"
-
-sketchybar --add alias "Control Center,WiFi" right \
-    --set "Control Center,WiFi" $default_opts \
-    click_script="$PLUGIN_DIR/open_menubar_controlcenter"
-
-sketchybar --add alias "WeatherMenu,Item-0" right \
-    --set "WeatherMenu,Item-0" $default_opts \
-    click_script="open /System/Applications/Weather.app"
+make_alias "TextInputMenuAgent,Item-0" "open /System/Library/PreferencePanes/Keyboard.prefPane"
+make_alias "Control Center,FocusModes" "$PLUGIN_DIR/open_menubar_controlcenter"
+make_alias "Control Center,WiFi"       "$PLUGIN_DIR/open_menubar_controlcenter"
+make_alias "WeatherMenu,Item-0"        "open /System/Applications/Weather.app"

@@ -1,10 +1,10 @@
 { username, userhome, ... }:
-
 {
   imports = [
     ./alacritty
     ./taskwarrior
     ./meetRecorder
+    ./icalPal
   ];
 
   # Home Manager needs a bit of information about you and the

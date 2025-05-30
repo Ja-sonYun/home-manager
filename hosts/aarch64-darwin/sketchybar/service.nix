@@ -1,13 +1,25 @@
-{ cacheDir, pkgs, config, ... }: {
+{
+  cacheDir,
+  pkgs,
+  config,
+  userhome,
+  ...
+}:
+let
+  # Copied from ../icalPal/default.nix
+  gemHome = "${userhome}/.local/share/gem/ruby/3.4.0";
+  icalPalHome = "${gemHome}/gems/icalPal-3.7.0";
+in
+{
   launchd.user.agents.sketchybar = {
     path = with pkgs; [
       gh
-      dasel
       sketchybar
       config.environment.systemPath
       flock
       yabai
       taskwarrior3
+      "${icalPalHome}/bin"
     ];
 
     environment = {

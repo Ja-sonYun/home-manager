@@ -1,4 +1,4 @@
-model: openai:o4-mini
+model: openai:gpt-4.1
 keybindings: vi
 
 clients:

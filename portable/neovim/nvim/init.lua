@@ -237,14 +237,6 @@ end)
 vim.keymap.set("n", "<C-s>r", "<ESC>*:%s///gc<left><left><left>")
 vim.keymap.set("n", "<C-s>R", "<ESC>*:%s///g<left><left>")
 
--- Terminal mappings
-vim.keymap.set("t", "<C-w>", "<C-\\><C-n><C-w>")
-vim.keymap.set("t", "<C-h>", "<C-\\><C-n><C-w>h")
-vim.keymap.set("t", "<C-j>", "<C-\\><C-n><C-w>j")
-vim.keymap.set("t", "<C-k>", "<C-\\><C-n><C-w>k")
-vim.keymap.set("t", "<C-l>", "<C-\\><C-n><C-w>l")
-vim.keymap.set("t", "<C-[>", "<C-\\><C-n>")
-
 -- Additional normal mode mapping
 vim.keymap.set("n", "<leader>e", ":Shell ")
 

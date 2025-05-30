@@ -6,6 +6,8 @@
     experimental-features = [
       "nix-command"
       "flakes"
+      "impure-derivations"
+      "ca-derivations"
     ];
 
     # substituers that will be considered before the official ones(https://cache.nixos.org)

@@ -41,7 +41,6 @@ in
       "sf-symbols"
       "discord"
       "google-chrome"
-      "chromium"
       "slack"
       "appcleaner"
       "drawio"
@@ -54,7 +53,9 @@ in
       "blender"
       "visual-studio-code"
       "obs"
-      "multipass"
+      "pdf-expert"
+      "raycast"
+      "alt-tab"
 
       "vagrant"
       "orbstack"

@@ -103,7 +103,7 @@ M.non_code = {
 
 M.lsp_servers = {
 	"typescript",
-	"css",
+	"cxx",
 	"go",
 	"lua",
 	"nix",

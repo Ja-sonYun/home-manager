@@ -52,25 +52,28 @@ let
       export NODE_PATH=${nodeDependencies}/lib/node_modules:$NODE_PATH
       cd ${userhome}/.config/llm-functions
       exec argc "$@"
+
+      unset -e
       EOF
 
       chmod +x $out/bin/llm-function
     '';
   };
 
-  aichat = pkgs.aichat.overrideAttrs (old: {
-    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
-    postInstall =
-      (old.postInstall or "")
-      + ''
-        wrapProgram $out/bin/aichat \
-          --set AICHAT_CONFIG_DIR ${toString ./config/aichat} \
-          --set AICHAT_PLATFORM openai \
-          --set AICHAT_ENV_FILE ${userhome}/.env \
-          --set AICHAT_SESSIONS_DIR ${cacheDir}/aichat \
-          --set AICHAT_FUNCTIONS_DIR ${userhome}/.config/llm-functions
-      '';
-  });
+  aichat = pkgs.symlinkJoin {
+    name = "aichat";
+    paths = [ pkgs.aichat ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+
+    postBuild = ''
+      wrapProgram $out/bin/aichat \
+            --set AICHAT_CONFIG_DIR ${toString ./config/aichat} \
+            --set AICHAT_PLATFORM openai \
+            --set AICHAT_ENV_FILE ${userhome}/.env \
+            --set AICHAT_SESSIONS_DIR ${cacheDir}/aichat \
+            --set AICHAT_FUNCTIONS_DIR ${userhome}/.config/llm-functions
+    '';
+  };
 in
 {
   home.packages = [

@@ -48,6 +48,9 @@
 
     # My nvim config
     nvim-pkg
+
+    nix-tree
+    nix-output-monitor
   ];
 
   home.sessionVariables = {

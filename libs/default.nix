@@ -23,4 +23,7 @@
       home = mergedConfigs.home;
     };
 
+  npm = import ./npm;
+  pip = import ./pip;
+  cargo = import ./cargo;
 }

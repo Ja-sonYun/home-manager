@@ -1,79 +1,91 @@
 local M = {}
 
---- Call the OpenAI API with the given texts and instruction.
---- @param texts string
---- @param instruction string
---- @param callback function
+-- openai.lua
+-- A tiny helper to call the OpenAI Chat Completions endpoint from Neovim.
+local uv = vim.uv or vim.loop
+
 M.call_api = function(texts, instruction, callback)
-  local api_key = vim.env.OPENAI_API_KEY
-  local api_base = 'https://api.openai.com/v1/chat/completions'
+	-- Validate callback
+	assert(type(callback) == "function", "`callback` must be a function")
 
-  -- Create the payload
-  local payload = {
-    model = 'gpt-4o',
-    messages = {
-      { role = 'system', content = instruction },
-      { role = 'user', content = texts },
-    },
-  }
-  if not instruction then
-    -- Remove the system message if no instruction is provided
-    table.remove(payload.messages, 1)
-  end
+	-- Validate API key
+	local api_key = vim.env.OPENAI_API_KEY
+	if not api_key or api_key == "" then
+		vim.schedule(function()
+			vim.notify("OPENAI_API_KEY environment variable is not set", vim.log.levels.ERROR)
+		end)
+		return
+	end
 
-  local json_payload = vim.fn.json_encode(payload)
+	-- Prepare chat messages
+	local messages = { { role = "user", content = texts } }
+	if instruction and instruction ~= "" then
+		table.insert(messages, 1, { role = "system", content = instruction })
+	end
 
-  -- Command arguments
-  local args = {
-    '-s',
-    '-H',
-    'Content-Type: application/json',
-    '-d',
-    json_payload,
-    '-H',
-    'Authorization: Bearer ' .. api_key,
-    api_base,
-  }
+	-- JSON payload
+	local payload = vim.fn.json_encode({
+		model = "gpt-4.1",
+		messages = messages,
+		stream = false,
+	})
 
-  -- Async process output handling
-  local stdout = vim.loop.new_pipe(false)
-  local stderr = vim.loop.new_pipe(false)
-  local result = {}
+	-- curl arguments (pass as argv → no shell-escaping headache)
+	local args = {
+		"-sS", -- silent, but still show HTTP errors
+		"-f", -- fail if HTTP status ≥400
+		"-H",
+		"Content-Type: application/json",
+		"-H",
+		"Authorization: Bearer " .. api_key,
+		"-d",
+		payload,
+		"https://api.openai.com/v1/chat/completions",
+	}
 
-  local handle = vim.loop.spawn('curl', {
-    args = args,
-    stdio = { nil, stdout, stderr },
-  }, function(code)
-    stdout:close()
-    stderr:close()
-    if code ~= 0 then
-      print('Error: GPT API call failed with code ' .. code)
-      return
-    end
+	-- Pipes & handle
+	local stdout, stderr = uv.new_pipe(false), uv.new_pipe(false)
+	local chunks = {}
+	local handle
+	handle = uv.spawn("curl", { args = args, stdio = { nil, stdout, stderr } }, function(code)
+		stdout:close()
+		stderr:close()
+		handle:close()
 
-    vim.schedule(function()
-      local response = vim.fn.json_decode(table.concat(result))
-      local text = response.choices[1].message.content
-      -- remove byte strings from the text lkie <80> and <82>
-      text = string.gsub(text, '<%d+>', '')
-      callback(text)
-    end)
-  end)
+		if code ~= 0 then
+			vim.schedule(function()
+				vim.notify(("OpenAI request failed (exit %d)"):format(code), vim.log.levels.ERROR)
+			end)
+			return
+		end
 
-  -- Read data from stdout
-  vim.loop.read_start(stdout, function(err, data)
-    assert(not err, err)
-    if data then
-      table.insert(result, data)
-    end
-  end)
+		vim.schedule(function()
+			local ok, resp = pcall(vim.fn.json_decode, table.concat(chunks))
+			if not ok or not (resp and resp.choices) then
+				vim.notify("Failed to parse OpenAI response", vim.log.levels.ERROR)
+				return
+			end
+			local text = resp.choices[1].message.content:gsub("<%d+>", "")
+			callback(text)
+		end)
+	end)
 
-  -- Read data from stderr (for error messages)
-  vim.loop.read_start(stderr, function(err, data)
-    if data then
-      print('stderr: ', data)
-    end
-  end)
+	-- Read stdout
+	uv.read_start(stdout, function(err, data)
+		assert(not err, err)
+		if data then
+			table.insert(chunks, data)
+		end
+	end)
+
+	-- Read stderr (show as Neovim notifications)
+	uv.read_start(stderr, function(_, data)
+		if data then
+			vim.schedule(function()
+				vim.notify("[OpenAI stderr] " .. data, vim.log.levels.WARN)
+			end)
+		end
+	end)
 end
 
 return M

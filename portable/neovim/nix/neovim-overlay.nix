@@ -82,7 +82,6 @@ let
 
     # octo-nvim
     telescope-nvim
-    fzf-lua
     avante-nvim
 
     markdown-preview-nvim
@@ -110,6 +109,7 @@ let
     nodejs_20 # For copilot
 
     harper
+    ctags
   ];
 
   nodePackagesOpt =

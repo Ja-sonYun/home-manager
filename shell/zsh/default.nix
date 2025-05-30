@@ -267,7 +267,7 @@
             cat "${configDir}/templates/$2/flake.nix"
             ;;
           *)
-            echo "Usage: templates [list|echo]"
+            echo "Usage: templates [list|echo|direnv] [template_name]"
             ;;
         esac
       '';

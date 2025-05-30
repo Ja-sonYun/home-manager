@@ -9,7 +9,7 @@ require("avante").setup({
 	-- currently designating it as `copilot` provider is dangerous because: https://github.com/yetone/avante.nvim/issues/1048
 	-- Of course, you can reduce the request frequency by increasing `suggestion.debounce`.
 	auto_suggestions_provider = "openai",
-	cursor_applying_provider = nil, -- The provider used in the applying phase of Cursor Planning Mode, defaults to nil, when nil uses Config.provider as the provider for the applying phase
+	cursor_applying_provider =  "openai", -- The provider used in Cursor Planning Mode
 	-- claude = {
 	-- 	endpoint = "https://api.anthropic.com",
 	-- 	model = "claude-3-5-sonnet-20241022",
@@ -18,9 +18,9 @@ require("avante").setup({
 	-- },
 	openai = {
 		endpoint = "https://api.openai.com/v1",
-		model = "gpt-4.1",
+		model = "o4-mini",
 		temperature = 0,
-		max_tokens = 4096,
+    max_completion_tokens = 8192,
 	},
 	rag_service = {
 		enabled = true, -- Enables the RAG service
@@ -54,7 +54,7 @@ require("avante").setup({
 		support_paste_from_clipboard = false,
 		minimize_diff = true, -- Whether to remove unchanged lines when applying a code block
 		enable_token_counting = true, -- Whether to enable token counting. Default to true.
-		enable_cursor_planning_mode = false, -- Whether to enable Cursor Planning Mode. Default to false.
+		enable_cursor_planning_mode = true, -- Whether to enable Cursor Planning Mode. Default to false.
 		enable_claude_text_editor_tool_mode = false, -- Whether to enable Claude Text Editor Tool Mode.
 	},
 	mappings = {
@@ -87,6 +87,7 @@ require("avante").setup({
 			insert = { "<C-c>" },
 		},
 		ask = "\\aa",
+    new_ask = "\\an",
 		edit = "\\ae",
 		refresh = "\\ar",
 		focus = "\\af",

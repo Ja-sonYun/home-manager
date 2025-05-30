@@ -1,4 +1,4 @@
-{ configDir, ... }:
+{ configDir, username, ... }:
 
 ###################################################################################
 #
@@ -11,8 +11,10 @@
 {
   system = {
     stateVersion = 5;
+    primaryUser = username;
+
     # activationScripts are executed every time you boot the system or run `nixos-rebuild` / `darwin-rebuild`.
-    activationScripts.postUserActivation.text = ''
+    activationScripts.reloadMacSettings.text = ''
       # activateSettings -u will reload the settings from the database and apply them to the current session,
       # so we do not need to logout and login again to make the changes take effect.
       /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
@@ -51,8 +53,9 @@
       dock = {
         autohide = true;
 
-        wvous-tr-corner = 12; # Show notification center
+        # wvous-tr-corner = 12; # Show notification center
         # Disable hot corner
+        wvous-tr-corner = 1; # Show notification center
         wvous-tl-corner = 1;
         wvous-br-corner = 1;
         wvous-bl-corner = 1;

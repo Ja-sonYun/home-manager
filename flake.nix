@@ -10,24 +10,22 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/release-24.11";
-    nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-24.11-darwin";
-
-    agenix.url = "github:ryantm/agenix";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/release-25.05";
 
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     darwin = {
-      url = "github:lnl7/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs-darwin";
+      url = "github:nix-darwin/nix-darwin/master";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Nix-Homebrew to install casks
     nix-homebrew = {
-      url = "github:zhaofengli-wip/nix-homebrew";
+      url = "github:zhaofengli/nix-homebrew";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     homebrew-bundle = {
       url = "github:homebrew/homebrew-bundle";
@@ -51,7 +49,6 @@
       nixpkgs,
       nixpkgs-stable,
       darwin,
-      agenix,
       home-manager,
       nix-homebrew,
       homebrew-bundle,
@@ -70,6 +67,7 @@
           userhome = "/Users/jasonyun";
           configDir = "/Users/jasonyun/dotfiles";
           cacheDir = "/Users/jasonyun/.nixcache/jasony";
+          libs = import ./libs;
         };
         "linux-devel" = {
           system = "x86_64-linux";
@@ -79,6 +77,7 @@
           userhome = "/home/vagrant";
           configDir = "/home/vagrant/dotfiles";
           cacheDir = "/home/vagrant/.nixcache/jasony";
+          libs = import ./libs;
         };
         "jason-win" = {
           system = "x86_64-linux";
@@ -88,6 +87,7 @@
           userhome = "/home/jasony";
           configDir = "/home/jasony/dotfiles";
           cacheDir = "/home/jasony/.nixcache/jasony";
+          libs = import ./libs;
         };
       };
 
@@ -125,7 +125,7 @@
             [ ]
         );
 
-      mkX86_63LinuxHomeConfiguration =
+      mkX86_64LinuxHomeConfiguration =
         hostname:
         opts@{
           useNvidia ? false,
@@ -186,19 +186,14 @@
                 autoMigrate = true;
               };
             }
-
-            agenix.nixosModules.default
-            {
-              environment.systemPackages = [ agenix.packages."${system}".default ];
-            }
           ];
         };
 
-      homeConfigurations."linux-devel" = mkX86_63LinuxHomeConfiguration "linux-devel" {
+      homeConfigurations."linux-devel" = mkX86_64LinuxHomeConfiguration "linux-devel" {
         useNvidia = false;
         isVM = true;
       };
-      homeConfigurations."jason-win" = mkX86_63LinuxHomeConfiguration "jason-win" {
+      homeConfigurations."jason-win" = mkX86_64LinuxHomeConfiguration "jason-win" {
         useNvidia = true;
         isVM = false;
       };

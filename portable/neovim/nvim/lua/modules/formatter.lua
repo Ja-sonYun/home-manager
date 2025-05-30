@@ -46,10 +46,10 @@ M.format_with_command = function(cmd_list, opts)
 		for _, cmd in ipairs(cmd_list) do
 			local command = cmd:gsub("%%", tmpfile)
 			command = "cd " .. opts.dir .. " && " .. command
-			local _ = vim.fn.system(command)
+			local ret_msg = vim.fn.system(command)
 			if vim.v.shell_error ~= 0 then
 				-- propagate error to outer pcall
-				error("formatter exited with code " .. vim.v.shell_error)
+				error(ret_msg)
 			end
 		end
 		-- read formatted result

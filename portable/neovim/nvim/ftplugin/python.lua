@@ -1,4 +1,4 @@
-require("modules.util").set_buffer_opts({ width = 4, is_code = true })
+require("modules.utils").set_buffer_opts({ width = 4, is_code = true })
 
 local python_executable, python_dir = require("modules.resolver").get_python_path()
 
