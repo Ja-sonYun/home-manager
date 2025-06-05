@@ -211,6 +211,7 @@ let
       [
         shellcheck
         shfmt
+        bash-language-server
       ]
     else
       [ ];

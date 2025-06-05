@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 {
   home.shellAliases = {
     js = "jj st --no-pager";
@@ -6,6 +6,9 @@
     jd = "jj describe";
     jg = "jj git";
   };
+  home.packages = with pkgs; [
+    jjui
+  ];
 
   programs.jujutsu = {
     enable = true;

@@ -23,7 +23,7 @@ require("avante").setup({
     max_completion_tokens = 8192,
 	},
 	rag_service = {
-		enabled = true, -- Enables the RAG service
+		enabled = false, -- Enables the RAG service
 		host_mount = os.getenv("HOME"), -- Host mount path for the rag service
 		provider = "openai", -- The provider to use for RAG service (e.g. openai or ollama)
 		llm_model = "gpt-4.1", -- The LLM model to use for RAG service
