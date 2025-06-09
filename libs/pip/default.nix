@@ -6,6 +6,12 @@
       pythonVersion ? "312",
       packages ? [ ], # List of packages to install, e.g. ["numpy" "pandas" "scipy==1.10.1"]
       exposedBinaries ? [ ],
+      buildInputs ? [ ],
+      postFixup ?
+        {
+          python ? null,
+        }:
+        "",
       outputHash ? null,
       ...
     }:
@@ -89,10 +95,13 @@
       inherit name version pname;
       src = tarball;
       dontUnpack = true;
-      nativeBuildInputs = with pkgs; [
-        gnutar
-        pkgs."python${pythonVersion}"
-      ];
+      nativeBuildInputs =
+        with pkgs;
+        [
+          gnutar
+          pkgs."python${pythonVersion}"
+        ]
+        ++ buildInputs;
 
       installPhase = ''
         runHook preInstall
@@ -114,9 +123,13 @@
 
         runHook postInstall
       '';
-      postFixup = ''
-        # Patch every shebang inside $out to use store path node
-        patchShebangs $out
-      '';
+      postFixup =
+        ''
+          patchShebangs $out
+          cd $out
+        ''
+        + (postFixup {
+          python = pkgs."python${pythonVersion}";
+        });
     };
 }

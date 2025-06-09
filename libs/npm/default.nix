@@ -6,6 +6,12 @@
       system,
       packages ? [ ], # List of packages to install, e.g. ["npm" "yarn" "express@latest"]
       exposedBinaries ? [ ],
+      buildInputs ? [ ],
+      postFixup ?
+        {
+          node ? null,
+        }:
+        "",
       outputHash ? null,
       nodeVersion ? "22",
       ...
@@ -83,10 +89,13 @@
       inherit name version pname;
       src = tarball;
       dontUnpack = true;
-      nativeBuildInputs = with pkgs; [
-        gnutar
-        nodeBinary
-      ];
+      nativeBuildInputs =
+        with pkgs;
+        [
+          gnutar
+          nodeBinary
+        ]
+        ++ buildInputs;
 
       installPhase = ''
         runHook preInstall
@@ -107,9 +116,13 @@
 
         runHook postInstall
       '';
-      postFixup = ''
-        # Patch every shebang inside $out to use store path node
-        patchShebangs $out
-      '';
+      postFixup =
+        ''
+          patchShebangs $out
+          cd $out
+        ''
+        + (postFixup {
+          node = nodeBinary;
+        });
     };
 }

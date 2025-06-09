@@ -14,20 +14,7 @@ let
     exposedBinaries = [
       "codex"
     ];
-    outputHash = "sha256-uMitqAbIxE2Ypp3KRcgUtvMgkSuT630uTTcndFz8ONM=";
-  };
-  llama-index = libs.pip.mkPipGlobalPackageDerivation {
-    inherit pkgs system;
-    name = "llama-index";
-    packages = [
-      "llama-index==0.12.36"
-      "llama-index-vector-stores-chroma"
-      "setuptools>=40.8.0"
-    ];
-    exposedBinaries = [
-      "llamaindex-cli"
-    ];
-    outputHash = "sha256-Fe3nf5pW3NReCnFOHYlGL29hCOqmOWIJEXX9jjXKRgg=";
+    outputHash = "sha256-zvAOUNvi8iudYsOBwHOpDTYx++rn8MODhLHWpOVqHGQ=";
   };
   llm = libs.pip.mkPipGlobalPackageDerivation {
     inherit pkgs system;
@@ -39,42 +26,33 @@ let
     exposedBinaries = [
       "llm"
     ];
-    outputHash = "sha256-6nwJ3UwuU+VrhTlBLE/lCwNTBMAUo+NUv/44iQzZU7I=";
+    outputHash = "sha256-RGV0E65ioLick5aJ8ZqGfdWFoZWYhiqTeFNAYEWNjok=";
+  };
+  claude-code = libs.npm.mkNpmGlobalPackageDerivation {
+    inherit pkgs system;
+    name = "claude-code";
+    packages = [
+      "@anthropic-ai/claude-code@1.0.17"
+    ];
+    exposedBinaries = [
+      "claude"
+    ];
+    postFixup =
+      {
+        node,
+      }:
+      ''
+        # Use global env rather than coreutils's env
+        sed -i '1s@^#!/.*/env.*@#!/usr/bin/env -S ${node}/bin/node --no-warnings --enable-source-maps @' node_modules/claude-code/lib/node_modules/@anthropic-ai/claude-code/cli.js
+      '';
+    outputHash = "sha256-7q6+8yXAqFSOm9yCObssaLcfZubNr9dXe6OsHXF/1iw=";
   };
 in
 {
   home.packages = with pkgs; [
-    aider-chat
     codex
-    llama-index
+    claude-code
     llm
+    ollama
   ];
-
-  home.file.aidersettings = {
-    target = ".aider.model.settings.yml";
-    text = ''
-      - name: o4-mini
-        edit_format: diff
-        weak_model_name: gpt-4.1-mini
-        use_repo_map: true
-        examples_as_sys_msg: true
-        use_temperature: false
-        editor_model_name: gpt-4.1
-        editor_edit_format: editor-diff
-        system_prompt_prefix: 'Formatting re-enabled. '
-        accepts_settings:
-        - reasoning_effort
-    '';
-  };
-  home.file.aiderconf = {
-    target = ".aider.conf.yml";
-    text = ''
-      dark-mode: true
-      auto-commits: false
-      notifications: true
-      yes-always: true
-      model: o4-mini
-      model-settings-file: ~/.aider.model.settings.yml
-    '';
-  };
 }

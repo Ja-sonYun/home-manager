@@ -4,24 +4,24 @@ end
 
 require("avante").setup({
 	---@alias Provider "claude" | "openai" | "azure" | "gemini" | "cohere" | "copilot" | string
-	provider = "openai", -- The provider used in Aider mode or in the planning phase of Cursor Planning Mode
+	provider = "openai",
+	providers = {
+		openai = {
+			endpoint = "https://api.openai.com/v1",
+			model = "o4-mini",
+		},
+	}, -- The provider used in Aider mode or in the planning phase of Cursor Planning Mode
 	-- WARNING: Since auto-suggestions are a high-frequency operation and therefore expensive,
 	-- currently designating it as `copilot` provider is dangerous because: https://github.com/yetone/avante.nvim/issues/1048
 	-- Of course, you can reduce the request frequency by increasing `suggestion.debounce`.
 	auto_suggestions_provider = "openai",
-	cursor_applying_provider =  "openai", -- The provider used in Cursor Planning Mode
+	cursor_applying_provider = "openai", -- The provider used in Cursor Planning Mode
 	-- claude = {
 	-- 	endpoint = "https://api.anthropic.com",
 	-- 	model = "claude-3-5-sonnet-20241022",
 	-- 	temperature = 0,
 	-- 	max_tokens = 4096,
 	-- },
-	openai = {
-		endpoint = "https://api.openai.com/v1",
-		model = "o4-mini",
-		temperature = 0,
-    max_completion_tokens = 8192,
-	},
 	rag_service = {
 		enabled = false, -- Enables the RAG service
 		host_mount = os.getenv("HOME"), -- Host mount path for the rag service
@@ -87,7 +87,7 @@ require("avante").setup({
 			insert = { "<C-c>" },
 		},
 		ask = "\\aa",
-    new_ask = "\\an",
+		new_ask = "\\an",
 		edit = "\\ae",
 		refresh = "\\ar",
 		focus = "\\af",

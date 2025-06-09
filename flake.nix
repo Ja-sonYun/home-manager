@@ -17,6 +17,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    home-manager-stable = {
+      url = "github:nix-community/home-manager/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
+
     darwin = {
       url = "github:nix-darwin/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -46,14 +51,19 @@
   outputs =
     inputs@{
       self,
+
       nixpkgs,
-      nixpkgs-stable,
-      darwin,
       home-manager,
+
+      nixpkgs-stable,
+      home-manager-stable,
+
+      darwin,
       nix-homebrew,
       homebrew-bundle,
       homebrew-core,
       homebrew-cask,
+
       neovim,
       ...
     }:
@@ -143,9 +153,11 @@
             ./hosts/x86_64-linux/core/nix-core.nix
           ] ++ (mkHomeManagerConfig hostname);
         };
-    in
-    {
-      darwinConfigurations."JasonYuns-MacBook-Pro" =
+
+      mkAarch64DarwinHomeConfiguration =
+        hostname:
+        opts@{
+        }:
         let
           hostname = "JasonYuns-MacBook-Pro";
           specialArgs = specialArgsPrepared."${hostname}";
@@ -188,6 +200,12 @@
             }
           ];
         };
+    in
+    {
+      darwinConfigurations."JasonYuns-MacBook-Pro" =
+        mkAarch64DarwinHomeConfiguration "JasonYuns-MacBook-Pro"
+          {
+          };
 
       homeConfigurations."linux-devel" = mkX86_64LinuxHomeConfiguration "linux-devel" {
         useNvidia = false;

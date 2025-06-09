@@ -55,7 +55,6 @@ in
       "obs"
       "pdf-expert"
       "raycast"
-      "alt-tab"
 
       "vagrant"
       "orbstack"
