@@ -1,6 +1,14 @@
 return {
 	cmd = { "pyright-langserver", "--stdio" },
-	root_markers = require("modules.constant").root_markers,
+	root_markers = {
+		"pyproject.toml",
+		"setup.py",
+		"setup.cfg",
+		"Pipfile",
+		"Pipfile.lock",
+		"requirements.txt",
+		".venv",
+	},
 	filetypes = { "python" },
 	settings = {
 		python = {

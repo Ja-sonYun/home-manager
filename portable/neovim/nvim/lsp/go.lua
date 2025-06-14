@@ -1,5 +1,8 @@
 return {
 	cmd = { "gopls", "serve" },
-	root_markers = require("modules.constant").root_markers,
+	root_markers = {
+		"go.mod",
+		"go.work",
+	},
 	filetypes = { "go" },
 }

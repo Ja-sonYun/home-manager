@@ -55,6 +55,8 @@ in
       "obs"
       "pdf-expert"
       "raycast"
+      "jump"
+      "utm"
 
       "vagrant"
       "orbstack"

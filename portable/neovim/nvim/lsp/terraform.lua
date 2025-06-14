@@ -1,5 +1,10 @@
 return {
 	cmd = { "terraform-ls", "serve" },
-	root_markers = require("modules.constant").root_markers,
+	root_markers = {
+		"terraform.rc",
+		".terraformrc",
+		"main.tf",
+		"versions.tf",
+	},
 	filetypes = { "hcl", "tf", "tfvars", "terraform" },
 }

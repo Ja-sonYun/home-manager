@@ -55,4 +55,21 @@ in
     llm
     ollama
   ];
+
+  programs.zshFunc = {
+    claude-aws = {
+      description = "Setup AWS credentials for Claude";
+      command = ''
+        if [ "$1" = "login" ]; then
+          ${pkgs.awscli2}/bin/aws sso login --profile bedrock
+          exit 0
+        fi
+        export ANTHROPIC_MODEL='us.anthropic.claude-sonnet-4-20250514-v1:0'
+        export ANTHROPIC_SMALL_FAST_MODEL='us.anthropic.claude-3-5-haiku-20241022-v1:0'
+        export CLAUDE_CODE_USE_BEDROCK=1
+        export AWS_PROFILE=bedrock
+        claude "$@"
+      '';
+    };
+  };
 }

@@ -1,6 +1,10 @@
 return {
 	cmd = { "lua-language-server" },
-	root_markers = require("modules.constant").root_markers,
+	root_markers = {
+		"lua-language-server.json",
+		".git",
+		".luarc.json",
+	},
 	filetypes = { "lua" },
 	settings = {
 		Lua = {

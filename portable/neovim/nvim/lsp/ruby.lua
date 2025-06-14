@@ -1,5 +1,10 @@
 return {
 	cmd = { "ruby-lsp" },
-	root_markers = require("modules.constant").root_markers,
+	root_markers = {
+		"Gemfile",
+		"Gemfile.lock",
+		".ruby-version",
+		".ruby-gemset",
+	},
 	filetypes = { "ruby" },
 }

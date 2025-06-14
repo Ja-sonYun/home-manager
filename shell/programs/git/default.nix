@@ -117,6 +117,7 @@
       "compile_commands.json"
 
       ".aider*"
+      ".claude"
     ];
 
     includes = [

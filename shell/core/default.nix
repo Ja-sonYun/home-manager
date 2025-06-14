@@ -41,6 +41,10 @@
     nix-search-cli
     viu
 
+    lazygit
+
+    comma
+
     httpie
     wget
 
@@ -50,6 +54,7 @@
     nvim-pkg
 
     nix-tree
+    nix-index
     nix-output-monitor
   ];
 
