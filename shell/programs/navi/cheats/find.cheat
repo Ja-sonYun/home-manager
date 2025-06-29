@@ -1,0 +1,23 @@
+% find, search, files
+
+# Find files by name (case insensitive)
+find <directory> -iname "<pattern>"
+
+# Find files modified in the last N days
+find <directory> -mtime -<days>
+
+# Find files by size (larger than)
+find <directory> -size +<size>
+
+# Find files and execute command on each
+find <directory> -name "<pattern>" -exec <command> {} \;
+
+# Find files excluding a directory
+find <directory> -path <exclude_dir> -prune -o -name "<pattern>" -print
+
+$ directory: pwd
+$ pattern: echo "*.txt"
+$ days: echo "7"
+$ size: echo "10M"
+$ command: echo "ls -la"
+$ exclude_dir: echo "./node_modules"

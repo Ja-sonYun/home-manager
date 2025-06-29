@@ -1,0 +1,24 @@
+% text, sed, awk, grep, string, manipulation
+
+# Replace text in file (in-place)
+sed -i 's/<search>/<replace>/g' <file>
+
+# Search recursively in directory
+grep -r '<pattern>' <directory>
+
+# Extract column with awk
+awk '{print $<column>}' <file>
+
+# Sort and count unique lines
+sort <file> | uniq -c | sort -nr
+
+# Pretty print JSON
+jq '.' <json_file>
+
+$ file: ls -1 *.txt 2>/dev/null || echo "file.txt"
+$ search: echo "old_text"
+$ replace: echo "new_text"
+$ pattern: echo "ERROR"
+$ directory: echo "."
+$ column: echo "2"
+$ json_file: ls -1 *.json 2>/dev/null || echo "data.json"

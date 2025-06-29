@@ -1,36 +1,4 @@
-local non_code = {
-	"*.so",
-	"*.o",
-	"*.obj",
-	"*.dylib",
-	"*.bin",
-	"*.dll",
-	"*.exe",
-	"*/.git/**",
-	"*/.svn/**",
-	"*/.venv/**",
-	"*/__pycache__/*",
-	"*/build/**",
-	"*.jpg",
-	"*.png",
-	"*.jpeg",
-	"*.bmp",
-	"*.gif",
-	"*.tiff",
-	"*.svg",
-	"*.ico",
-	"*.pyc",
-	"*.pkl",
-	"*.DS_Store",
-	"*.aux",
-	"*.bbl",
-	"*.blg",
-	"*.brf",
-	"*.fls",
-	"*.fdb_latexmk",
-	"*.synctex.gz",
-	"*.xdv",
-}
+local constant = require("modules.constant")
 
 -----------------------------------------------------------
 vim.g.logging_level = "info"
@@ -58,7 +26,7 @@ vim.opt.virtualedit = "block"
 -----------------------------------------------------------
 -- Ignore certain files and folders when globing
 -----------------------------------------------------------
-vim.opt.wildignore:append(non_code)
+vim.opt.wildignore:append(constant.non_code)
 vim.opt.wildignorecase = true
 
 -----------------------------------------------------------
@@ -66,7 +34,7 @@ vim.opt.wildignorecase = true
 -----------------------------------------------------------
 vim.g.backupdir = vim.fn.expand(vim.fn.stdpath("data") .. "/backup//")
 vim.opt.backupdir = vim.g.backupdir
-vim.opt.backupskip = non_code
+vim.opt.backupskip = constant.non_code
 vim.opt.backup = true
 vim.opt.backupcopy = "yes"
 
@@ -108,6 +76,7 @@ vim.opt.linebreak = true -- Wrap on word boundary
 vim.opt.termguicolors = false -- Enable 24-bit RGB colors
 vim.opt.ruler = true
 vim.opt.scrolloff = 3
+vim.opt.jumpoptions = "stack"
 
 -----------------------------------------------------------
 -- Tabs, indent
@@ -269,14 +238,6 @@ end)
 vim.keymap.set("n", "<C-s>r", "<ESC>*:%s///gc<left><left><left>")
 vim.keymap.set("n", "<C-s>R", "<ESC>*:%s///g<left><left>")
 
--- Terminal mappings
-vim.keymap.set("t", "<C-w>", "<C-\\><C-n><C-w>")
-vim.keymap.set("t", "<C-h>", "<C-\\><C-n><C-w>h")
-vim.keymap.set("t", "<C-j>", "<C-\\><C-n><C-w>j")
-vim.keymap.set("t", "<C-k>", "<C-\\><C-n><C-w>k")
-vim.keymap.set("t", "<C-l>", "<C-\\><C-n><C-w>l")
-vim.keymap.set("t", "<C-[>", "<C-\\><C-n>")
-
 -- Additional normal mode mapping
 vim.keymap.set("n", "<leader>e", ":Shell ")
 
@@ -320,3 +281,140 @@ vim.api.nvim_set_hl(0, "Search", { ctermfg = "black", ctermbg = "yellow" })
 vim.api.nvim_set_hl(0, "Pmenu", { ctermbg = 238 })
 vim.api.nvim_set_hl(0, "FloatBorder", { ctermfg = 3 })
 vim.api.nvim_set_hl(0, "MatchParen", { ctermbg = 238, ctermfg = 3, underline = true })
+
+-----------------------------------------------------------
+-- Enable LSPs
+-----------------------------------------------------------
+---[[AUTOCOMPLETION SETUP
+vim.o.complete = ".,t"
+vim.o.completeopt = "menu,menuone,noselect,noinsert,popup,fuzzy"
+
+---[[ Setup keymaps so we can accept completion using Enter and choose items using Tab.
+local pumMaps = {
+	["<Tab>"] = "<C-n>",
+	["<S-Tab>"] = "<C-p>",
+	["<CR>"] = "<C-y>",
+}
+for insertKmap, pumKmap in pairs(pumMaps) do
+	vim.keymap.set("i", insertKmap, function()
+		return vim.fn.pumvisible() == 1 and pumKmap or insertKmap
+	end, { expr = true })
+end
+---]]
+
+-- insert mode autocomplete
+local group = vim.api.nvim_create_augroup("ins-autocomplete", {})
+local complete_in_progress = false
+
+local lsp_triggers = { ".", ":", ">", "(", "," }
+
+vim.api.nvim_create_autocmd("InsertCharPre", {
+	desc = "filepath & lsp & keyword completion",
+	group = group,
+	callback = function(args)
+		if
+			complete_in_progress
+			or vim.fn.pumvisible() ~= 0
+			or vim.tbl_contains({ "terminal", "prompt", "help" }, vim.bo[args.buf].buftype)
+		then
+			return
+		end
+
+		complete_in_progress = true -- lock
+
+		if vim.v.char == "/" then
+			vim.api.nvim_feedkeys(vim.keycode("<C-X><C-F>"), "ni", false)
+		elseif vim.tbl_contains(lsp_triggers, vim.v.char) then
+			vim.schedule(function()
+				if
+					vim.lsp.get_clients({
+						bufnr = args.buf,
+						method = vim.lsp.protocol.Methods.textDocument_completion,
+					})[1]
+				then
+					vim.lsp.completion.get()
+				end
+				complete_in_progress = false
+			end)
+			return
+		elseif
+			not vim.tbl_isempty(vim.lsp.get_clients({
+				bufnr = args.buf,
+				method = vim.lsp.protocol.Methods.textDocument_completion,
+			}))
+		then
+			vim.lsp.completion.get()
+		elseif vim.fn.match(vim.v.char, [[\k]]) ~= -1 then
+			vim.api.nvim_feedkeys(vim.keycode("<C-N>"), "ni", false)
+		end
+	end,
+})
+
+vim.api.nvim_create_autocmd("TextChangedI", {
+	desc = "multi-char trigger completion",
+	group = group,
+	callback = function(args)
+		if complete_in_progress or vim.fn.pumvisible() ~= 0 then
+			complete_in_progress = false
+			return
+		end
+
+		local _, col = unpack(vim.api.nvim_win_get_cursor(0))
+		if col < 2 then
+			return
+		end
+
+		local line = vim.api.nvim_get_current_line()
+		local two_char = line:sub(col - 1, col)
+
+		local multi_triggers = { "::", "->", "?." }
+		if vim.tbl_contains(multi_triggers, two_char) then
+			if
+				vim.lsp.get_clients({
+					bufnr = args.buf,
+					method = vim.lsp.protocol.Methods.textDocument_completion,
+				})[1]
+			then
+				vim.lsp.completion.get()
+			end
+		end
+
+		complete_in_progress = false
+	end,
+})
+
+vim.api.nvim_create_autocmd("LspAttach", {
+	desc = "auto enable lsp completion if capable",
+	group = group,
+	callback = function(args)
+		local client_id = args.data.client_id
+		local client = vim.lsp.get_client_by_id(client_id)
+		if client:supports_method(vim.lsp.protocol.Methods.textDocument_completion) then
+			vim.lsp.completion.enable(true, client_id, args.buf)
+		end
+	end,
+})
+
+-- Enable all
+vim.lsp.enable(constant.lsp_servers)
+
+vim.cmd([[
+augroup diffcolors
+  autocmd!
+  autocmd Colorscheme * call s:SetDiffHighlights()
+augroup END
+
+function! s:SetDiffHighlights()
+  if &background == "dark"
+    highlight DiffAdd gui=bold guifg=none guibg=#2e4b2e
+    highlight DiffDelete gui=bold guifg=none guibg=#4c1e15
+    highlight DiffChange gui=bold guifg=none guibg=#45565c
+    highlight DiffText gui=bold guifg=none guibg=#996d74
+  else
+    highlight DiffAdd gui=bold guifg=none guibg=palegreen
+    highlight DiffDelete gui=bold guifg=none guibg=tomato
+    highlight DiffChange gui=bold guifg=none guibg=lightblue
+    highlight DiffText gui=bold guifg=none guibg=lightpink
+  endif
+endfunction
+]])

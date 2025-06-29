@@ -1,10 +1,15 @@
-{ username, userhome, ... }:
-
+{
+  pkgs,
+  username,
+  userhome,
+  ...
+}:
 {
   imports = [
     ./alacritty
     ./taskwarrior
-    ./meetRecorder
+    ./claude
+    # ./meetRecorder
   ];
 
   # Home Manager needs a bit of information about you and the
@@ -26,4 +31,8 @@
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
+
+  home.packages = with pkgs; [
+    terraform-local
+  ];
 }

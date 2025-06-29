@@ -3,4 +3,4 @@
 user=$(whoami)
 buffer=""
 
-echo "#[fg=red]X #[fg=default]$user>>"
+echo "#[fg=red]X #[fg=default]$user>> "

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sketchybar --add event    calendar_fetch                          \
+sketchybar \
            --add item     calendar right                          \
            --set calendar icon=cal                                \
                           icon.font="$FONT:Black:12.0"            \
@@ -16,17 +16,20 @@ sketchybar --add event    calendar_fetch                          \
            --subscribe calendar                                   \
                           system_woke                             \
                           mouse.entered                           \
-                          mouse.exited                            \
                           mouse.exited.global                     \
            --add item     calendar.template popup.calendar        \
            --set calendar.template                                \
                           drawing=off                             \
                           icon.color=$ORANGE                      \
+           --add item     calendar.template_now popup.calendar    \
+           --set calendar.template_now                            \
+                          drawing=off                             \
+                          icon.color=$GREEN                       \
            --add item     calendar.event right                    \
            --set calendar.event                                   \
                           y_offset=-10                            \
                           width=0                                 \
-                          update_freq=300                         \
+                          update_freq=270                         \
                           script="$PLUGIN_DIR/calendar_event.sh"  \
                           label.font="$FONT:Black:7.0"            \
                           icon.font="$FONT:Heavy:7.0"             \
@@ -35,9 +38,3 @@ sketchybar --add event    calendar_fetch                          \
                           icon=""                                 \
                           padding_right=-135                      \
                           drawing=on                              \
-           --subscribe calendar.event                             \
-                          calendar_fetch
-
-
-                          # label.font="BigBlue_TerminalPlus Nerd Font:Book:12.0" \
-                          # popup.height=15                   \

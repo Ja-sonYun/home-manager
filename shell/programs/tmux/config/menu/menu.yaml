@@ -70,11 +70,22 @@ items:
         h: 40
 
   - Menu:
-      name: "chatgpt"
-      shortcut: c
-      command: aichat --session tm --role ask
+      name: "weechat"
+      shortcut: w
+      command: weechat
       session: true
-      session_name: "chatgpt"
+      session_name: "weechat"
+
+      position:
+        w: 200
+        h: 70
+
+  - Menu:
+      name: "claude"
+      shortcut: c
+      command: mkdir -p $HOME/.chat && cd $HOME/.chat && claude
+      session: true
+      session_name: "claude"
 
       position:
         w: 120

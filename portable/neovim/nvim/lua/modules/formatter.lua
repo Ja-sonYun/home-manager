@@ -3,6 +3,8 @@ local M = {}
 M.key = "ql"
 M.tempdir = ".tmp"
 
+M._registered_formatters = {}
+
 --- @class module.formatter.format_with_command
 --- @field dir? string
 --- @field suffix? string
@@ -19,43 +21,50 @@ M.format_with_command = function(cmd_list, opts)
 	if opts.dir == nil then
 		opts.dir = vim.fn.getcwd()
 	end
-	local uuid = require("modules.util").uuid()
-	local tmpfile = nil
+
+	-- original filename (e.g. "main.ts")
+	local original_filename = vim.fn.expand("%:t")
+	local tmpfile
+
 	if opts.run_in_cwd then
 		local tempdir = opts.dir .. "/" .. M.tempdir
 		if vim.fn.isdirectory(tempdir) == 0 then
-			vim.fn.mkdir(tempdir)
+			vim.fn.mkdir(tempdir, "p")
 		end
-		tmpfile = tempdir .. "/" .. uuid
+		tmpfile = tempdir .. "/" .. original_filename
 	else
-		tmpfile = vim.fn.tempname()
-	end
-
-	local current_file_suffix = vim.fn.expand("%:t"):match(".+%.(.+)")
-	if opts.suffix then
-		tmpfile = tmpfile .. opts.suffix
-	else
-		tmpfile = tmpfile .. "." .. current_file_suffix
+		local tmpdir = vim.fn.tempname()
+		vim.fn.mkdir(tmpdir)
+		tmpfile = tmpdir .. "/" .. original_filename
 	end
 
 	vim.cmd("write! " .. tmpfile)
 
-	for _, cmd in ipairs(cmd_list) do
-		local command = cmd:gsub("%%", tmpfile)
-		command = "cd " .. opts.dir .. " && " .. command
-		local stdout = vim.fn.system(command)
-		local exit_code = vim.v.shell_error
-		if exit_code ~= 0 then
-			vim.fn.delete(tmpfile)
-			vim.notify("Failed to format", vim.log.levels.ERROR)
-			error(stdout)
-			return
+	local new_content = nil
+	local ok, err = pcall(function()
+		-- run each formatter command
+		for _, cmd in ipairs(cmd_list) do
+			local command = cmd:gsub("%%", tmpfile)
+			command = "cd " .. opts.dir .. " && " .. command
+			local ret_msg = vim.fn.system(command)
+			if vim.v.shell_error ~= 0 then
+				-- propagate error to outer pcall
+				error(ret_msg)
+			end
 		end
+		-- read formatted result
+		new_content = vim.fn.readfile(tmpfile)
+	end)
+	if vim.fn.filereadable(tmpfile) == 1 then
+		vim.fn.delete(tmpfile)
 	end
 
-	local new_content = vim.fn.readfile(tmpfile)
+	if not ok then
+		vim.notify("Failed to format", vim.log.levels.ERROR)
+		error(err) -- rethrow for caller / stack trace
+	end
+
 	vim.api.nvim_buf_set_lines(0, 0, -1, false, new_content)
-	vim.fn.delete(tmpfile)
 	vim.notify("Formatted")
 end
 
@@ -64,10 +73,6 @@ end
 --- @param opts? module.formatter.format_with_command
 --- @return nil
 M.register_formatter = function(func, opts)
-	if M._registered_formatters == nil then
-		M._registered_formatters = {}
-	end
-
 	if opts == nil then
 		opts = {}
 	end
@@ -85,7 +90,6 @@ M.register_formatter = function(func, opts)
 			vim.keymap.set("n", M.key, function()
 				M.format_with_command(M._registered_formatters[key], opts)
 			end, { buffer = true, nowait = true })
-			vim.notify("Found registered formatter")
 			return
 		end
 	end
@@ -95,7 +99,6 @@ M.register_formatter = function(func, opts)
 		M._registered_formatters[opts.dir] = cmd_list
 	end
 
-	vim.notify("Registered formatter with " .. table.concat(cmd_list, " && "), "info")
 	vim.keymap.set("n", M.key, function()
 		M.format_with_command(cmd_list, opts)
 	end, { buffer = true, nowait = true })

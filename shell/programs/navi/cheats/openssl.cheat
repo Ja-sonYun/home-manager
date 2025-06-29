@@ -1,0 +1,20 @@
+% openssl, encryption, decryption, security, crypto
+
+# Encrypt a file with AES-256-CBC
+openssl enc -aes-256-cbc -salt -in <input_file> -out <output_file>
+
+# Decrypt a file with AES-256-CBC
+openssl enc -d -aes-256-cbc -in <encrypted_file> -out <decrypted_file>
+
+# Generate a strong random password
+openssl rand -base64 <length>
+
+# Create SHA256 hash of a file
+openssl dgst -sha256 <file>
+
+$ input_file: ls -1 | grep -v "\.enc$"
+$ output_file: echo "encrypted.enc"
+$ encrypted_file: ls -1 *.enc 2>/dev/null || echo "file.enc"
+$ decrypted_file: echo "decrypted.txt"
+$ length: echo "32"
+$ file: ls -1

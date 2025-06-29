@@ -1,0 +1,21 @@
+% xargs, parallel, batch, process
+
+# Execute command for each line of input
+<input_command> | xargs <command>
+
+# Execute commands in parallel
+<input_command> | xargs -P <processes> <command>
+
+# Use null character as delimiter (for filenames with spaces)
+<input_command> | xargs -0 <command>
+
+# Replace string in command with input
+<input_command> | xargs -I {} <command> {}
+
+# Find and delete files (safe with spaces)
+find . -name "<pattern>" -print0 | xargs -0 rm -f
+
+$ input_command: echo "find . -name '*.txt'"
+$ command: echo "echo"
+$ processes: echo "4"
+$ pattern: echo "*.tmp"

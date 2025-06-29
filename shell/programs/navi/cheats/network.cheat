@@ -1,0 +1,25 @@
+% network, net, curl, wget, ssh, connection
+
+# Download file with curl
+curl -O <url>
+
+# POST JSON data with curl
+curl -X POST -H "Content-Type: application/json" -d '<json_data>' <url>
+
+# Test port connectivity
+nc -zv <host> <port>
+
+# Copy file via SCP
+scp <local_file> <user>@<host>:<remote_path>
+
+# Test connectivity
+ping -c <count> <host>
+
+$ url: echo "https://example.com/file.zip"
+$ json_data: echo '{"key": "value"}'
+$ host: echo "example.com"
+$ port: echo "80"
+$ local_file: echo "file.txt"
+$ user: echo "root"
+$ remote_path: echo "/home/user/"
+$ count: echo "4"

@@ -51,9 +51,24 @@ buf=""
 is_git=$(git rev-parse --is-inside-work-tree)
 
 if [[ $is_git == "true" ]]; then
+    FOLDER_NAME=$(basename $(git rev-parse --show-toplevel))
     GIT_BRANCH=$(shorten-string 20 $(git branch --show-current))
     buf="#[fg=red]${GIT_BRANCH}#[fg=default]"
-    buf="#[fg=grey]Git#[fg=default]($buf):"
+    buf="#[fg=red]Git#[fg=default]($buf):"
+
+    window_name="$FOLDER_NAME"
+else
+    window_name="$(basename $PWD)"
+fi
+
+session_name=$(tmux display-message -p '#S')
+if [[ "$session_name" == "default" || "$session_name" == "popup" ]]; then
+    if [[ -n "$window_name" ]]; then
+        current_window_name=$(tmux display-message -p '#W')
+        if [[ "$current_window_name" != "$window_name" ]]; then
+            tmux rename-window "$window_name"
+        fi
+    fi
 fi
 
 message=$(tail -1 $log_path)
