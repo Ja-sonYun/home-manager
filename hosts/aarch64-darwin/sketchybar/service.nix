@@ -5,6 +5,9 @@
   ...
 }:
 let
+  # icalPal is a Ruby gem that accesses macOS calendar data
+  # The Foundation and EventKit frameworks are accessed via Ruby's native extensions
+  # rather than being linked directly, so we don't need to explicitly include them
   icalPal = pkgs.stdenv.mkDerivation rec {
     pname = "icalPal";
     version = "3.7.0";
@@ -12,8 +15,6 @@ let
     buildInputs = with pkgs; [
       ruby_3_4
       sqlite
-      darwin.apple_sdk.frameworks.Foundation
-      darwin.apple_sdk.frameworks.EventKit
     ];
 
     nativeBuildInputs = with pkgs; [
