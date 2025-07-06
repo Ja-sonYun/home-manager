@@ -2,7 +2,7 @@ require("modules.utils").set_buffer_opts({ width = 4, is_code = true })
 
 local python_executable, python_dir = require("modules.resolver").get_python_path()
 
-require("modules.formatter").register_formatter(function()
+require("modules.formatter").register("python", function()
 	if python_dir == nil then
 		return {
 			"black %",

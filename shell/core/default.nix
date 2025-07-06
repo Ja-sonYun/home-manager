@@ -33,7 +33,6 @@
     caddy
     gnupg
     flock
-    gawk
     argc
 
     # productivity
@@ -66,6 +65,8 @@
     nix-tree
     nix-index
     nix-output-monitor
+
+    devenv
   ];
 
   home.sessionVariables = {

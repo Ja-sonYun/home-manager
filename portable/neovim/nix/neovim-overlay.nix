@@ -73,6 +73,7 @@ let
     vim-eunuch
     vim-commentary
     vim-tmux-navigator
+    vim-fugitive
     tagbar
     harpoon2
     rainbow-delimiters-nvim

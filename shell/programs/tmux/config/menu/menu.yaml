@@ -83,7 +83,7 @@ items:
   - Menu:
       name: "claude"
       shortcut: c
-      command: mkdir -p $HOME/.chat && cd $HOME/.chat && claude
+      command: mkdir -p $HOME/.chat && cd $HOME/.chat && claude -c
       session: true
       session_name: "claude"
 

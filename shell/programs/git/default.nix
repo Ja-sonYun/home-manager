@@ -119,6 +119,7 @@
       ".aider*"
       ".claude"
       ".serena"
+      ".taskmaster"
       "CLAUDE.md"
     ];
 

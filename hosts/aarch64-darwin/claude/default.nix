@@ -113,17 +113,31 @@ let
     inherit pkgs;
     name = "desktop-commander";
     packages = [
-      "@wonderwhy-er/desktop-commander"
+      "@wonderwhy-er/desktop-commander@0.2.3"
     ];
     exposedBinaries = [
       "desktop-commander"
     ];
-    outputHash = "sha256-irY4rGZ0HjV645h0uUaFgkX3Z+p2Yc1ujykoPNjaOis=";
+    outputHash = "sha256-+880M/0ck0zQG+X//7/te5lkRBKhk5KJdkM/wsuF6NE=";
+  };
+  task-master = pkgs.lib.npm.mkNpmGlobalPackageDerivation {
+    inherit pkgs;
+    name = "task-master";
+    packages = [
+      "task-master-ai@0.18.0"
+    ];
+    exposedBinaries = [
+      "task-master"
+      "task-master-mcp"
+      "task-master-ai"
+    ];
+    outputHash = "sha256-uOuxbhlTgurBf8v6cCfoYzQguYe7+hAwzn+YpMJ5AdI=";
   };
 in
 {
   home.packages = [
     serena
+    task-master
   ];
   home.activation = {
     serena-config = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -138,6 +152,33 @@ in
       projects: []
       EOF
       fi
+    '';
+  };
+  home.file."task_master_config.json" = {
+    target = ".taskmaster/config.json";
+    text = ''
+      {
+        "models": {
+          "main": {
+            "provider": "claude-code",
+            "modelId": "opus",
+            "maxTokens": 32000,
+            "temperature": 0.2
+          },
+          "research": {
+            "provider": "claude-code",
+            "modelId": "opus",
+            "maxTokens": 32000,
+            "temperature": 0.1
+          },
+          "fallback": {
+            "provider": "claude-code",
+            "modelId": "sonnet",
+            "maxTokens": 64000,
+            "temperature": 0.2
+          }
+        }
+      }
     '';
   };
   home.file."claude_desktop_config.json" = {
@@ -190,6 +231,10 @@ in
           },
           "desktop-commander": {
             "command": "${desktop-commander}/bin/desktop-commander",
+            "args": []
+          },
+          "taskmaster-ai": {
+            "command": "${task-master}/bin/task-master-ai",
             "args": []
           }
         }

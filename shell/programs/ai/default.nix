@@ -30,7 +30,7 @@ let
     inherit pkgs;
     name = "claude-code";
     packages = [
-      "@anthropic-ai/claude-code@1.0.35"
+      "@anthropic-ai/claude-code@1.0.41"
     ];
     exposedBinaries = [
       "claude"
@@ -43,7 +43,7 @@ let
         # Use global env rather than coreutils's env
         sed -i '1s@^#!/.*/env.*@#!/usr/bin/env -S ${node}/bin/node --no-warnings --enable-source-maps @' node_modules/claude-code/lib/node_modules/@anthropic-ai/claude-code/cli.js
       '';
-    outputHash = "sha256-7OXxXAQudpg1ot+wWYqG/xJ28F0z148H9E/0yshCc6s=";
+    outputHash = "sha256-36Z4cxY0BbTLq8SGet/jd+Yq7TDQ0FfMnxgKo0FC2Cw=";
   };
   ccusage = pkgs.lib.npm.mkNpmGlobalPackageDerivation {
     inherit pkgs;
@@ -80,5 +80,8 @@ in
     claude-monitor
     llm
     ollama
+
+    # For ai can read specific part of readme
+    mdq
   ];
 }
