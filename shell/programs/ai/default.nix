@@ -14,23 +14,11 @@ let
     ];
     outputHash = "sha256-vGktwrxnkFtQIpAoWkppJQT5GALWHseQUQvtsEqeS1w=";
   };
-  llm = pkgs.lib.pip.mkPipGlobalPackageDerivation {
-    inherit pkgs;
-    name = "llm";
-    packages = [
-      "llm==0.26"
-      "llm-mlx==0.4"
-    ];
-    exposedBinaries = [
-      "llm"
-    ];
-    outputHash = "sha256-XOdCguhfaeTbHMp/MWrUpPp29AFooJTKh0Ab4JYJios=";
-  };
   claude-code = pkgs.lib.npm.mkNpmGlobalPackageDerivation {
     inherit pkgs;
     name = "claude-code";
     packages = [
-      "@anthropic-ai/claude-code@1.0.41"
+      "@anthropic-ai/claude-code@1.0.43"
     ];
     exposedBinaries = [
       "claude"
@@ -43,7 +31,7 @@ let
         # Use global env rather than coreutils's env
         sed -i '1s@^#!/.*/env.*@#!/usr/bin/env -S ${node}/bin/node --no-warnings --enable-source-maps @' node_modules/claude-code/lib/node_modules/@anthropic-ai/claude-code/cli.js
       '';
-    outputHash = "sha256-36Z4cxY0BbTLq8SGet/jd+Yq7TDQ0FfMnxgKo0FC2Cw=";
+    outputHash = "sha256-8pPW8yDTq/tzdJKNGghG5QlUnoEFY1+9xqGEoWoMY2E=";
   };
   ccusage = pkgs.lib.npm.mkNpmGlobalPackageDerivation {
     inherit pkgs;
@@ -78,10 +66,6 @@ in
     claude-code
     ccusage
     claude-monitor
-    llm
     ollama
-
-    # For ai can read specific part of readme
-    mdq
   ];
 }

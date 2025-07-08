@@ -121,6 +121,7 @@
       ".serena"
       ".taskmaster"
       "CLAUDE.md"
+      "backlog"
     ];
 
     includes = [

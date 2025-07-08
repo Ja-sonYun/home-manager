@@ -267,6 +267,14 @@ end
 
 --- Set up user commands for formatter management
 M.setup_commands = function()
+	vim.keymap.set("n", M.config.keymap, function()
+		vim.notify("No formatter registered for current filetype", vim.log.levels.WARN)
+	end, {
+		buffer = true,
+		desc = "Format current buffer",
+		nowait = true,
+	})
+
 	-- List all registered formatters or specific filetype
 	vim.api.nvim_create_user_command("FormatList", function(opts)
 		local filetype = opts.args ~= "" and opts.args or nil

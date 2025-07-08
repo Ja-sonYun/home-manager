@@ -109,35 +109,22 @@ let
       chmod +x $out/bin/mcp-server-playwright
     '';
   };
-  desktop-commander = pkgs.lib.npm.mkNpmGlobalPackageDerivation {
+  backlog-md = pkgs.lib.npm.mkNpmGlobalPackageDerivation {
     inherit pkgs;
-    name = "desktop-commander";
+    name = "backlog-md";
     packages = [
-      "@wonderwhy-er/desktop-commander@0.2.3"
+      "backlog.md@1.0.1"
     ];
     exposedBinaries = [
-      "desktop-commander"
+      "backlog"
     ];
-    outputHash = "sha256-+880M/0ck0zQG+X//7/te5lkRBKhk5KJdkM/wsuF6NE=";
-  };
-  task-master = pkgs.lib.npm.mkNpmGlobalPackageDerivation {
-    inherit pkgs;
-    name = "task-master";
-    packages = [
-      "task-master-ai@0.18.0"
-    ];
-    exposedBinaries = [
-      "task-master"
-      "task-master-mcp"
-      "task-master-ai"
-    ];
-    outputHash = "sha256-uOuxbhlTgurBf8v6cCfoYzQguYe7+hAwzn+YpMJ5AdI=";
+    outputHash = "sha256-Dgo7OzSw6B5vHjJ5+085qum7kNfZu9CI6XiBkVb+iLc=";
   };
 in
 {
   home.packages = [
     serena
-    task-master
+    backlog-md
   ];
   home.activation = {
     serena-config = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -152,33 +139,6 @@ in
       projects: []
       EOF
       fi
-    '';
-  };
-  home.file."task_master_config.json" = {
-    target = ".taskmaster/config.json";
-    text = ''
-      {
-        "models": {
-          "main": {
-            "provider": "claude-code",
-            "modelId": "opus",
-            "maxTokens": 32000,
-            "temperature": 0.2
-          },
-          "research": {
-            "provider": "claude-code",
-            "modelId": "opus",
-            "maxTokens": 32000,
-            "temperature": 0.1
-          },
-          "fallback": {
-            "provider": "claude-code",
-            "modelId": "sonnet",
-            "maxTokens": 64000,
-            "temperature": 0.2
-          }
-        }
-      }
     '';
   };
   home.file."claude_desktop_config.json" = {
@@ -227,14 +187,6 @@ in
           },
           "playwright": {
             "command": "${playwright-mcp}/bin/mcp-server-playwright",
-            "args": []
-          },
-          "desktop-commander": {
-            "command": "${desktop-commander}/bin/desktop-commander",
-            "args": []
-          },
-          "taskmaster-ai": {
-            "command": "${task-master}/bin/task-master-ai",
             "args": []
           }
         }
