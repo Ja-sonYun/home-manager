@@ -1,6 +1,18 @@
-model: openai
+model: openai:gpt-4.1
 keybindings: vi
 
 clients:
 - type: openai
-  api_key: null
+  models:
+    - name: o3
+      max_input_tokens: 200000
+      supports_vision: true
+
+    - name: gpt-4.1
+      max_input_tokens: 1047576
+      supports_function_calling: true
+      supports_vision: true
+
+    - name: o4-mini
+      max_input_tokens: 200000
+      supports_vision: true

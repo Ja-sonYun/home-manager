@@ -48,7 +48,15 @@ items:
   - Menu:
       name: "shell"
       shortcut: s
-      next_menu: "./shell.yaml"
+      command: mkdir -p .hooks/on_leave .hooks/on_exit && echo aWYgW1sgISAteiAiJFRNVVgiIF1dOyB0aGVuCiAgIGxvY2FsIGhvb2tzX2Rpcj0kKGZpbmRfaG9va3NfZGlyICIkT0xEUFdEIikKICAgaWYgW1sgLW4gIiRob29rc19kaXIiIF1dOyB0aGVuCiAgICAgICBsb2NhbCBwcm9qZWN0X3Jvb3Q9JChkaXJuYW1lICIkaG9va3NfZGlyIikKICAgICAgIHRtdXhfc2Vzc2lvbl9uYW1lPSQodG11eCBsaXN0LXNlc3Npb25zIHwgYXdrIC1GOiAnLyciZ2l0X3Jvb3Rfc3Vic2hlbGxfJChlY2hvICRwcm9qZWN0X3Jvb3QgfCB0ciAnLycgJ18nIHwgdHIgJyAnICdfJyk6IicvIHtwcmludCAkMX0nKQogICAgICAgaWYgW1sgLW4gIiR0bXV4X3Nlc3Npb25fbmFtZSIgXV07IHRoZW4KICAgICAgICAgICBpZiBhc2tfeWVzX25vICJLaWxsIHN1YnNoZWxsIjsgdGhlbgogICAgICAgICAgICAgICB0bXV4IGtpbGwtc2Vzc2lvbiAtdCAkdG11eF9zZXNzaW9uX25hbWUgMj4vZGV2L251bGwgJiYgXAogICAgICAgICAgICAgICAgICAgZWNobyAiQ2xvc2VkIHRtdXggc2Vzc2lvbiBmb3Igc3Vic2hlbGxfJChlY2hvICRwcm9qZWN0X3Jvb3QgfCB0ciAnLycgJ18nIHwgdHIgJyAnICdfJykiIHx8IFwKICAgICAgICAgICAgICAgICAgIGVjaG8gIkZhaWxlZCB0byBjbG9zZSB0bXV4IHNlc3Npb24gZm9yIHN1YnNoZWxsXyQoZWNobyAkcHJvamVjdF9yb290IHwgdHIgJy8nICdfJyB8IHRyICcgJyAnXycpIgogICAgICAgICAgIGVsc2UKICAgICAgICAgICAgICAgZWNobyAiQ2FuY2VsbGVkLiIKICAgICAgICAgICBmaQogICAgICAgZmkKICAgZmkKZmkK | base64 -d > .hooks/on_leave/close-sub-shell && cp .hooks/on_leave/close-sub-shell .hooks/on_exit/close-sub-shell && zsh
+      session: true
+      session_name: "subshell"
+      session_on_dir: true
+      run_on_git_root: true
+
+      position:
+        w: 60%
+        h: 70%
 
   - Menu:
       name: "docker"
@@ -66,19 +74,56 @@ items:
       shortcut: n
       command: navi --path=$CONFIG/navi --print | pbcopy
       position:
-        w: 120
-        h: 40
+        w: 40%
+        h: 55%
 
   - Menu:
-      name: "chatgpt"
-      shortcut: c
-      command: aichat --session tm --role ask
+      name: "weechat"
+      shortcut: w
+      command: weechat
       session: true
-      session_name: "chatgpt"
+      session_name: "weechat"
 
       position:
-        w: 120
-        h: 70
+        w: 60%
+        h: 70%
+
+  - Menu:
+      name: "claude"
+      shortcut: c
+      command: mkdir -p .hooks/on_leave .hooks/on_exit && echo aWYgW1sgISAteiAiJFRNVVgiIF1dOyB0aGVuCiAgIGxvY2FsIGhvb2tzX2Rpcj0kKGZpbmRfaG9va3NfZGlyICIkT0xEUFdEIikKICAgaWYgW1sgLW4gIiRob29rc19kaXIiIF1dOyB0aGVuCiAgICAgICBsb2NhbCBwcm9qZWN0X3Jvb3Q9JChkaXJuYW1lICIkaG9va3NfZGlyIikKICAgICAgIHRtdXhfc2Vzc2lvbl9uYW1lPSQodG11eCBsaXN0LXNlc3Npb25zIHwgYXdrIC1GOiAnLyciZ2l0X3Jvb3RfY2xhdWRlXyQoZWNobyAkcHJvamVjdF9yb290IHwgdHIgJy8nICdfJyB8IHRyICcgJyAnXycpOiInLyB7cHJpbnQgJDF9JykKICAgICAgIGlmIFtbIC1uICIkdG11eF9zZXNzaW9uX25hbWUiIF1dOyB0aGVuCiAgICAgICAgICAgaWYgYXNrX3llc19ubyAiS2lsbCBjbGF1ZGUtY29kZSI7IHRoZW4KICAgICAgICAgICAgICAgdG11eCBraWxsLXNlc3Npb24gLXQgJHRtdXhfc2Vzc2lvbl9uYW1lIDI+L2Rldi9udWxsICYmIFwKICAgICAgICAgICAgICAgICAgIGVjaG8gIkNsb3NlZCB0bXV4IHNlc3Npb24gZm9yIGNsYXVkZV8kKGVjaG8gJHByb2plY3Rfcm9vdCB8IHRyICcvJyAnXycgfCB0ciAnICcgJ18nKSIgfHwgXAogICAgICAgICAgICAgICAgICAgZWNobyAiRmFpbGVkIHRvIGNsb3NlIHRtdXggc2Vzc2lvbiBmb3IgY2xhdWRlXyQoZWNobyAkcHJvamVjdF9yb290IHwgdHIgJy8nICdfJyB8IHRyICcgJyAnXycpIgogICAgICAgICAgIGVsc2UKICAgICAgICAgICAgICAgZWNobyAiQ2FuY2VsbGVkLiIKICAgICAgICAgICBmaQogICAgICAgZmkKICAgZmkKZmkK | base64 -d > .hooks/on_leave/close-claude && cp .hooks/on_leave/close-claude .hooks/on_exit/close-claude && direnv exec . claude
+      session: true
+      session_name: "claude"
+      session_on_dir: true
+      run_on_git_root: true
+
+      position:
+        w: 50%
+        h: 55%
+
+  - Menu:
+      name: "claude2"
+      shortcut: C
+      command: mkdir -p .hooks/on_leave .hooks/on_exit && echo aWYgW1sgISAteiAiJFRNVVgiIF1dOyB0aGVuCiAgIGxvY2FsIGhvb2tzX2Rpcj0kKGZpbmRfaG9va3NfZGlyICIkT0xEUFdEIikKICAgaWYgW1sgLW4gIiRob29rc19kaXIiIF1dOyB0aGVuCiAgICAgICBsb2NhbCBwcm9qZWN0X3Jvb3Q9JChkaXJuYW1lICIkaG9va3NfZGlyIikKICAgICAgIHRtdXhfc2Vzc2lvbl9uYW1lPSQodG11eCBsaXN0LXNlc3Npb25zIHwgYXdrIC1GOiAnLyciZ2l0X3Jvb3RfY2xhdWRlMl8kKGVjaG8gJHByb2plY3Rfcm9vdCB8IHRyICcvJyAnXycgfCB0ciAnICcgJ18nKToiJy8ge3ByaW50ICQxfScpCiAgICAgICBpZiBbWyAtbiAiJHRtdXhfc2Vzc2lvbl9uYW1lIiBdXTsgdGhlbgogICAgICAgICAgIGlmIGFza195ZXNfbm8gIktpbGwgY2xhdWRlLWNvZGUgMiI7IHRoZW4KICAgICAgICAgICAgICAgdG11eCBraWxsLXNlc3Npb24gLXQgJHRtdXhfc2Vzc2lvbl9uYW1lIDI+L2Rldi9udWxsICYmIFwKICAgICAgICAgICAgICAgICAgIGVjaG8gIkNsb3NlZCB0bXV4IHNlc3Npb24gZm9yIGNsYXVkZTJfJChlY2hvICRwcm9qZWN0X3Jvb3QgfCB0ciAnLycgJ18nIHwgdHIgJyAnICdfJykiIHx8IFwKICAgICAgICAgICAgICAgICAgIGVjaG8gIkZhaWxlZCB0byBjbG9zZSB0bXV4IHNlc3Npb24gZm9yIGNsYXVkZTJfJChlY2hvICRwcm9qZWN0X3Jvb3QgfCB0ciAnLycgJ18nIHwgdHIgJyAnICdfJykiCiAgICAgICAgICAgZWxzZQogICAgICAgICAgICAgICBlY2hvICJDYW5jZWxsZWQuIgogICAgICAgICAgIGZpCiAgICAgICBmaQogICBmaQpmaQo= | base64 -d > .hooks/on_leave/close-claude2 && cp .hooks/on_leave/close-claude2 .hooks/on_exit/close-claude2 && direnv exec . claude
+      session: true
+      session_name: "claude2"
+      session_on_dir: true
+      run_on_git_root: true
+
+      position:
+        w: 50%
+        h: 55%
+
+  - Menu:
+      name: "claude-chat"
+      shortcut: a
+      command: mkdir -p $HOME/.chat && cd $HOME/.chat && claude -c
+      session: true
+      session_name: "claude-chat"
+
+      position:
+        w: 50%
+        h: 55%
 
   - Menu:
       name: "Record Meeting"

@@ -1,0 +1,20 @@
+% git, version control, vcs
+
+# Add all changes and commit
+git add . && git commit -m "<message>"
+
+# Push to remote
+git push origin <branch>
+
+# Pull latest changes
+git pull origin <branch>
+
+# Stash all local changes and pull latest changes and reapply stashed changes
+git stash && git pull origin <branch> && git stash pop
+
+# Show commit history with graph
+git log --oneline --graph --all
+
+$ message: echo "Update feature"
+$ branch: git branch | grep -v "^*" | sed 's/^ *//'
+$ new_branch: echo "feature/new-feature"

@@ -1,9 +1,7 @@
-require("modules.util").set_buffer_opts({ width = 2, is_code = true })
+require("modules.utils").set_buffer_opts({ width = 2 })
 
-vim.opt.number = true
+-- if vim.bo.buftype ~= "nofile" then
+-- 	vim.opt_local.number = true
+-- end
 
-require("language_server.markdown").marksman()
-
-require("modules.formatter").register_formatter(function()
-	return { "markdownlint-cli2 %" }
-end)
+require("modules.formatter").register("markdown", "prettier --write %")

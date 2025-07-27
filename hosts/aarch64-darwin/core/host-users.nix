@@ -1,4 +1,9 @@
-{ hostname, username, userhome, ... }:
+{
+  hostname,
+  username,
+  userhome,
+  ...
+}:
 
 #############################################################
 #

@@ -1,4 +1,9 @@
-{ pkgs, lib, userhome, ... }:
+{
+  pkgs,
+  lib,
+  userhome,
+  ...
+}:
 let
   createTaskHook = filePath: target: {
     executable = true;
@@ -37,9 +42,11 @@ in
       description = "Sync taskwarrior tasks from reminder";
       command =
         let
-          pythonEnv = pkgs.python312.withPackages (ps: with ps; [
-            rich
-          ]);
+          pythonEnv = pkgs.python312.withPackages (
+            ps: with ps; [
+              rich
+            ]
+          );
         in
         ''
           export TASKWARRIOR_BIN=${pkgs.taskwarrior3}/bin/task
@@ -51,11 +58,13 @@ in
       description = "Sync taskwarrior tasks from github";
       command =
         let
-          pythonEnv = pkgs.python312.withPackages (ps: with ps; [
-            rich
-            pygithub
-            openai
-          ]);
+          pythonEnv = pkgs.python312.withPackages (
+            ps: with ps; [
+              rich
+              pygithub
+              openai
+            ]
+          );
         in
         ''
           export TASKWARRIOR_BIN=${pkgs.taskwarrior3}/bin/task

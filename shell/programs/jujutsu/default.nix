@@ -1,19 +1,19 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   home.shellAliases = {
     js = "jj st --no-pager";
     je = "jj edit";
     jd = "jj describe";
     jg = "jj git";
   };
-
-  # home.packages = with pkgs; [
-  #   lazyjj
-  # ];
+  home.packages = with pkgs; [
+    jjui
+  ];
 
   programs.jujutsu = {
     enable = true;
 
-    ediff = true;
+    ediff = false;
 
     settings = {
       user = {
@@ -22,7 +22,12 @@
 
       };
       ui = {
-        default-command = [ "log" "-n" "10" "--no-pager" ];
+        default-command = [
+          "log"
+          "-n"
+          "10"
+          "--no-pager"
+        ];
       };
     };
   };

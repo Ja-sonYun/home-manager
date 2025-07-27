@@ -1,10 +1,8 @@
-require("modules.util").set_buffer_opts({ width = 4, is_code = true })
+require("modules.utils").set_buffer_opts({ width = 4, is_code = true })
 
-local python_lsp = require("language_server.python")
-local python_executable, python_dir = python_lsp.get_python_path()
-python_lsp.pyright(python_executable)
+local python_executable, python_dir = require("modules.resolver").get_python_path()
 
-require("modules.formatter").register_formatter(function()
+require("modules.formatter").register("python", function()
 	if python_dir == nil then
 		return {
 			"black %",

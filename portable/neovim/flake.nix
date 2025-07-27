@@ -51,6 +51,18 @@
       url = "github:j-hui/fidget.nvim";
       flake = false;
     };
+    quicker-nvim = {
+      url = "github:stevearc/quicker.nvim";
+      flake = false;
+    };
+    claude-code-nvim = {
+      url = "github:greggh/claude-code.nvim";
+      flake = false;
+    };
+    winresizer = {
+      url = "github:simeji/winresizer";
+      flake = false;
+    };
   };
 
   outputs =
@@ -64,7 +76,30 @@
       systems = builtins.attrNames nixpkgs.legacyPackages;
 
       # This is where the Neovim derivation is built.
-      neovim-overlay = import ./nix/neovim-overlay.nix { inherit inputs; };
+      neovim-overlay = import ./nix/neovim-overlay.nix {
+        inherit inputs;
+        # neovim = {
+        #   version = "0.11.0";
+        #   sha256 = "sha256-UVMRHqyq3AP9sV79EkPUZnVkj0FpbS+XDPPOppp2yFE=";
+        #   mkBuildInputs =
+        #     final: with final; [
+        #       utf8proc
+        #     ];
+        # };
+        config = {
+          useGo = true;
+          useRust = true;
+          usePython = true;
+          useNode = true;
+          useLua = true;
+          useNix = true;
+          useTerraform = true;
+          useCxx = true;
+          useMarkdown = true;
+          useShell = true;
+          useRuby = true;
+        };
+      };
     in
     flake-utils.lib.eachSystem systems (
       system:
@@ -75,6 +110,7 @@
             neovim-overlay
             inputs.gen-luarc.overlays.default
           ];
+          config.allowUnfree = true;
         };
         shell = pkgs.mkShell {
           name = "nvim-devShell";
@@ -87,7 +123,6 @@
             nvim-dev
           ];
           shellHook = ''
-            # symlink the .luarc.json generated in the overlay
             ln -fs ${pkgs.nvim-luarc-json} .luarc.json
             # allow quick iteration of lua configs
             ln -Tfns $PWD/nvim ~/.config/nvim-dev

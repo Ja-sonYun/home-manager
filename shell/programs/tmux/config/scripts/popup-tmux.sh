@@ -11,8 +11,8 @@ if [ "$session_name" = "\"popup\"" ]; then
     fi
 else
     if [ "$1" = "top" ]; then
-        tmux popup -d '#{pane_current_path}' -w75% -h70% -E "tmux attach -t popup || tmux new -s popup" || true
+        tmux popup -w75% -h70% -E "tmux attach -t popup || tmux new -s popup" || true
     elif [ "$1" = "bottom" ]; then
-        tmux popup -d '#{pane_current_path}' -w75% -h70% -E "tmux attach -t popup || tmux new -s popup" || true
+        tmux popup -w75% -h70% -E "tmux attach -t popup || tmux new -s popup" || true
     fi
 fi

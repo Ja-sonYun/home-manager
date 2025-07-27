@@ -1,4 +1,8 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  configDir,
+  ...
+}:
 {
   home.packages = with pkgs; [
     # archives
@@ -29,24 +33,53 @@
     caddy
     gnupg
     flock
-    gawk
+    argc
 
     # productivity
     glow # markdown previewer in terminal
     nix-search-cli
     viu
 
+    lazygit
+    lazysql
+
+    comma
+
     httpie
     wget
 
-    aider-chat
+    hwatch
+
+    mermaid-cli
+
+    entr
+    fd
+    dua
+    glance
+
+    cookiecutter
+
+    # My nvim config
+    nvim-pkg
+
+    nix-tree
+    nix-index
+    nix-output-monitor
+
+    devenv
   ];
 
   home.sessionVariables = {
-    PAGER = "${pkgs.moar}/bin/moar";
+    EDITOR = "${pkgs.nvim-pkg}/bin/nvim";
+    # PAGER = "${pkgs.moar}/bin/moar";
+    FLAKE_TEMPLATES_DIR = "${configDir}/templates";
   };
 
   home.shellAliases = {
+    vi = "nvim";
+    vim = "nvim";
+    cat = "bat";
     gsed = "sed";
+    watch = "hwatch";
   };
 }

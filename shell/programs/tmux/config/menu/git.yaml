@@ -28,15 +28,6 @@ items:
         h: 80
 
   - Menu:
-      name: "lazyjj"
-      shortcut: j
-      command: lazyjj
-
-      position:
-        w: 140
-        h: 80
-
-  - Menu:
       name: "gh dash"
       shortcut: d
       command: gh dash
