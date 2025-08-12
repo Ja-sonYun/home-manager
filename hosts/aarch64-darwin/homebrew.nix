@@ -34,7 +34,8 @@ in
       "keith/formulae/reminders-cli"
       "localstack/tap/localstack-cli"
       "qemu"
-    ] ++ allBrews;
+    ]
+    ++ allBrews;
     casks = [
       "aldente"
       "keycastr" # Show keystroke realtime
@@ -65,14 +66,18 @@ in
       "alfred"
       "aldente"
       "cleanshot"
-      "lm-studio"
+
+      "hyprnote"
 
       # TODO: Move to nix
       "macfuse"
-    ] ++ allCasks;
+    ]
+    ++ allCasks;
     taps = [
       "keith/formulae"
       "localstack/tap"
-    ] ++ allTaps;
+      "fastrepl/hyprnote"
+    ]
+    ++ allTaps;
   };
 }

@@ -62,7 +62,7 @@ else
 fi
 
 session_name=$(tmux display-message -p '#S')
-if [[ "$session_name" == "default" || "$session_name" == "popup" ]]; then
+if [[ "$session_name" == "main" || "$session_name" == "popup" ]]; then
     if [[ -n "$window_name" ]]; then
         current_window_name=$(tmux display-message -p '#W')
         if [[ "$current_window_name" != "$window_name" ]]; then

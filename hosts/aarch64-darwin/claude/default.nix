@@ -10,45 +10,45 @@ let
     inherit pkgs;
     name = "awslabs.aws-documentation-mcp-server";
     packages = [
-      "awslabs.aws-documentation-mcp-server==1.1.2"
+      "awslabs.aws-documentation-mcp-server==1.1.3"
     ];
     exposedBinaries = [
       "awslabs.aws-documentation-mcp-server"
     ];
-    outputHash = "sha256-73E/CWHFQ91aCOJf6+6YwzWeRAGhiRxUdWkp8sEj7lg=";
+    outputHash = "sha256-lEb1SK5FUS4JIY5zJhBnpnX//0zftcUQBGvznb4m+H0=";
   };
   aws-diagram-mcp-server = pkgs.lib.pip.mkPipGlobalPackageDerivation {
     inherit pkgs;
     name = "awslabs.aws-diagram-mcp-server";
     packages = [
-      "awslabs.aws-diagram-mcp-server==1.0.3"
+      "awslabs.aws-diagram-mcp-server==1.0.6"
     ];
     exposedBinaries = [
       "awslabs.aws-diagram-mcp-server"
     ];
-    outputHash = "sha256-jPYsskeFd6jQ7skhPHiKl+tjpYyMPusimOMr+8Mrxr8=";
+    outputHash = "sha256-j2ijeGvtPCuyb5lLT5qo+5LihSxlUGcoErEY4uSTxcQ=";
   };
   aws-pricing-mcp-server = pkgs.lib.pip.mkPipGlobalPackageDerivation {
     inherit pkgs;
     name = "awslabs.aws-pricing-mcp-server";
     packages = [
-      "awslabs.aws-pricing-mcp-server==1.0.6"
+      "awslabs.aws-pricing-mcp-server==1.0.10"
     ];
     exposedBinaries = [
       "awslabs.aws-pricing-mcp-server"
     ];
-    outputHash = "sha256-hxpqTXFm0v3eBWOs1Lif22RFDg0b+72/3udVCBIYVdo=";
+    outputHash = "sha256-FYjNMzGLTekO5/o226bzzGIH+5vGrN8Pue6aJqTZTCw=";
   };
   terraform-mcp-serves = pkgs.lib.pip.mkPipGlobalPackageDerivation {
     inherit pkgs;
     name = "awslabs.terraform-mcp-serves";
     packages = [
-      "awslabs.terraform-mcp-server==1.0.3"
+      "awslabs.terraform-mcp-server==1.0.4"
     ];
     exposedBinaries = [
       "awslabs.terraform-mcp-server"
     ];
-    outputHash = "sha256-juqRuzb+HLyIECTgw3uDAw09LbB42MA6lCbJu3XltEg=";
+    outputHash = "sha256-oW449aF1Qx4UalrDeTxCWZiS9yPtLrWf/dvan0zUxzY=";
   };
   _pyright = pkgs.lib.pip.mkPipGlobalPackageDerivation {
     inherit pkgs;
@@ -60,7 +60,7 @@ let
     exposedBinaries = [
       "pyright"
     ];
-    outputHash = "sha256-60AXU6UjZkvYGtEnRUA2e+3q679gnzhDA33Ipe0Q2ng=";
+    outputHash = "sha256-iCy6bLhM7YJxKzDzqWt8XWj9vUwbsZzBTIohUD6FOWs=";
   };
   serena = pkgs.lib.pip.mkPipGlobalPackageDerivation {
     inherit pkgs;
@@ -70,12 +70,12 @@ let
       "hatchling"
     ];
     packages = [
-      "git+https://github.com/oraios/serena.git@2025-06-20#egg=serena"
+      "git+https://github.com/oraios/serena.git@v0.1.3#egg=serena-agent"
     ];
     exposedBinaries = [
       "serena-mcp-server"
     ];
-    outputHash = "sha256-qhQ2Ny48T1Y23EWPV6U2IZvzu1nE1Bq4KOwt0lfFJHg=";
+    outputHash = "sha256-Gl3MLoE4Qu2+1iwxYhcX6Sq+r/aTQoSC9I/cdES0WNg=";
     postInstall = ''
       ln -s ${userhome}/.serena_config.yml $out/venv/serena/lib/python3.11/serena_config.yml
       wrapProgram $out/bin/serena-mcp-server \
@@ -84,7 +84,7 @@ let
           lib.makeBinPath [
             "${_pyright}/venv/pyright"
             pkgs.typescript-language-server
-            pkgs.rust-analyzer
+            # pkgs.rust-analyzer # Temporarily disabled due to hash mismatch
           ]
         }
     '';
@@ -98,18 +98,18 @@ let
     exposedBinaries = [
       "mcp-server-sequential-thinking"
     ];
-    outputHash = "sha256-y9GEft+XdyovoDOj1Xh7tn+5jRHJHMcOHpJ9qQjHk6Y=";
+    outputHash = "sha256-LHMN/M/MTiNNoJsVeqFNQVGzlPUvXUWtdtNwdXb0Ll8=";
   };
   playwright-mcp = pkgs.lib.npm.mkNpmGlobalPackageDerivation {
     inherit pkgs;
     name = "playwright-mcp";
     packages = [
-      "@playwright/mcp@0.0.31"
+      "@playwright/mcp@0.0.33"
     ];
     exposedBinaries = [
       "mcp-server-playwright"
     ];
-    outputHash = "sha256-brRx+NuK+xvx7gwpz95PuD0gZjN/pb23HcXVOwRLVtM=";
+    outputHash = "sha256-d+2UYMECRuIh35P/+qD7r3txRZv5+DklwmdYdrf/zUk=";
     postInstall = ''
       binary_path=$(readlink -f $out/bin/mcp-server-playwright)
       rm -f $out/bin/mcp-server-playwright
@@ -126,14 +126,24 @@ let
     inherit pkgs;
     name = "backlog-md";
     packages = [
-      "backlog.md@1.5.0"
+      "backlog.md@1.8.2"
     ];
     exposedBinaries = [
       "backlog"
     ];
-    outputHash = "sha256-zgqH1fAgrNSYKiu6B7epGpIsswx+qPhZMtYgmyro31w=";
+    outputHash = "sha256-EIpLDPyLikNpUpzLdea8FYci7/5zTq2YEN9EF+1Q/KQ=";
   };
-
+  ccusage = pkgs.lib.npm.mkNpmGlobalPackageDerivation {
+    inherit pkgs;
+    name = "ccusage";
+    packages = [
+      "ccusage@15.9.4"
+    ];
+    exposedBinaries = [
+      "ccusage"
+    ];
+    outputHash = "sha256-yCNVCgNjWXlgfGieQMBQucfvh22Deksc9dzreMCRMzU=";
+  };
   claudeDesktopMcpConfig = {
     mcpServers = {
       terraform = {
@@ -200,8 +210,11 @@ let
       };
     };
   };
-
   claudeCodeSettings = {
+    "$schema" = "https://json.schemastore.org/claude-code-settings.json";
+    feedbackSurveyState = {
+      lastShownTime = 9999999999999;
+    };
     env = { };
     permissions = {
       allow = [
@@ -246,6 +259,11 @@ let
       deny = [ "Bash(sudo:*)" ];
     };
     model = "opus";
+    statusLine = {
+      type = "command";
+      command = "${ccusage}/bin/ccusage statusline";
+      padding = 0;
+    };
     hooks = {
       Notification = [
         {
@@ -278,6 +296,7 @@ in
   home.packages = [
     serena
     backlog-md
+    ccusage
   ];
   home.activation = {
     serena-config = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

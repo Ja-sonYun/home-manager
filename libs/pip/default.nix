@@ -15,6 +15,7 @@ let
     in
     pkgs.stdenv.mkDerivation rec {
       pname = "python";
+      name = "${pname}-${version}";
       inherit version;
 
       src = pkgs.fetchurl {
@@ -190,13 +191,12 @@ in
       '';
       postBuild = postBuild;
       postInstall = postInstall;
-      postFixup =
-        ''
-          patchShebangs $out
-          cd $out
-        ''
-        + (postFixup {
-          python = pkgs."python${pythonVersion}";
-        });
+      postFixup = ''
+        patchShebangs $out
+        cd $out
+      ''
+      + (postFixup {
+        python = pkgs."python${pythonVersion}";
+      });
     };
 }

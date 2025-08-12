@@ -1,12 +1,15 @@
 #!/bin/sh
 
-CURRENT_SESSION=$(tmux display-message -p '#S')
+tmux rename-session -t main _temp_current
+tmux rename-session -t popup _temp_popup
 
-if [ "$CURRENT_SESSION" == "popup" ]; then
-    tmux switch-client -t popup
-else
-    tmux rename-session -t $CURRENT_SESSION _temp
-    tmux rename-session -t popup $CURRENT_SESSION
-    tmux rename-session -t _temp popup
-    tmux switch-client -t $CURRENT_SESSION
-fi
+tmux rename-session -t _temp_current popup
+tmux rename-session -t _temp_popup main
+
+tmux set-environment -t main -u MAIN_POPUP
+tmux set-environment -t main MAIN 1
+
+tmux set-environment -t popup -u MAIN
+tmux set-environment -t popup MAIN_POPUP 1
+
+tmux switch-client -t main
