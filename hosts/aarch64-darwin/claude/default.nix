@@ -10,12 +10,12 @@ let
     inherit pkgs;
     name = "awslabs.aws-documentation-mcp-server";
     packages = [
-      "awslabs.aws-documentation-mcp-server==1.1.3"
+      "awslabs.aws-documentation-mcp-server==1.1.4"
     ];
     exposedBinaries = [
       "awslabs.aws-documentation-mcp-server"
     ];
-    outputHash = "sha256-lEb1SK5FUS4JIY5zJhBnpnX//0zftcUQBGvznb4m+H0=";
+    outputHash = "sha256-jIhw0NzbA46zI8YLf1nJwu6lMXLaUsUhxRfVBqvqFHc=";
   };
   aws-diagram-mcp-server = pkgs.lib.pip.mkPipGlobalPackageDerivation {
     inherit pkgs;
@@ -84,7 +84,7 @@ let
           lib.makeBinPath [
             "${_pyright}/venv/pyright"
             pkgs.typescript-language-server
-            # pkgs.rust-analyzer # Temporarily disabled due to hash mismatch
+            pkgs.rust-analyzer
           ]
         }
     '';
@@ -137,12 +137,12 @@ let
     inherit pkgs;
     name = "ccusage";
     packages = [
-      "ccusage@15.9.4"
+      "ccusage@15.9.5"
     ];
     exposedBinaries = [
       "ccusage"
     ];
-    outputHash = "sha256-yCNVCgNjWXlgfGieQMBQucfvh22Deksc9dzreMCRMzU=";
+    outputHash = "sha256-vIZ2Mrw5t/ULRilvMdDvVi3ybYsP03dKio8Obe/lZl4=";
   };
   claudeDesktopMcpConfig = {
     mcpServers = {

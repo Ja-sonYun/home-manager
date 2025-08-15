@@ -18,7 +18,7 @@ let
     inherit pkgs;
     name = "claude-code";
     packages = [
-      "@anthropic-ai/claude-code@1.0.77"
+      "@anthropic-ai/claude-code@1.0.81"
     ];
     exposedBinaries = [
       "claude"
@@ -39,7 +39,7 @@ let
         # Use global env rather than coreutils's env
         sed -i '1s@^#!/.*/env.*@#!/usr/bin/env -S ${node}/bin/node --no-warnings --enable-source-maps @' node_modules/claude-code/lib/node_modules/@anthropic-ai/claude-code/cli.js
       '';
-    outputHash = "sha256-dER+a/1u7RP4eWm5oF8uw0ZYP7LwxAluHHAbr4KgQXA=";
+    outputHash = "sha256-pwAxiAfG658rTOsbzEvL6ZRo3tOSnHQnbmIRo4F7WXk=";
   };
 in
 {

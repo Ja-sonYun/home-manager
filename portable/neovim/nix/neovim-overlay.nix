@@ -148,7 +148,7 @@ let
     if config.useRust then
       with pkgs;
       [
-        # rust-analyzer # Temporarily disabled due to hash mismatch
+        rust-analyzer
         rustfmt
         rustPackages.cargo
         rustPackages.rustc
