@@ -1,36 +1,4 @@
-local non_code = {
-	"*.so",
-	"*.o",
-	"*.obj",
-	"*.dylib",
-	"*.bin",
-	"*.dll",
-	"*.exe",
-	"*/.git/**",
-	"*/.svn/**",
-	"*/.venv/**",
-	"*/__pycache__/*",
-	"*/build/**",
-	"*.jpg",
-	"*.png",
-	"*.jpeg",
-	"*.bmp",
-	"*.gif",
-	"*.tiff",
-	"*.svg",
-	"*.ico",
-	"*.pyc",
-	"*.pkl",
-	"*.DS_Store",
-	"*.aux",
-	"*.bbl",
-	"*.blg",
-	"*.brf",
-	"*.fls",
-	"*.fdb_latexmk",
-	"*.synctex.gz",
-	"*.xdv",
-}
+local constant = require("modules.constant")
 
 -----------------------------------------------------------
 vim.g.logging_level = "info"
@@ -55,10 +23,12 @@ vim.opt.swapfile = false -- Don't use swapfile
 vim.opt.shiftround = true
 vim.opt.virtualedit = "block"
 
+vim.opt.timeoutlen = 400 -- Time to wait for a mapped sequence to complete
+
 -----------------------------------------------------------
 -- Ignore certain files and folders when globing
 -----------------------------------------------------------
-vim.opt.wildignore:append(non_code)
+vim.opt.wildignore:append(constant.non_code)
 vim.opt.wildignorecase = true
 
 -----------------------------------------------------------
@@ -66,7 +36,7 @@ vim.opt.wildignorecase = true
 -----------------------------------------------------------
 vim.g.backupdir = vim.fn.expand(vim.fn.stdpath("data") .. "/backup//")
 vim.opt.backupdir = vim.g.backupdir
-vim.opt.backupskip = non_code
+vim.opt.backupskip = constant.non_code
 vim.opt.backup = true
 vim.opt.backupcopy = "yes"
 
@@ -87,6 +57,7 @@ vim.opt.winblend = 0 -- pseudo transparency for floating window
 vim.opt.number = false -- Show line number
 vim.opt.showmatch = true -- Highlight matching parenthesis
 vim.opt.splitkeep = "screen"
+vim.opt.signcolumn = "auto:2"
 
 -----------------------------------------------------------
 -- Folding
@@ -108,6 +79,7 @@ vim.opt.linebreak = true -- Wrap on word boundary
 vim.opt.termguicolors = false -- Enable 24-bit RGB colors
 vim.opt.ruler = true
 vim.opt.scrolloff = 3
+vim.opt.jumpoptions = "stack"
 
 -----------------------------------------------------------
 -- Tabs, indent
@@ -142,7 +114,7 @@ vim.opt.updatetime = 250 -- ms to wait for trigger an event
 -- Startup
 -----------------------------------------------------------
 -- Disable nvim intro
-vim.opt.shortmess:append("sI")
+-- vim.opt.shortmess:append("sI")
 
 -----------------------------------------------------------
 -- DefaultTheme
@@ -150,98 +122,6 @@ vim.opt.shortmess:append("sI")
 vim.opt.background = "light" -- Dark background
 
 vim.cmd([[colorscheme vim]])
-
------------------------------------------------------------
--- NetRW
------------------------------------------------------------
-vim.g.netrw_preview = 1
-vim.g.netrw_use_errorwindow = 0
-vim.g.netrw_winsize = 30
-vim.g.netrw_fastbrowse = 0
-vim.g.netrw_keepdir = 0
-vim.g.netrw_liststyle = 0
-vim.g.netrw_special_syntax = 1
-
-vim.keymap.set("n", "<leader>f", function()
-	local cur_file = vim.fn.expand("%:t")
-	vim.cmd.Ex()
-
-	local starting_line = 10
-	local lines = vim.api.nvim_buf_get_lines(0, starting_line, -1, false)
-	for i, file in ipairs(lines) do
-		if file == cur_file then
-			vim.api.nvim_win_set_cursor(0, { i + starting_line, 0 })
-			break
-		end
-	end
-end)
-
------------------------------------------------------------
--- Macro
------------------------------------------------------------
-vim.keymap.set("n", "@", "q")
-vim.keymap.set("n", "q", "@")
-vim.keymap.set("n", "qq", "@@")
-vim.keymap.set("n", "~", "Q")
-vim.keymap.set("n", "Q", ":MacroEdit<CR>")
-
-vim.cmd([[
-  function! YankToRegister()
-    exe printf('norm! ^"%sy$', b:registername)
-  endfunction
-
-  function! OpenMacroEditorWindow()
-    let registername = nr2char(getchar())
-    let name = 'MacroEditor'
-    if bufexists(name)
-      echohl WarningMsg
-      echom "One macro at a time:)"
-      echohl None
-      let win = bufwinnr(name)
-      exe printf('%d . wincmd w', win)
-      return
-    endif
-    let height = 3
-    execute height 'new ' name
-    let b:registername = registername
-    setlocal bufhidden=wipe noswapfile nobuflisted
-    exe printf('norm! "%sp', b:registername)
-    set nomodified
-    augroup MacroEditor
-      au!
-      au BufWriteCmd <buffer> call YankToRegister()
-      au BufWriteCmd <buffer> set nomodified
-    augroup END
-  endfunction
-  command! MacroEdit call OpenMacroEditorWindow()
-]])
-
------------------------------------------------------------
--- Statusline
------------------------------------------------------------
-function GetScrollbar()
-	local sbar_chars = { "▇", "▆", "▅", "▄", "▃", "▂", "▁" }
-
-	local cur_line = vim.api.nvim_win_get_cursor(0)[1]
-	local lines = vim.api.nvim_buf_line_count(0)
-
-	local i = math.floor((cur_line - 1) / lines * #sbar_chars) + 1
-	local sbar = string.rep(sbar_chars[i], 2)
-
-	return sbar
-end
-
-function GetFileInfo()
-	-- if buffer has 'info' variable, return it
-	if vim.b.info then
-		return vim.b.info
-	end
-	return ""
-end
-
-vim.api.nvim_set_hl(0, "Substitute", { ctermfg = "white", ctermbg = "black" })
-
-vim.opt.statusline = "%<%f%h%m%r%{v:lua.GetFileInfo()}%=%b 0x%B %l,%c%V %{v:lua.GetScrollbar()} %P"
 
 -----------------------------------------------------------
 -- Keymaps
@@ -253,7 +133,7 @@ vim.keymap.set("v", "K", "<nop>")
 vim.keymap.set("n", "<leader>a", ":nohl<CR>")
 
 -- Reload configuration without restart nvim
-vim.keymap.set("n", "<leader>R", ":source ~/.config/nvim/init.lua|Msg init.lua reloaded!<CR>")
+vim.keymap.set("n", "<leader>R", ":source ~/.config/nvim/init.lua|lua vim.notify('init.lua reloaded!')<CR>")
 
 -- Fast saving with <leader> and s
 vim.keymap.set("n", "<leader>w", function()
@@ -265,17 +145,26 @@ vim.keymap.set("n", "<leader>r", function()
 	vim.notify("Reloaded")
 end)
 
--- Replace
-vim.keymap.set("n", "<C-s>r", "<ESC>*:%s///gc<left><left><left>")
-vim.keymap.set("n", "<C-s>R", "<ESC>*:%s///g<left><left>")
+-- Switch between buffers
+vim.keymap.set("n", "<leader><leader>", "<C-^>")
 
--- Terminal mappings
-vim.keymap.set("t", "<C-w>", "<C-\\><C-n><C-w>")
-vim.keymap.set("t", "<C-h>", "<C-\\><C-n><C-w>h")
-vim.keymap.set("t", "<C-j>", "<C-\\><C-n><C-w>j")
-vim.keymap.set("t", "<C-k>", "<C-\\><C-n><C-w>k")
-vim.keymap.set("t", "<C-l>", "<C-\\><C-n><C-w>l")
-vim.keymap.set("t", "<C-[>", "<C-\\><C-n>")
+-- vim.keymap.set("v", "K", "")
+
+-- Smart line movement
+vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true })
+vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true })
+
+-- Visual line movement
+vim.keymap.set("v", "<C-j>", ":m '>+1<CR>gv=gv")
+vim.keymap.set("v", "<C-k>", ":m '<-2<CR>gv=gv")
+
+-- Replace current text
+vim.keymap.set("n", "<C-s>r", [[:%s/\<<C-r><C-w>\>//gc<left><left><left>]])
+vim.keymap.set("n", "<C-s>R", [[:%s/\<<C-r><C-w>\>//g<left><left>]])
+
+-- Replace in visual selection only
+vim.keymap.set("v", "<C-s>r", [[:s/\%V/gc<left><left><left>]])
+vim.keymap.set("v", "<C-s>R", [[:s/\%V/g<left><left>]])
 
 -- Additional normal mode mapping
 vim.keymap.set("n", "<leader>e", ":Shell ")
@@ -283,8 +172,8 @@ vim.keymap.set("n", "<leader>e", ":Shell ")
 -- Remap incsearch
 vim.keymap.set("n", "*", "#N")
 vim.keymap.set("n", "#", "*N")
-vim.keymap.set("v", "#", 'y/\\V<C-R>"<CR>')
-vim.keymap.set("v", "*", 'y?\\V<C-R>"<CR>')
+vim.keymap.set("v", "#", [[y:let @/='\V'.substitute(escape(@", '\'), '/', '\\/', 'g')<CR>n]])
+vim.keymap.set("v", "*", [[y:let @/='\V'.substitute(escape(@", '\'), '/', '\\/', 'g')<CR>N]])
 
 -- Remap tab operations
 vim.keymap.set("n", "to", ":tabnew<cr>")
@@ -307,9 +196,8 @@ vim.keymap.set("i", "<C-e>", "<ESC>$a")
 -- Copy current file path to clipboard
 vim.keymap.set("n", "<leader>y", ":let @*=expand('%:p')<CR>:echo 'Copied to clipboard'<CR>")
 
-vim.keymap.set("n", "qn", ":cnext<CR>")
-vim.keymap.set("n", "qp", ":cprev<CR>")
-vim.keymap.set("n", "qs", ":copen<CR>")
+vim.keymap.set("n", "qo", ":copen<CR>")
+vim.keymap.set("n", "qd", ":Dispatch ")
 
 -----------------------------------------------------------
 -- Highlight
@@ -320,3 +208,19 @@ vim.api.nvim_set_hl(0, "Search", { ctermfg = "black", ctermbg = "yellow" })
 vim.api.nvim_set_hl(0, "Pmenu", { ctermbg = 238 })
 vim.api.nvim_set_hl(0, "FloatBorder", { ctermfg = 3 })
 vim.api.nvim_set_hl(0, "MatchParen", { ctermbg = 238, ctermfg = 3, underline = true })
+
+vim.api.nvim_set_hl(0, "DiffAdd", { ctermbg = 17, bold = true })
+vim.api.nvim_set_hl(0, "DiffChange", { ctermbg = 235, bold = true })
+vim.api.nvim_set_hl(0, "DiffText", { ctermbg = 238, bold = true, underline = true })
+vim.api.nvim_set_hl(0, "DiffDelete", { ctermbg = 52, ctermfg = 255, bold = true })
+
+vim.api.nvim_set_hl(0, "Folded", { ctermbg = 233, ctermfg = 5, bold = true, underline = true, italic = true })
+vim.api.nvim_set_hl(0, "FoldColumn", { ctermbg = 0, ctermfg = 5, bold = true })
+
+vim.api.nvim_set_hl(0, "Substitute", { ctermbg = 3, ctermfg = 0, bold = true })
+
+vim.api.nvim_set_hl(0, "NormalFloat", { ctermbg = 236, bold = true })
+
+vim.api.nvim_create_user_command("BufOnly", function()
+	vim.cmd("%bd|e#|bd#")
+end, {})

@@ -1,0 +1,20 @@
+% process, ps, kill, system, monitor
+
+# Find process by name
+ps aux | grep <process_name>
+
+# Kill process by PID
+kill <pid>
+
+# Force kill process by PID
+kill -9 <pid>
+
+# Monitor processes in real-time
+htop
+
+# Show processes using a port
+lsof -i :<port>
+
+$ process_name: echo "firefox"
+$ pid: ps aux | awk '{print $2}' | tail -n +2
+$ port: echo "8080"

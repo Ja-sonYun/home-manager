@@ -2,34 +2,4 @@ if require("modules.plugin").mark_as_loaded("vim_rooter") then
 	return
 end
 
-vim.g.rooter_patterns = {
-	".git",
-	"*.sln",
-	"build/env.sh",
-	"pyproject.toml",
-	"env",
-	"Pipenv",
-	"setup.cfg",
-	"setup.py",
-	".venv",
-	"package.json",
-	"package-lock.json",
-	"node_modules",
-	"yarn.lock",
-	"yarn-error.log",
-	"composer.json",
-	"composer.lock",
-	"vendor",
-	"Gemfile",
-	"Gemfile.lock",
-	"Podfile",
-	"Podfile.lock",
-	"Pods",
-	"Cartfile",
-	"Cartfile.resolved",
-	"Carthage",
-	"Carthage.resolved",
-	"Makefile",
-	"makefile",
-	".terraform",
-}
+vim.g.rooter_patterns = require("modules.constant").root_markers

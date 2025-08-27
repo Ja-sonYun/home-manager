@@ -37,8 +37,8 @@ sketchybar --add bracket spaces '/space\..*/'                  \
 
 
 sketchybar   --add item       separator left                                  \
-             --set separator  icon=                                          \
-                              icon.font="Hack Nerd Font:Regular:16.0"         \
+             --set separator  icon=:chevron_right:                            \
+                              icon.font="sketchybar-app-font:Regular:16.0"    \
                               padding_left=17                                 \
                               padding_right=10                                \
                               label.drawing=off                               \

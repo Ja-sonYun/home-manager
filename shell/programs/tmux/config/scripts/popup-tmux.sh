@@ -1,18 +1,15 @@
-#!/bin/bash
+#!/bin/sh
 
-session_name=$(tmux display-message -p -F \"#{session_name}\")
+if tmux show-environment MAIN_POPUP >/dev/null 2>&1; then
+    IS_MAIN_ATTACHED=$(tmux list-sessions | grep '^main:' | grep '(attached)')
 
-if [ "$session_name" = "\"popup\"" ]; then
-    IS_DEFAULT_ATTACHED=$(tmux ls | grep 'default')
-    if [[ "$IS_DEFAULT_ATTACHED" == *"(attached)"* ]]; then
+    if [ -n "$IS_MAIN_ATTACHED" ]; then
         tmux detach-client
     else
-        tmux switch-client -t default
+        tmux switch-client -t main
     fi
 else
-    if [ "$1" = "top" ]; then
-        tmux popup -d '#{pane_current_path}' -w75% -h70% -E "tmux attach -t popup || tmux new -s popup" || true
-    elif [ "$1" = "bottom" ]; then
-        tmux popup -d '#{pane_current_path}' -w75% -h70% -E "tmux attach -t popup || tmux new -s popup" || true
+    if [ "$1" = "top" ] || [ "$1" = "bottom" ]; then
+        tmux popup -e POPUP=1 -w75% -h70% -E "tmux attach -t popup || tmux new -s popup -e MAIN_POPUP=1 -e DEFAULT=1"
     fi
 fi

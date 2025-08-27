@@ -10,6 +10,7 @@ in
   imports = [
     ./alacritty/brew.nix
     ./meetRecorder/brew.nix
+    # ./claude/brew.nix
   ];
 
   homebrew = {
@@ -31,10 +32,13 @@ in
     };
     brews = [
       "keith/formulae/reminders-cli"
-    ] ++ allBrews;
+      "localstack/tap/localstack-cli"
+      "qemu"
+    ]
+    ++ allBrews;
     casks = [
       "aldente"
-      "keycastr"  # Show keystroke realtime
+      "keycastr" # Show keystroke realtime
       "chatgpt"
       "gimp"
       "sf-symbols"
@@ -49,20 +53,31 @@ in
       "basictex"
       "openvpn-connect"
       "freecad"
-      "orbstack"
       "blender"
       "visual-studio-code"
       "obs"
+      "pdf-expert"
+      "jump"
+      "utm"
+      "kicad"
+
+      "vagrant"
+      "orbstack"
+      "alfred"
+      "aldente"
+      "cleanshot"
+
+      "hyprnote"
 
       # TODO: Move to nix
       "macfuse"
-      "vagrant"
-    ] ++ allCasks;
+    ]
+    ++ allCasks;
     taps = [
-      "homebrew/bundle"
-      "homebrew/services"
-
       "keith/formulae"
-    ] ++ allTaps;
+      "localstack/tap"
+      "fastrepl/hyprnote"
+    ]
+    ++ allTaps;
   };
 }

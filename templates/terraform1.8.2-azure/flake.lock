@@ -1,0 +1,44 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1749903597,
+        "narHash": "sha256-jp0D4vzBcRKwNZwfY4BcWHemLGUs4JrS3X9w5k/JYDA=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "41da1e3ea8e23e094e5e3eeb1e6b830468a7399e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-terraform": {
+      "locked": {
+        "lastModified": 1715721473,
+        "narHash": "sha256-42okGEXT2cPw3xfSxpb+L/O1YdIM/luq4poIuqEW/Fk=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "0c19708cf035f50d28eb4b2b8e7a79d4dc52f6bb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "0c19708cf035f50d28eb4b2b8e7a79d4dc52f6bb",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "nixpkgs-terraform": "nixpkgs-terraform"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

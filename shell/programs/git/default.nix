@@ -1,4 +1,8 @@
-{ lib, username, useremail, ... }: {
+{
+  lib,
+  ...
+}:
+{
   # `programs.git` will generate the config file: ~/.config/git/config
   # to make git use this config file, `~/.gitconfig` should not exist!
   #
@@ -108,6 +112,17 @@
       ".venv"
       ".direnv"
       ".tmp"
+
+      ".ccls-cache"
+      "compile_commands.json"
+
+      ".aider*"
+      ".claude"
+      ".serena"
+      ".taskmaster"
+      "CLAUDE.md"
+      "backlog"
+      ".hooks"
     ];
 
     includes = [
@@ -122,6 +137,12 @@
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
       pull.rebase = true;
+      commit.verbose = true;
+      branch.sort = "-committerdate";
+      column.ui = "auto";
+      tag.sort = "-version:refname";
+      diff.algorithm = "histogram";
+      help.autocorrect = "prompt";
     };
 
     # signing = {

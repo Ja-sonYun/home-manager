@@ -1,4 +1,9 @@
-{ pkgs, cacheDir, ... }:
+{
+  pkgs,
+  cacheDir,
+  configDir,
+  ...
+}:
 {
   imports = [
     ../../modules/zshFunc
@@ -49,7 +54,7 @@
 
     localVariables = { };
 
-    initExtra =
+    initContent =
       let
         PS1 =
           let
@@ -61,12 +66,17 @@
           "${promptTime}${jobStatus}${directory}${symbol} ";
       in
       ''
+        set -o ignoreeof
+
         export PATH="$PATH:$HOME/.bin:$HOME/.local/bin:$HOME/go/bin"
 
         function zvm_after_init() {
           if [[ $options[zle] = on ]]; then
             source ${pkgs.fzf}/share/fzf/completion.zsh
             source ${pkgs.fzf}/share/fzf/key-bindings.zsh
+
+            eval "$(${pkgs.atuin}/bin/atuin init zsh --disable-up-arrow)"
+            eval "$(${pkgs.navi}/bin/navi widget zsh)"
           fi
         }
 
@@ -74,24 +84,111 @@
 
         # Initialize ps1 after source zshfuncs since we're using it
         PS1='${PS1}'
+
+        find_hooks_dir() {
+            local dir="$1"
+            while [[ "$dir" != "/" ]]; do
+                if [[ -d "$dir/.hooks" ]]; then
+                    echo "$dir/.hooks"
+                    return 0
+                fi
+                dir=$(dirname "$dir")
+            done
+            return 1
+        }
+
+        chpwd() {
+            local old_hooks=""
+            local new_hooks=""
+
+            # Find hooks directories
+            [[ -n "$OLDPWD" ]] && old_hooks=$(find_hooks_dir "$OLDPWD")
+            new_hooks=$(find_hooks_dir "$PWD")
+
+            # Only run hooks if we're changing between different hook contexts
+            if [[ "$old_hooks" != "$new_hooks" ]]; then
+                # Run on_leave hooks
+                if [[ -n "$old_hooks" && -d "$old_hooks/on_leave" ]]; then
+                    setopt localoptions nullglob
+                    for file in "$old_hooks/on_leave/"*; do
+                        if [[ -f "$file" ]]; then
+                            source "$file"
+                        fi
+                    done
+                fi
+                # Run on_enter hooks
+                if [[ -n "$new_hooks" && -d "$new_hooks/on_enter" ]]; then
+                    setopt localoptions nullglob
+                    for file in "$new_hooks/on_enter/"*; do
+                        if [[ -f "$file" ]]; then
+                            source "$file"
+                        fi
+                    done
+                fi
+            fi
+        }
+
+        zshexit() {
+            local current_hooks=$(find_hooks_dir "$PWD")
+
+            if [[ -n "$current_hooks" && -d "$current_hooks/on_exit" ]]; then
+                export OLDPWD="$PWD"
+                setopt localoptions nullglob
+                for file in "$current_hooks/on_exit/"*; do
+                    if [[ -f "$file" ]]; then
+                        source "$file"
+                    fi
+                done
+            fi
+        }
+
+        ask_yes_no() {
+            local prompt="''${1:-Continue}"
+            local answer
+
+            while true; do
+                echo -n "$prompt (y/n): "
+                read -k1 answer
+                echo
+                if [[ $answer == "y" || $answer == "Y" ]]; then
+                    return 0
+                elif [[ $answer == "n" || $answer == "N" ]]; then
+                    return 1
+                else
+                    echo "Please enter y or n."
+                fi
+            done
+        }
+
+        chpwd-hook-init() {
+          mkdir -p .hooks/on_enter .hooks/on_leave
+          echo "echo 'You have entered $(basename \"$PWD\")'" > .hooks/on_enter/enter.sh
+          echo "echo 'You have left $(basename \"$PWD\")'" > .hooks/on_leave/leave.sh
+          echo "echo 'You have exited $(basename \"$PWD\")'" > .hooks/on_exit/exit.sh
+        }
       '';
 
-    envExtra = ''
-      [ -f "$HOME/.env" ] && source "$HOME/.env"
-    '';
-
-    profileExtra = ''
-      if [ -f "~/.orbstack/shell/init.zsh" ]; then
-      # Added by OrbStack: command-line tools and integration
-        source ~/.orbstack/shell/init.zsh 2>/dev/null || :
-      fi
-    '';
+    envExtra = '''';
+    profileExtra = '''';
   };
 
   programs.fzf = {
     enable = true;
-
     enableZshIntegration = true;
+  };
+
+  programs.atuin = {
+    enable = true;
+    flags = [
+      "--disable-up-arrow"
+    ];
+    # Will manually enable in the zsh initContent
+    settings = {
+      auto_sync = false;
+      sync_address = "http://localhost:8080"; # Override dummy address
+      show_help = false;
+      show_tabs = false;
+    };
   };
 
   programs.bat.enable = true;
@@ -197,30 +294,6 @@
         echo "Extraction completed: $output_dir"
       '';
     };
-    flake-gen = {
-      description = "Generate flake templates";
-      command = ''
-        first_arg="$1"
-        if [[ -z "$first_arg" ]]; then
-          echo "Usage: flake-gen <option>"
-          return 1
-        fi
-        if [[ "$first_arg" == "list" ]]; then
-          ls -l ${toString ./templates}
-          return 0
-        fi
-        if [ -f "flake.nix" ]; then
-          echo "flake.nix already exists"
-          return 1
-        fi
-        cat ${toString ./templates}/"$first_arg".template.nix > ./flake.nix
-        if [ -f ".envrc" ]; then
-          echo "use flake" >> .envrc
-        else
-          echo "use flake" > .envrc
-        fi
-      '';
-    };
     flake-ignore = {
       description = "Ignore flake in git repository";
       command = ''
@@ -243,6 +316,52 @@
         if [ -f "flake.lock" ]; then
           git update-index assume-unchanged flake.lock
         fi
+      '';
+    };
+    templates = {
+      description = "Manage templates";
+      command = ''
+        # Match the first argument, list or echo.
+        case "$1" in
+          list)
+            ls -1 "${configDir}/templates"
+            ;;
+          direnv)
+            # Check if the second argument is provided
+            if [ -z "$2" ]; then
+              echo "Error: No template name provided."
+              exit 1
+            fi
+
+            # Check if the template directory exists
+            if [ ! -d "${configDir}/templates/$2" ]; then
+              echo "Error: Template '$2' not found."
+              exit 1
+            fi
+
+            # Print the content of the template directory
+            echo "use flake \"\$FLAKE_TEMPLATES_DIR/$2\""
+            ;;
+          echo)
+            # Check if the second argument is provided
+            if [ -z "$2" ]; then
+              echo "Error: No template name provided."
+              exit 1
+            fi
+
+            # Check if the template file exists
+            if [ ! -f "${configDir}/templates/$2/flake.nix" ]; then
+              echo "Error: Template '$2' not found."
+              exit 1
+            fi
+
+            # Print the content of the template file
+            cat "${configDir}/templates/$2/flake.nix"
+            ;;
+          *)
+            echo "Usage: templates [list|echo|direnv] [template_name]"
+            ;;
+        esac
       '';
     };
   };

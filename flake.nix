@@ -3,31 +3,33 @@
 
   nixConfig = {
     substituters = [
-      # Query the mirror of USTC first, and then the official cache.
       "https://cache.nixos.org"
     ];
   };
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/release-24.11";
-    nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-24.11-darwin";
-
-    agenix.url = "github:ryantm/agenix";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/release-25.05";
 
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    home-manager-stable = {
+      url = "github:nix-community/home-manager/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
     };
 
     darwin = {
-      url = "github:lnl7/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs-darwin";
+      url = "github:nix-darwin/nix-darwin/master";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Nix-Homebrew to install casks
     nix-homebrew = {
-      url = "github:zhaofengli-wip/nix-homebrew";
+      url = "github:zhaofengli/nix-homebrew";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     homebrew-bundle = {
       url = "github:homebrew/homebrew-bundle";
@@ -43,85 +45,160 @@
     };
 
     neovim.url = "path:./portable/neovim";
+
+    # Agenix for secret management
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    agenix-secrets = {
+      url = "github:Ja-sonYun/agenix-secrets/main";
+      flake = false;
+    };
   };
 
   outputs =
     inputs@{
       self,
+
       nixpkgs,
-      nixpkgs-stable,
-      darwin,
-      agenix,
       home-manager,
+
+      nixpkgs-stable,
+      home-manager-stable,
+
+      darwin,
       nix-homebrew,
       homebrew-bundle,
       homebrew-core,
       homebrew-cask,
+
       neovim,
+      agenix,
+      agenix-secrets,
       ...
     }:
     let
       specialArgsPrepared = {
-        "Jasons-MacBook-Pro-2" = {
+        "JasonYuns-MacBook-Pro" = {
           system = "aarch64-darwin";
-          username = "jasony";
+          username = "jasonyun";
           useremail = "jason@abex.dev";
-          hostname = "Jasons-MacBook-Pro-2";
-          userhome = "/Users/jasony";
-          configDir = "/Users/jasony/dotfiles";
-          cacheDir = "/Users/jasony/.nixcache/jasony";
+          hostname = "JasonYuns-MacBook-Pro";
+          userhome = "/Users/jasonyun";
+          configDir = "/Users/jasonyun/dotfiles";
+          cacheDir = "/Users/jasonyun/.nixcache/jasony";
         };
-        "Linux" = {
+        "linux-devel" = {
+          system = "x86_64-linux";
+          username = "vagrant";
+          useremail = "jason@abex.dev";
+          hostname = "linux-devel";
+          userhome = "/home/vagrant";
+          configDir = "/home/vagrant/dotfiles";
+          cacheDir = "/home/vagrant/.nixcache/jasony";
+        };
+        "jason-win" = {
           system = "x86_64-linux";
           username = "jasony";
           useremail = "jason@abex.dev";
-          hostname = "Linux";
+          hostname = "jason-win";
           userhome = "/home/jasony";
           configDir = "/home/jasony/dotfiles";
-          cacheDir = "/Users/jasony/.nixcache/jasony";
+          cacheDir = "/home/jasony/.nixcache/jasony";
         };
       };
-
-    in
-    {
-      darwinConfigurations."Jasons-MacBook-Pro-2" =
+      mkSpecialArgs =
+        hostname: pkgs:
         let
-          hostname = "Jasons-MacBook-Pro-2";
           specialArgs = specialArgsPrepared."${hostname}";
           system = specialArgs.system;
+        in
+        {
+          inherit system;
+          inherit (specialArgs)
+            username
+            useremail
+            hostname
+            userhome
+            configDir
+            cacheDir
+            ;
+          inherit agenix agenix-secrets;
+        };
 
-          pkgs = import nixpkgs {
-            inherit system;
+      mkPkgsProvider =
+        system:
+        import nixpkgs {
+          inherit system;
+          overlays = self.overlays;
+          config.allowUnfree = true;
+        };
 
-            overlays = self.overlays;
-          };
-
-          configPaths =
+      mkHomeManagerConfig =
+        hostname:
+        let
+          specialArgs = specialArgsPrepared."${hostname}";
+          system = specialArgs.system;
+        in
+        [
+          # Agenix for secrets management
+          agenix.homeManagerModules.default
+          # Common configurations
+          ./shell
+          ./misc/fonts
+        ]
+        ++ (
+          if system == "aarch64-darwin" then
             [
-              # Common configurations
-              ./shell
-              ./portable
+              # Mac os specific configurations
+              ./hosts/aarch64-darwin/homemanager.nix
             ]
-            ++ (
-              if system == "aarch64-darwin" then
-                [
-                  # Mac os specific configurations
-                  ./hosts/aarch64-darwin/homemanager.nix
-                ]
-              else if system == "x86_64-linux" then
-                [
-                  # Linux specific configurations, which isn't implemented yet
-                  ./hosts/x86_64-linux/homemanager.nix
-                ]
-              else
-                [ ]
-            );
+
+          else if system == "x86_64-linux" then
+            [
+              # Linux specific configurations, which isn't implemented yet
+              ./hosts/x86_64-linux/homemanager.nix
+            ]
+          else
+            [ ]
+        );
+
+      mkX86_64LinuxHomeConfiguration =
+        hostname:
+        opts@{
+          useNvidia ? false,
+          isVM ? false,
+        }:
+        let
+          pkgs = mkPkgsProvider system;
+          extraSpecialArgs = (mkSpecialArgs hostname pkgs) // opts;
+          system = extraSpecialArgs.system;
+        in
+        home-manager.lib.homeManagerConfiguration {
+          inherit extraSpecialArgs pkgs;
+          modules = [
+            # System configurations
+            ./hosts/x86_64-linux/core/nix-core.nix
+          ]
+          ++ (mkHomeManagerConfig hostname);
+        };
+
+      mkAarch64DarwinHomeConfiguration =
+        hostname:
+        opts@{
+        }:
+        let
+          hostname = "JasonYuns-MacBook-Pro";
+          pkgs = mkPkgsProvider system;
+          specialArgs = mkSpecialArgs hostname pkgs;
+          system = specialArgs.system;
         in
         darwin.lib.darwinSystem {
           inherit system specialArgs pkgs;
           modules = [
             # System configurations
-            ./shell/system.nix
+            ./hosts/aarch64-darwin/shell.nix
 
             ./hosts/aarch64-darwin/core/nix-core.nix
             ./hosts/aarch64-darwin/core/system.nix
@@ -137,7 +214,7 @@
                 useGlobalPkgs = true;
                 useUserPackages = false;
                 extraSpecialArgs = specialArgs;
-                users.${specialArgs.username}.imports = configPaths;
+                users.${specialArgs.username}.imports = mkHomeManagerConfig hostname;
               };
             }
 
@@ -151,13 +228,23 @@
                 autoMigrate = true;
               };
             }
-
-            agenix.nixosModules.default
-            {
-              environment.systemPackages = [ agenix.packages."${system}".default ];
-            }
           ];
         };
+    in
+    {
+      darwinConfigurations."JasonYuns-MacBook-Pro" =
+        mkAarch64DarwinHomeConfiguration "JasonYuns-MacBook-Pro"
+          {
+          };
+
+      homeConfigurations."linux-devel" = mkX86_64LinuxHomeConfiguration "linux-devel" {
+        useNvidia = false;
+        isVM = true;
+      };
+      homeConfigurations."jason-win" = mkX86_64LinuxHomeConfiguration "jason-win" {
+        useNvidia = true;
+        isVM = false;
+      };
 
       overlays = builtins.attrValues (import ./overlays { inherit inputs; });
     };

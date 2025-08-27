@@ -1,4 +1,5 @@
-{ ... }: {
+{ pkgs, ... }:
+{
   programs.gh = {
     enable = true;
 
@@ -60,6 +61,7 @@
 
   programs.gitui = {
     enable = true;
+    package = pkgs.stable.gitui;
 
     keyConfig = ''
       (
@@ -75,4 +77,8 @@
       )
     '';
   };
+
+  home.packages = with pkgs; [
+    tig
+  ];
 }

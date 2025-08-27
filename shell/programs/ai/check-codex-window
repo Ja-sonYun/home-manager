@@ -1,0 +1,189 @@
+#!/usr/bin/env gawk -f
+
+BEGIN {
+	# --- Settings ---
+	TZ = "Asia/Tokyo"	# treat timestamps as JST
+	FIVE_H = 5 * 3600	# 5 hours window
+	ONE_WEEK = 7 * 24 * 3600	# 7 days in seconds
+	outFile = ENVIRON["HOME"] "/.codex/windows.json"
+	outDir = ENVIRON["HOME"] "/.codex"
+	todayDir = strftime("%Y/%m/%d")
+	baseDir = ENVIRON["HOME"] "/.codex/sessions/" todayDir
+	# Ensure output directory exists
+	system("mkdir -p " quote(outDir))
+	# 1) Collect rollout timestamps (JST) from today directory
+	n = 0
+	cmd = "ls -1 " quote(baseDir) "/rollout-*.jsonl 2>/dev/null"
+	while ((cmd | getline line) > 0) {
+		if (match(line, /rollout-([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2})-([0-9]{2})-([0-9]{2})-/, a)) {
+			ep = to_epoch(a[1], a[2], a[3], a[4], a[5], a[6])
+			if (ep > 0) {
+				n++
+				NEW_EPOCH[n] = ep
+			}
+		}
+	}
+	close(cmd)
+	# Build 5h windows (with virtual chaining) from today's events
+	nw = 0
+	if (n > 0) {
+		asort(NEW_EPOCH, S)	# S[1..n] sorted epochs
+		curStart = S[1]
+		for (i = 2; i <= n; i++) {
+			nextEp = S[i]
+			curEnd = curStart + FIVE_H
+			if (nextEp < curEnd) {
+				# within current window -> continue
+				continue
+			}
+			# chain virtual windows until nextEp enters a window
+			while (nextEp >= curEnd) {
+				nw++
+				NW_START[nw] = curStart
+				NW_END[nw] = curEnd
+				curStart = curEnd
+				curEnd = curStart + FIVE_H
+			}
+		}
+		# close last
+		nw++
+		NW_START[nw] = curStart
+		NW_END[nw] = curStart + FIVE_H
+	}
+	# 2) Load existing ~/.codex/windows.json and keep only last 7 days
+	ew = 0
+	if ((getline jl < outFile) > 0) {
+		# read whole file (very small)
+		json_all = jl
+		while ((getline jl < outFile) > 0) {
+			json_all = json_all "\n" jl
+		}
+		close(outFile)
+		# extract "start"/"end" from existing JSON (ISO like 2025-08-25T12:46:12+0900)
+		pos = 1
+		while (match(substr(json_all, pos), /"start"[[:space:]]*:[[:space:]]*"([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\+[0-9]{4})?)"[[:space:]]*,[[:space:]]*"end"[[:space:]]*:[[:space:]]*"([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\+[0-9]{4})?)"/, m)) {
+			sstr = strip_tz(m[1])
+			estr = strip_tz(m[3])
+			sep = iso_to_epoch(sstr)
+			eep = iso_to_epoch(estr)
+			if (eep > 0 && sep > 0) {
+				# prune if older than one week by end-time
+				if (eep >= (systime() - ONE_WEEK)) {
+					ew++
+					EW_START[ew] = sep
+					EW_END[ew] = eep
+				}
+			}
+			pos += RSTART + RLENGTH - 1
+		}
+	}
+	# 3) Merge existing (pruned) + new windows, deduplicate by start-epoch
+	# preference: new windows overwrite same-start existing
+	for (i = 1; i <= ew; i++) {
+		key = sprintf("%ld", EW_START[i])
+		MERGE_S[key] = EW_START[i]
+		MERGE_E[key] = EW_END[i]
+	}
+	for (i = 1; i <= nw; i++) {
+		key = sprintf("%ld", NW_START[i])
+		MERGE_S[key] = NW_START[i]
+		MERGE_E[key] = NW_END[i]
+	}
+	# Collect merged keys and sort by start time
+	mkc = 0
+	for (k in MERGE_S) {
+		mkc++
+		MK[mkc] = k
+	}
+	if (mkc == 0) {
+		# nothing to write; still emit minimal JSON
+		print("{\"timezone\":\"Asia/Tokyo\",\"next_unlock_at\":null,\"windows\":[]}") > outFile
+		exit
+	}
+	# sort MK by MERGE_S[k]
+	asort_by_start(MK, mkc, MERGE_S)
+	# Determine next_unlock_at = end of last window
+	lastStart = MERGE_S[MK[mkc]]
+	lastEnd = MERGE_E[MK[mkc]]
+	next_unlock = strftime("%Y-%m-%dT%H:%M:%S%z", lastEnd)
+	next_unlock_text = strftime("%H:%M", lastEnd)
+	checked_at = strftime("%Y-%m-%dT%H:%M:%S%z", systime())
+	# Emit JSON
+	print("{") > outFile
+	printf("  \"timezone\": \"Asia/Tokyo\",\n") >> outFile
+	printf("  \"checked_at\": \"%s\",\n", checked_at) >> outFile
+	printf("  \"next_unlock_at\": \"%s\",\n", next_unlock) >> outFile
+	print("  \"windows\": [") >> outFile
+	now = systime()
+	for (i = 1; i <= mkc; i++) {
+		ke = MK[i]
+		ss = MERGE_S[ke]
+		ee = MERGE_E[ke]
+		siso = strftime("%Y-%m-%dT%H:%M:%S%z", ss)
+		eiso = strftime("%Y-%m-%dT%H:%M:%S%z", ee)
+		act = (now < ee) ? "true" : "false"
+		if (i > 1) {
+			printf(",\n") >> outFile
+		}
+		printf("    { \"start\": \"%s\", \"end\": \"%s\", \"active\": %s }", siso, eiso, act) >> outFile
+	}
+	print("\n  ]") >> outFile
+	print("}") >> outFile
+	# Status message for tmux (to be read by status line script)
+	printf(">_ r%s", next_unlock_text) > "/tmp/tmux_status_messages/2_codex_window"
+}
+
+
+# Sort array of keys by MERGE_S[key] ascending
+function asort_by_start(keys, nkeys, S, i, j, tmp)
+{
+	for (i = 1; i <= nkeys; i++) {
+		for (j = i + 1; j <= nkeys; j++) {
+			if (S[keys[i]] > S[keys[j]]) {
+				tmp = keys[i]
+				keys[i] = keys[j]
+				keys[j] = tmp
+			}
+		}
+	}
+}
+
+
+# Parse ISO "YYYY-MM-DDTHH:MM:SS" into epoch (local TZ=JST)
+function iso_to_epoch(s, a, y, m, d, H, M, S)
+{
+	if (match(s, /^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})$/, a)) {
+		y = a[1]
+		m = a[2]
+		d = a[3]
+		H = a[4]
+		M = a[5]
+		S = a[6]
+		return to_epoch(y, m, d, H, M, S)
+	}
+	return 0
+}
+
+
+# --- Helpers ---
+function quote(p, q)
+{
+	q = p
+	gsub(/(["\\ ])/, "\\\\&", q)
+	return ("\"" q "\"")
+}
+
+
+# Remove timezone suffix like "+0900" if present (we treat local TZ anyway)
+function strip_tz(s)
+{
+	sub(/\+[0-9]{4}$/, "", s)
+	return s
+}
+
+
+# Build epoch from numeric Y M D h m s (local TZ=JST)
+function to_epoch(y, m, d, H, M, S)
+{
+	return mktime(sprintf("%04d %02d %02d %02d %02d %02d", y, m, d, H, M, S))
+}

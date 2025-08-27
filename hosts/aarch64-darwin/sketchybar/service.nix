@@ -1,13 +1,19 @@
-{ cacheDir, pkgs, config, ... }: {
+{
+  cacheDir,
+  pkgs,
+  config,
+  ...
+}:
+{
   launchd.user.agents.sketchybar = {
     path = with pkgs; [
       gh
-      dasel
       sketchybar
       config.environment.systemPath
       flock
       yabai
       taskwarrior3
+      pkgs.custom.mac.icalPal
     ];
 
     environment = {
