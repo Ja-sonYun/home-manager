@@ -4,12 +4,12 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   inherit pkgs;
   name = "playwright-mcp";
   packages = [
-    "@playwright/mcp@0.0.35"
+    "@playwright/mcp@0.0.36"
   ];
   exposedBinaries = [
     "mcp-server-playwright"
   ];
-  outputHash = "sha256-3h6f1IO+CUk3TeHJcvK5C3LAuxA351tmb5l/W98wCRU=";
+  outputHash = "sha256-W0dN2zWPkw3V4K/VflkA3uq0JfVgn6JwPYYHGa4bKEU=";
   postInstall = ''
     binary_path=$(readlink -f $out/bin/mcp-server-playwright)
     rm -f $out/bin/mcp-server-playwright

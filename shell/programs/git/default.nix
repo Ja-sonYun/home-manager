@@ -19,7 +19,6 @@
     enable = true;
     lfs.enable = true;
 
-    # TODO replace with your own name & email
     userName = "Ja-sonYun";
     userEmail = "killa30867@gmail.com";
 

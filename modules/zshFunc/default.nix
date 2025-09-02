@@ -1,50 +1,87 @@
-{ config, pkgs, lib, ... }:
-
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 with lib;
 
 let
-  zshFuncAttrs = config.programs.zshFunc;
+  cfg = config.programs.zshFunc;
 in
 {
-  ##############################
-  # Module Options Definition
-  ##############################
   options.programs.zshFunc = mkOption {
-    type = types.attrs;
+    type =
+      with types;
+      attrsOf (submodule {
+        options = {
+          description = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "Help text. When null, no -h/--help parsing is added.";
+          };
+          command = mkOption {
+            type = types.str;
+            default = "echo 'No command provided.'";
+          };
+          source = mkOption {
+            type = types.bool;
+            default = false;
+            description = "If true, define as a zsh function in initContent.";
+          };
+        };
+      });
     default = { };
-    description = ''
-      Configuration for zsh functions.
-      Each attribute is a function name with a definition containing:
-      - description: A brief description of what the function does.
-      - command: The shell command to execute.
-    '';
+    description = "Zsh functions with optional help and sourceable functions.";
   };
 
-  ##########################################
-  # Configuration: Generate `.zshfuncs` File
-  ##########################################
   config =
     let
-      # Generate the content of a single function
-      generateZshFunction = functionName: functionConfig:
+      toScriptBin =
+        name: fn:
         let
-          funcDescription = functionConfig.description or "No description provided.";
-          funcCommand = functionConfig.command or "echo 'No command provided.'";
-          scripts = ''
-            #!${pkgs.zsh}/bin/zsh
-
-            if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-              echo "${funcDescription}"
-              return 1
+          hasDesc = fn ? description && fn.description != null;
+          helpBlock = optionalString hasDesc ''
+            if [[ "''${1-}" == "-h" || "''${1-}" == "--help" ]]; then
+              print -- "${fn.description}"
+              exit 0
             fi
-            ${funcCommand}
           '';
         in
-        (pkgs.writeScriptBin functionName scripts);
+        pkgs.writeScriptBin name ''
+          #!${pkgs.zsh}/bin/zsh
+          set -euo pipefail
+          ${helpBlock}
+          ${fn.command}
+        '';
 
-      allFunctions = mapAttrsToList generateZshFunction zshFuncAttrs;
+      binAttrs = filterAttrs (_: fn: !(fn.source or false)) cfg;
+      allBins = mapAttrsToList toScriptBin binAttrs;
+
+      sourcedFns = concatStringsSep "\n\n" (
+        mapAttrsToList (
+          name: fn:
+          let
+            hasDesc = fn ? description && fn.description != null;
+            helpBlock = optionalString hasDesc ''
+              if [[ "''${1-}" == "-h" || "''${1-}" == "--help" ]]; then
+                print -- "${fn.description}"
+                return 0
+              fi
+            '';
+          in
+          ''
+            # ${optionalString hasDesc (fn.description)}
+            ${name}() {
+              ${helpBlock}
+              ${fn.command}
+            }
+          ''
+        ) (filterAttrs (_: fn: fn.source or false) cfg)
+      );
     in
     {
-      home.packages = allFunctions;
+      home.packages = allBins;
+      programs.zsh.initContent = lib.mkAfter sourcedFns;
     };
 }

@@ -1,5 +1,49 @@
 { pkgs, ... }:
+let
+  git-wt = (pkgs.writeShellScriptBin "git-wt" (builtins.readFile ./git-wt));
+in
 {
+  imports = [
+    ../../../modules/zshFunc
+  ];
+
+  programs.zshFunc = {
+    git-wt = {
+      source = true;
+      command = ''
+        # run underlying binary and capture output
+        local out
+        if ! out="$(${git-wt}/bin/git-wt "$@")"; then
+          # propagate failure with any output
+          printf '%s\n' "$out"
+          return 1
+        fi
+
+        # cd to last line if it is a directory
+        local dir
+        dir="$(printf '%s\n' "$out" | tail -n 1)"
+        if [ -d "$dir" ]; then
+          cd "$dir" || return
+        fi
+
+        # echo original output
+        printf '%s\n' "$out"
+      '';
+    };
+    git = {
+      source = true;
+      # To apply cd in a sourced script, we need to wrap the original command
+      command = ''
+        if [[ "$1" == wt ]]; then
+          shift
+          git-wt "$@"
+        else
+          command git "$@"
+        fi
+      '';
+    };
+  };
+
   programs.gh = {
     enable = true;
 
@@ -61,7 +105,6 @@
 
   programs.gitui = {
     enable = true;
-    package = pkgs.stable.gitui;
 
     keyConfig = ''
       (

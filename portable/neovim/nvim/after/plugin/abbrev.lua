@@ -5,8 +5,12 @@ end
 local function abolish(lhs, rhs, opts)
 	opts = opts or {}
 	local flags = {}
-	if opts.buffer then table.insert(flags, "-buffer") end
-	if opts.cmdline then table.insert(flags, "-cmdline") end
+	if opts.buffer then
+		table.insert(flags, "-buffer")
+	end
+	if opts.cmdline then
+		table.insert(flags, "-cmdline")
+	end
 	local prefix = (#flags > 0) and (table.concat(flags, " ") .. " ") or ""
 	vim.cmd(("Abolish %s%s %s"):format(prefix, lhs, rhs))
 end
@@ -115,6 +119,10 @@ abolish("Github", "GitHub")
 abolish("Javascript", "JavaScript")
 abolish("Typescript", "TypeScript")
 abolish("Postgresql", "PostgreSQL")
+
+-- Check
+abolish("cehck", "check")
+abolish("healtch", "health")
 
 -- Command-line abbreviations
 vim.cmd("cabbrev qq q!")

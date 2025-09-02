@@ -238,6 +238,16 @@ let
     else
       [ ];
 
+  swiftPackagesOpt =
+    if config.useSwift then
+      with pkgs;
+      [
+        # Use sourcekit-lsp from bundled Swift toolchain
+        swift-format
+      ]
+    else
+      [ ];
+
   extraPackages = pkgs.lib.concatLists [
     commonPackages
     nodePackagesOpt
@@ -251,6 +261,7 @@ let
     markdownPackagesOpt
     shellPackagesOpt
     rubyPackagesOpt
+    swiftPackagesOpt
   ];
 in
 {

@@ -59,6 +59,9 @@ M.root_markers = {
 	".git",
 	".gitignore",
 	".gitmodules",
+	"Package.swift",
+	".xcodeproj",
+	".xcworkspace",
 }
 
 M.non_code = {

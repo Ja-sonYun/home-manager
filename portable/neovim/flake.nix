@@ -98,6 +98,7 @@
           useMarkdown = true;
           useShell = true;
           useRuby = true;
+          useSwift = true;
         };
       };
     in
