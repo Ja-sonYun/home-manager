@@ -44,6 +44,10 @@ in
     };
   };
 
+  home.shellAliases = {
+    gw = "git wt";
+  };
+
   programs.gh = {
     enable = true;
 

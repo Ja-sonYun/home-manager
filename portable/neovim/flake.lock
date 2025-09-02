@@ -119,11 +119,11 @@
     "fzf": {
       "flake": false,
       "locked": {
-        "lastModified": 1756646324,
-        "narHash": "sha256-vIAkbZ3jx5B5+zdjT+4jMxhGPmiYUBIz5UjSP5HhQ9k=",
+        "lastModified": 1756855137,
+        "narHash": "sha256-EzQBmY0mD0l5kvBzgYDd81zmIT4mfwWqoSPWxIJmlfw=",
         "owner": "junegunn",
         "repo": "fzf",
-        "rev": "416aff86e9d550d0a34af9d3cc12dfede25354c3",
+        "rev": "de4059c8fa9d88247e0716f546a76d65fa3eb17b",
         "type": "github"
       },
       "original": {
