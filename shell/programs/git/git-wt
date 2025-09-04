@@ -6,7 +6,12 @@ err() {
     exit 1
 }
 inside_repo() { git rev-parse --is-inside-work-tree >/dev/null 2>&1; }
-safe() { echo "${1//\//-}"; }
+safe() {
+    local s
+    s="${1//\//-}"
+    s="${s//#/}"
+    echo "$s"
+}
 
 repo_paths() {
     local root parent base
@@ -75,11 +80,39 @@ cmd_checkout() {
 }
 
 cmd_rm() {
-    local br="${1:-}"
-    [ -n "$br" ] || err "usage: git wt rm <branch>"
+    local force_flag=""
+    local target=""
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+        -f | --force)
+            force_flag="--force"
+            shift
+            ;;
+        -*)
+            err "unknown option: $1"
+            ;;
+        *)
+            target="$1"
+            shift
+            ;;
+        esac
+    done
+
+    [ -n "$target" ] || err "usage: git wt rm [-f|--force] <branch|path>"
+
     local path
-    path="$(resolve_branch_path "$br")"
-    git worktree remove "$path"
+    if [ -d "$target" ]; then
+        path="$target"
+    else
+        path="$(resolve_branch_path "$target")"
+    fi
+
+    if [ -n "$force_flag" ]; then
+        git worktree remove "$force_flag" "$path"
+    else
+        git worktree remove "$path"
+    fi
 }
 
 cmd_unlock() {

@@ -9,8 +9,6 @@ in
 {
   imports = [
     ./alacritty/brew.nix
-    ./meetRecorder/brew.nix
-    # ./claude/brew.nix
   ];
 
   homebrew = {

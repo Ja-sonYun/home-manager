@@ -8,8 +8,6 @@
   imports = [
     ./alacritty
     ./taskwarrior
-    # ./claude
-    # ./meetRecorder
   ];
 
   # Home Manager needs a bit of information about you and the

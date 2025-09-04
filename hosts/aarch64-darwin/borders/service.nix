@@ -11,7 +11,7 @@ in
 {
   launchd.user.agents.jankyborders = {
     path = with pkgs; [
-      jankyborders
+      jankyborders-local
       config.environment.systemPath
     ];
 

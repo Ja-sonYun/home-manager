@@ -33,4 +33,10 @@
         tmux = final.callPackage ../pkgs/tmux { system = final.stdenv.hostPlatform.system; };
       };
     };
+
+  # Override upstream packages using our local pkgs/* definitions
+  unstable-pkgs-override = final: prev: {
+    yabai = final.callPackage ../pkgs/yabai { inherit prev final; };
+    # jankyborders = final.callPackage ../pkgs/jankyborders { inherit prev final; };
+  };
 }

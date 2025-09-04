@@ -1,0 +1,3 @@
+[submodule "pkgs/yabai/yabai-tahoe"]
+	path = pkgs/yabai/yabai-tahoe
+	url = git@github.com:tbiehn/yabai-tahoe.git
