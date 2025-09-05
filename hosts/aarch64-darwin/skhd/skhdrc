@@ -25,10 +25,10 @@ shift + rcmd - 4 : %yabai% -m window --space 4; %yabai% -m space --focus 4
 shift + rcmd - 5 : %yabai% -m window --space 5; %yabai% -m space --focus 5
 
 # TODO: When yabai support sa script comment out
-# rcmd - a : %yabai% -m space --focus prev
-# rcmd - d : %yabai% -m space --focus next
-rcmd - a : %skhd% -k "ctrl - left"
-rcmd - d : %skhd% -k "ctrl - right"
+rcmd - a : %yabai% -m space --focus prev
+rcmd - d : %yabai% -m space --focus next
+# rcmd - a : %skhd% -k "ctrl - left"
+# rcmd - d : %skhd% -k "ctrl - right"
 
 # rcmd - s : %yabai% -m space --focus last
 

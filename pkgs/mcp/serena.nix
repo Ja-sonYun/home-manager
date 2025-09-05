@@ -16,7 +16,7 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   exposedBinaries = [
     "serena-mcp-server"
   ];
-  outputHash = "sha256-pbnuQZcHR4mdj8J2aZbtMtoHN6rGxZE4TnECKBeJix0=";
+  outputHash = "sha256-7gGD4x3cu7RqDCxSMtYHbocSDzTUWAG9JsXbtA1pAGA=";
   postInstall = ''
     ln -s ${userhome}/.serena_config.yml $out/venv/serena/lib/python3.11/serena_config.yml
     wrapProgram $out/bin/serena-mcp-server \
