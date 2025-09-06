@@ -18,7 +18,7 @@ endif
 update-neovim:
 	cd ./portable/neovim && nix flake update
 
-update:
+update: update-neovim
 	nix flake update
 
 add:

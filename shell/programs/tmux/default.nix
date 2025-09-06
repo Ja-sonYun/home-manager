@@ -33,7 +33,7 @@
            local hooks_dir=\$(find_hooks_dir "\$OLDPWD")
            if [[ -n "\$hooks_dir" ]]; then
                local project_root=\$(dirname "\$hooks_dir")
-               tmux_session_name=\$(tmux list-sessions | awk -F: '/'"git_root_''${command}_\$(echo \$project_root | tr '/' '_' | tr ' ' '_'):"'/ {print \$1}')
+               tmux_session_name=\$(tmux list-sessions | awk -F: '/'"git_root_''${command}_\$(echo \$project_root | sed -e 's/\//_/g' -e 's/ /_/g' -e 's/+/\\+/g'):"'/ {print \$1}')
                if [[ -n "\$tmux_session_name" ]]; then
                    if ask_yes_no "Kill ''${command}"; then
                        tmux kill-session -t \$tmux_session_name 2>/dev/null && \\
