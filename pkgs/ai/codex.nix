@@ -4,10 +4,10 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   inherit pkgs;
   name = "openai-codex";
   packages = [
-    "@openai/codex@0.30.0"
+    "@openai/codex@0.31.0"
   ];
   exposedBinaries = [
     "codex"
   ];
-  outputHash = "sha256-CW2k2aUya6Fr3JXFN6kbGEqbl1wyjBVGRPk9/VMYYqE=";
+  outputHash = "sha256-bxLZfPdfwhNIZ/xk1O6sRfiu9/YsJmMxAEfJCFwTBNg=";
 }

@@ -9,6 +9,7 @@
   serena = pkgs.callPackage ./serena.nix { inherit userhome; };
   sequential-thinking = pkgs.callPackage ./sequential-thinking.nix {};
   playwright = pkgs.callPackage ./playwright.nix {};
+  browser-use = pkgs.callPackage ./browser-use.nix {};
   backlog-md = pkgs.callPackage ./backlog-md.nix {};
   ccusage = pkgs.callPackage ./ccusage.nix {};
 }

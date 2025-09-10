@@ -7,8 +7,6 @@ local uv = vim.uv or vim.loop
 M.config = {
 	model = "gpt-5",
 	timeout = 30000, -- 30 seconds
-	max_tokens = 4096,
-	temperature = 0.7,
 	retry_count = 2,
 	retry_delay = 1000, -- 1 second
 }

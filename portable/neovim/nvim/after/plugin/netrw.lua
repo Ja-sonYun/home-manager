@@ -15,7 +15,7 @@ vim.g.netrw_special_syntax = 1
 
 vim.keymap.set("n", "<leader>f", function()
 	local cur_file = vim.fn.expand("%:t")
-	vim.cmd.Ex()
+	vim.cmd.Explore()
 
 	local starting_line = 10
 	local lines = vim.api.nvim_buf_get_lines(0, starting_line, -1, false)

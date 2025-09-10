@@ -76,12 +76,18 @@ let
       args = [ ];
       env = { };
     }
-    {
-      name = "playwright";
-      command = "${pkgs.custom.mcp.playwright}/bin/mcp-server-playwright";
-      args = [ ];
-      env = { };
-    }
+    # {
+    #   name = "browser-use";
+    #   command = "${pkgs.custom.mcp.browser-use}/bin/browser-use";
+    #   args = [ "--mcp" ];
+    #   env = { };
+    # }
+    # {
+    #   name = "playwright";
+    #   command = "${pkgs.custom.mcp.playwright}/bin/mcp-server-playwright";
+    #   args = [ ];
+    #   env = { };
+    # }
     {
       name = "serena";
       command = "${pkgs.custom.mcp.serena}/bin/serena-mcp-server";
@@ -105,10 +111,8 @@ in
   home.packages = [
     pkgs.ollama
     pkgs.custom.ai.codex
-    # pkgs.custom.ai.claude-code
     pkgs.custom.mcp.serena
     pkgs.custom.mcp.backlog-md
-    # pkgs.custom.mcp.ccusage
   ];
 
   home.file."codex-config.toml" = {

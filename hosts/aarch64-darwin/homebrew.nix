@@ -58,6 +58,7 @@ in
       "jump"
       "utm"
       "kicad"
+      "firefox"
 
       "vagrant"
       "orbstack"
