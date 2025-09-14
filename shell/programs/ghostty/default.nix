@@ -1,0 +1,59 @@
+{ pkgs, ... }:
+{
+  programs.ghostty = {
+    enable = true;
+    enableZshIntegration = true;
+
+    # Use brew to install ghostty on macOS
+    package = if pkgs.stdenv.isDarwin then null else pkgs.ghostty;
+
+    settings = {
+      # Terminal identity
+      term = "xterm-256color";
+
+      # Font
+      font-family = "BigBlue_TerminalPlus Nerd Font";
+      font-size = 11;
+
+      # Colors
+      background = "000000";
+      foreground = "ffffff";
+      cursor-color = "ffffff";
+      cursor-text = "F81CE5";
+      palette = [
+        "0=#000000"
+        "1=#fe0100"
+        "2=#33ff00"
+        "3=#feff00"
+        "4=#0066ff"
+        "5=#cc00ff"
+        "6=#00ffff"
+        "7=#d0d0d0"
+        "8=#808080"
+        "9=#fe0100"
+        "10=#33ff00"
+        "11=#feff00"
+        "12=#0066ff"
+        "13=#cc00ff"
+        "14=#00ffff"
+        "15=#ffffff"
+      ];
+
+      # Window
+      background-opacity = 0.98;
+      window-padding-x = 10;
+      window-padding-y = 10;
+
+      # Title bar
+      title = "⎦˚◡˚⎣";
+      macos-titlebar-style = "hidden";
+      macos-option-as-alt = true;
+
+      # Keybinds
+      keybind = [
+        # Send Ctrl-Q (tmux prefix)
+        "unconsumed:ctrl+q=text:\\x11"
+      ];
+    };
+  };
+}

@@ -12,6 +12,7 @@
       ./programs/git/utils.nix
       # We'll use orbstack on macOS
       # ./programs/docker
+      ./programs/ghostty
       ./programs/jujutsu
       ./programs/tmux
       ./programs/visidata

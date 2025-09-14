@@ -6,7 +6,6 @@
 }:
 {
   imports = [
-    ./alacritty
     ./taskwarrior
   ];
 

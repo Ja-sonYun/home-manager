@@ -7,10 +7,6 @@ let
   allTaps = lib.concatMap (pkg: pkg.homebrew.taps or [ ]) packageBrews;
 in
 {
-  imports = [
-    ./alacritty/brew.nix
-  ];
-
   homebrew = {
     enable = true;
     global = {
@@ -35,6 +31,7 @@ in
     ]
     ++ allBrews;
     casks = [
+      "ghostty"
       "aldente"
       "keycastr" # Show keystroke realtime
       "chatgpt"
