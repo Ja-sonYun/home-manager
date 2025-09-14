@@ -4,7 +4,7 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   inherit pkgs;
   name = "ccusage";
   packages = [
-    "ccusage@16.2.3"
+    "ccusage@16.2.4"
   ];
   exposedBinaries = [
     "ccusage"

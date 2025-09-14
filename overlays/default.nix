@@ -19,6 +19,7 @@
   };
 
   neovim = inputs.neovim.overlays.default;
+  say = inputs.say.overlays.default;
 
   custom-packages =
     final: prev:

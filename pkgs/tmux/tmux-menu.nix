@@ -5,5 +5,5 @@ pkgs.lib.cargo.mkCargoGlobalPackageDerivation {
   name = "tmux-menu";
   version = "0.1.15";
   rustEdition = "2021";
-  outputHash = "sha256-r4k8je4ft5iEPU6/ePou+9dDl74lNPpLWSTIAFtVozM=";
+  outputHash = "sha256-v9NOy7eWnkcPCjRBIVMW2zxfBpQlEC5ACga6z8E/aSQ=";
 }

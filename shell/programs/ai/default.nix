@@ -112,7 +112,6 @@ in
     pkgs.ollama
     pkgs.custom.ai.codex
     pkgs.custom.mcp.serena
-    pkgs.custom.mcp.backlog-md
   ];
 
   home.file."codex-config.toml" = {

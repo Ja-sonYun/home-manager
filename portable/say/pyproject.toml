@@ -1,0 +1,27 @@
+[project]
+name = "nvtts"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11, <3.12"
+dependencies = [
+    "en-core-web-sm",
+    "kokoro>=0.9.4",
+    "misaki[ja]>=0.9.4",
+    "pydantic-settings>=2.10.1",
+    "sounddevice>=0.5.2",
+    "soundfile>=0.13.1",
+]
+
+[project.scripts]
+nvtts = "say:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["say.py"]
+
+[tool.uv.sources]
+en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }

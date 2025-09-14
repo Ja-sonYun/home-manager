@@ -45,6 +45,7 @@
     };
 
     neovim.url = "path:./portable/neovim";
+    say.url = "path:./portable/say";
 
     # Agenix for secret management
     agenix = {
@@ -74,6 +75,8 @@
       homebrew-cask,
 
       neovim,
+      say,
+
       agenix,
       agenix-secrets,
       ...

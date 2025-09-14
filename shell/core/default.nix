@@ -61,6 +61,7 @@
 
     # My nvim config
     nvim-pkg
+    say
 
     nix-tree
     nix-index

@@ -98,7 +98,7 @@
       ".netrwhist"
 
       # Auto-generated tag files
-      "tags"
+      # "tags"
       # Persistent undo
       "[._]*.un~"
 

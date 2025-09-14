@@ -59,6 +59,7 @@ in
       "utm"
       "kicad"
       "firefox"
+      "raycast"
 
       "vagrant"
       "orbstack"
