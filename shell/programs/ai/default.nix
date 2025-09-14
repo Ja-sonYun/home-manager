@@ -76,6 +76,15 @@ let
       args = [ ];
       env = { };
     }
+    {
+      name = "context7";
+      command = pkgs.writeShellScript "context7-mcp-wrapper" ''
+        export CONTEXT7_API_KEY=$(cat ${config.age.secrets.context7-api-key.path})
+        exec ${pkgs.custom.mcp.context7}/bin/context7-mcp --api-key "$CONTEXT7_API_KEY"
+      '';
+      args = [ ];
+      env = { };
+    }
     # {
     #   name = "browser-use";
     #   command = "${pkgs.custom.mcp.browser-use}/bin/browser-use";

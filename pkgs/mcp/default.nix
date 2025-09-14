@@ -12,4 +12,5 @@
   browser-use = pkgs.callPackage ./browser-use.nix {};
   backlog-md = pkgs.callPackage ./backlog-md.nix {};
   ccusage = pkgs.callPackage ./ccusage.nix {};
+  context7 = pkgs.callPackage ./context7.nix {};
 }

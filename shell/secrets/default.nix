@@ -15,6 +15,9 @@
     openai-api-key = {
       file = "${agenix-secrets}/openai-api-key.age";
     };
+    context7-api-key = {
+      file = "${agenix-secrets}/context7-api-key.age";
+    };
   };
 
   home.sessionVariables = {
