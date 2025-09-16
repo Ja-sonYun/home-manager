@@ -21,6 +21,12 @@
   neovim = inputs.neovim.overlays.default;
   say = inputs.say.overlays.default;
 
+  tmux-with-sixel = final: prev: {
+    tmux = prev.tmux.overrideAttrs (old: {
+      configureFlags = (old.configureFlags or [ ]) ++ [ "--enable-sixel" ];
+    });
+  };
+
   custom-packages =
     final: prev:
     let

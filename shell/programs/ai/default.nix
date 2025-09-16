@@ -97,15 +97,15 @@ let
     #   args = [ ];
     #   env = { };
     # }
-    {
-      name = "serena";
-      command = "${pkgs.custom.mcp.serena}/bin/serena-mcp-server";
-      args = [
-        "--context"
-        "codex"
-      ];
-      env = { };
-    }
+    # {
+    #   name = "serena";
+    #   command = "${pkgs.custom.mcp.serena}/bin/serena-mcp-server";
+    #   args = [
+    #     "--context"
+    #     "codex"
+    #   ];
+    #   env = { };
+    # }
   ];
 
   codexMcpServersConfig = lib.concatMapStringsSep "\n" genCodexMcpServer mcpServers;
@@ -120,17 +120,19 @@ in
   home.packages = [
     pkgs.ollama
     pkgs.custom.ai.codex
-    pkgs.custom.mcp.serena
+    # pkgs.custom.mcp.serena
   ];
 
   home.file."codex-config.toml" = {
     target = ".codex/config.toml";
     text = ''
+      model = "gpt-5-codex"
+
       approval_policy = "on-request"
       sandbox_mode = "workspace-write"
 
       hide_agent_reasoning = false
-      model_reasoning_effort = "high"
+      model_reasoning_effort = "medium"
 
       notify = ["${notifierScript}"]
       file_opener = "none"
@@ -141,6 +143,9 @@ in
       exclude_slash_tmp = false
       writable_roots = []
 
+      [tui]
+      notifications = true
+
       [shell_environment_policy]
       inherit = "all"
       ignore_default_excludes = false
@@ -148,24 +153,27 @@ in
       set = {}
       include_only = []
 
+      [tools]
+      web_search = true
+
       ${codexMcpServersConfig}
     '';
   };
 
   home.activation = {
-    serena-config = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      if [ ! -f "$HOME/.serena_config.yml" ]; then
-        echo "Creating default serena config file at $HOME/.serena_config.yml"
-        cat > $HOME/.serena_config.yml <<-'EOF'
-      gui_log_window: False
-      web_dashboard: True
-      log_level: 20
-      trace_lsp_communication: False
-      tool_timeout: 240
-      projects: []
-      EOF
-      fi
-    '';
+    # serena-config = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    #   if [ ! -f "$HOME/.serena_config.yml" ]; then
+    #     echo "Creating default serena config file at $HOME/.serena_config.yml"
+    #     cat > $HOME/.serena_config.yml <<-'EOF'
+    #   gui_log_window: False
+    #   web_dashboard: True
+    #   log_level: 20
+    #   trace_lsp_communication: False
+    #   tool_timeout: 240
+    #   projects: []
+    #   EOF
+    #   fi
+    # '';
   };
 
   # age.secrets.claude = {

@@ -13,7 +13,20 @@
 
       # Font
       font-family = "BigBlue_TerminalPlus Nerd Font";
+      font-style = "Book";
       font-size = 11;
+
+      adjust-cursor-thickness = "200%";
+
+      font-feature = [
+        "-calt"
+        "-dlig"
+      ];
+
+      font-thicken = true;
+      font-synthetic-style = false;
+      minimum-contrast = 1;
+      selection-invert-fg-bg = false;
 
       # Colors
       background = "000000";
@@ -51,8 +64,12 @@
 
       # Keybinds
       keybind = [
-        # Send Ctrl-Q (tmux prefix)
-        "unconsumed:ctrl+q=text:\\x11"
+        "clear"
+        "cmd+c=copy_to_clipboard"
+        "cmd+v=paste_from_clipboard"
+        "cmd+a=select_all"
+        "cmd+q=quit"
+        "cmd+w=close_window"
       ];
     };
   };
