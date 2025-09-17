@@ -118,6 +118,14 @@ end
 --- @return nil
 M.set_buffer_opts = function(opts)
 	local width = opts.width or 2
+	if width <= 0 then
+		width = vim.bo.tabstop
+		if width <= 0 then
+			width = 2
+		end
+	end
+
+	vim.opt_local.shiftwidth = width
 	vim.opt_local.shiftwidth = width
 	vim.opt_local.tabstop = width
 	vim.opt_local.expandtab = true
@@ -132,24 +140,24 @@ end
 --- @param filetype table
 --- @param func function
 M.on_buffer_change = function(filetype, func)
-    local group = vim.api.nvim_create_augroup("on_buffer_change", { clear = true })
-    vim.api.nvim_create_autocmd("BufLeave", {
-        group = group,
-        pattern = filetype,
-        callback = function()
-            M.last_dir = vim.fn.fnamemodify(vim.fn.expand("%:p"), ":h")
-        end,
-    })
-    vim.api.nvim_create_autocmd("BufEnter", {
-        group = group,
-        callback = function()
-            local current_dir = vim.fn.fnamemodify(vim.fn.expand("%:p"), ":h")
-            if M.last_dir and M.last_dir ~= current_dir then
-                vim.notify("Directory changed from " .. M.last_dir .. " to " .. current_dir)
-                func(M.last_dir, current_dir)
-            end
-        end,
-    })
+	local group = vim.api.nvim_create_augroup("on_buffer_change", { clear = true })
+	vim.api.nvim_create_autocmd("BufLeave", {
+		group = group,
+		pattern = filetype,
+		callback = function()
+			M.last_dir = vim.fn.fnamemodify(vim.fn.expand("%:p"), ":h")
+		end,
+	})
+	vim.api.nvim_create_autocmd("BufEnter", {
+		group = group,
+		callback = function()
+			local current_dir = vim.fn.fnamemodify(vim.fn.expand("%:p"), ":h")
+			if M.last_dir and M.last_dir ~= current_dir then
+				vim.notify("Directory changed from " .. M.last_dir .. " to " .. current_dir)
+				func(M.last_dir, current_dir)
+			end
+		end,
+	})
 end
 
 M.uuid = function()

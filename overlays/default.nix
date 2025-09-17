@@ -20,6 +20,7 @@
 
   neovim = inputs.neovim.overlays.default;
   say = inputs.say.overlays.default;
+  plot = inputs.plot.overlays.default;
 
   tmux-with-sixel = final: prev: {
     tmux = prev.tmux.overrideAttrs (old: {

@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+  echo "Usage: $0 <path-to-nix-file>" >&2
+  exit 1
+fi
+
+ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
+TARGET_INPUT=$1
+
+if [[ "$TARGET_INPUT" = /* ]]; then
+  TARGET_PATH="$TARGET_INPUT"
+else
+  TARGET_PATH="$ROOT_DIR/$TARGET_INPUT"
+fi
+
+if [[ ! -f "$TARGET_PATH" ]]; then
+  echo "Target file not found: $TARGET_PATH" >&2
+  exit 1
+fi
+
+PLACEHOLDER="pkgs.lib.fakeSha256"
+
+sed_inplace() {
+  local script="$1"
+  local file="$2"
+  if sed --version >/dev/null 2>&1; then
+    sed -i -e "$script" "$file"
+  else
+    sed -i '' -e "$script" "$file"
+  fi
+}
+
+mktemp_nix() {
+  local prefix="$1"
+  local tmp
+  if tmp=$(mktemp -t "${prefix}.XXXXXX" 2>/dev/null); then
+    printf '%s\n' "$tmp"
+    return
+  fi
+  tmp=$(mktemp "/tmp/${prefix}.XXXXXX")
+  printf '%s\n' "$tmp"
+}
+
+TMP_FILE=$(mktemp_nix update-output-hash)
+trap 'rm -f "$TMP_FILE"' EXIT
+cp "$TARGET_PATH" "$TMP_FILE"
+
+sed_inplace "s/^\\([[:space:]]*outputHash[[:space:]]*=[[:space:]]*\).*$/\\1${PLACEHOLDER};/" "$TMP_FILE"
+
+BUILD_EXPR=$(cat <<EXPR
+let
+  flake = builtins.getFlake (toString ${ROOT_DIR});
+  pkgs = import flake.inputs.nixpkgs {
+    system = builtins.currentSystem;
+    overlays = flake.overlays;
+    config.allowUnfree = true;
+  };
+in pkgs.callPackage ${TMP_FILE} {}
+EXPR
+)
+
+set +e
+BUILD_LOG=$(nix build --impure --expr "$BUILD_EXPR" -L 2>&1)
+BUILD_STATUS=$?
+set -e
+
+if [[ $BUILD_STATUS -eq 0 ]]; then
+  echo "Unexpected success: placeholder hash did not trigger mismatch." >&2
+  printf '%s\n' "$BUILD_LOG"
+  exit 1
+fi
+
+NEW_HASH=$(printf '%s\n' "$BUILD_LOG" | sed -nE 's/.*got:[[:space:]]*(sha256-[A-Za-z0-9+/=]+).*/\1/p' | tail -n 1)
+
+if [[ -z "$NEW_HASH" ]]; then
+  echo "Failed to parse output hash from build." >&2
+  printf '%s\n' "$BUILD_LOG"
+  exit 1
+fi
+
+ESCAPED_HASH=$(printf '%s' "$NEW_HASH" | sed 's/[\/^&]/\\&/g')
+sed_inplace "s/^\\([[:space:]]*outputHash[[:space:]]*=[[:space:]]*\).*$/\\1\"${ESCAPED_HASH}\";/" "$TARGET_PATH"
+
+if ! grep -q "$NEW_HASH" "$TARGET_PATH"; then
+  echo "Hash update failed to apply." >&2
+  exit 1
+fi
+
+cat <<MSG
+Updated outputHash in $TARGET_PATH
+  -> $NEW_HASH
+MSG

@@ -62,6 +62,7 @@
     # My nvim config
     nvim-pkg
     say
+    plot
 
     nix-tree
     nix-index

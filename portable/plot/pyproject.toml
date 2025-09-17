@@ -1,0 +1,24 @@
+[project]
+name = "plot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Ja-sonYun", email = "killa30867@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "openai>=1.107.3",
+    "psutil>=7.0.0",
+    "pydantic>=2.11.9",
+    "pydantic-settings>=2.10.1",
+    "rich>=14.1.0",
+    "uniplot>=0.21.4",
+]
+
+[project.scripts]
+plot = "plot.main:main"
+
+[build-system]
+requires = ["uv_build>=0.8.14,<0.9.0"]
+build-backend = "uv_build"

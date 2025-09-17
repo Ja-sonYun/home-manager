@@ -46,6 +46,7 @@
 
     neovim.url = "path:./portable/neovim";
     say.url = "path:./portable/say";
+    plot.url = "path:./portable/plot";
 
     # Agenix for secret management
     agenix = {
