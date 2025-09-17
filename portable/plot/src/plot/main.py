@@ -49,6 +49,7 @@ async def _main() -> None:
     with stdout.status("[bold green]Synthesizing regex pattern...", spinner="dots"):
         response = await client.beta.chat.completions.parse(
             model=settings.model,
+            reasoning_effort="minimal" if "gpt-5" in settings.model else None,
             messages=[
                 {
                     "role": "user",
