@@ -9,6 +9,7 @@
     ../../modules/zshFunc
 
     ./zle/better_grammar
+    ./zle/command_generator
   ];
 
   programs.zsh = {
