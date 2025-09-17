@@ -3,6 +3,7 @@ import re
 import shutil
 import time
 from collections import deque
+from typing import Deque
 
 from rich.live import Live
 from rich.text import Text
@@ -52,18 +53,15 @@ def generate_plot(
     )
 
 
-def _render_stream_plot(
-    settings: AppSettings,
-    plot_spec: PlotSpec,
-    min_value: float | None,
-    max_value: float | None,
-    start_time: float,
-    buffers: dict[str, deque[float]],
-    time_queue: deque[float],
+def _append_sample(
+    *,
     line: str,
-    live: Live,
+    plot_spec: PlotSpec,
+    start_time: float,
+    buffers: dict[str, Deque[float]],
+    time_queue: Deque[float],
+    line_queue: Deque[str],
 ) -> bool:
-
     values: dict[str, float] = {}
     missing: list[str] = []
 
@@ -90,15 +88,63 @@ def _render_stream_plot(
 
     for name, val in values.items():
         buffers[name].append(val)
-        min_value = val if min_value is None else min(min_value, val)
-        max_value = val if max_value is None else max(max_value, val)
 
     elapsed = time.time() - start_time
     time_queue.append(elapsed)
+    line_queue.append(line)
+
+    return True
+
+
+def _series_snapshot(
+    *,
+    buffers: dict[str, Deque[float]],
+    time_queue: Deque[float],
+    line_queue: Deque[str],
+    end_index: int | None,
+) -> tuple[list[str], list[list[float]], list[float], str]:
+    times = list(time_queue)
+    if not times:
+        return [], [], [], ""
+
+    final_index = len(times) - 1 if end_index is None else end_index
+    final_index = max(0, min(final_index, len(times) - 1))
 
     legends = list(buffers.keys())
-    series = [list(buffers[name]) for name in legends]
-    # choose y-axis unit: prefer the first non-empty per-series unit, else fallback
+    materialized = {name: list(series) for name, series in buffers.items()}
+    series = [materialized[name][: final_index + 1] for name in legends]
+    time_slice = times[: final_index + 1]
+    lines = list(line_queue)
+    line = lines[final_index] if lines else ""
+
+    return legends, series, time_slice, line
+
+
+def _render_view(
+    *,
+    live: Live,
+    settings: AppSettings,
+    plot_spec: PlotSpec,
+    buffers: dict[str, Deque[float]],
+    time_queue: Deque[float],
+    line_queue: Deque[str],
+    end_index: int | None,
+    paused: bool,
+) -> None:
+    legends, series, times, line = _series_snapshot(
+        buffers=buffers,
+        time_queue=time_queue,
+        line_queue=line_queue,
+        end_index=end_index,
+    )
+
+    if not times or not series:
+        return
+
+    flat_values = [value for stream in series for value in stream]
+    y_min = min(flat_values) if flat_values else None
+    y_max = max(flat_values) if flat_values else None
+
     y_unit = next(
         (ex.unit for ex in plot_spec.extracts if ex.unit), plot_spec.unit or ""
     )
@@ -107,17 +153,45 @@ def _render_stream_plot(
         title=plot_spec.title,
         legends=legends,
         series=series,
-        time=list(time_queue),
+        time=times,
         height=settings.height,
-        y_min=min_value,
-        y_max=max_value,
+        y_min=y_min,
+        y_max=y_max,
         y_unit=y_unit,
     )
-    rendered = f"{rendered_plot}\n\n{line}"
+
+    if paused:
+        suffix = f"{line} [yellow](paused)[/yellow]" if line else "[yellow](paused)[/yellow]"
+        status = suffix
+    else:
+        status = line
+
+    rendered = f"{rendered_plot}\n\n{status}"
     renderable = Text.from_ansi(rendered)
     live.update(renderable, refresh=True)
 
-    return True
+
+def _step_backward(times: list[float], index: int, seconds: float) -> int:
+    if not times:
+        return index
+
+    target = times[index] - seconds
+    cursor = index
+    while cursor > 0 and times[cursor] > target:
+        cursor -= 1
+    return cursor
+
+
+def _step_forward(times: list[float], index: int, seconds: float) -> int:
+    if not times:
+        return index
+
+    target = times[index] + seconds
+    cursor = index
+    last = len(times) - 1
+    while cursor < last and times[cursor] < target:
+        cursor += 1
+    return cursor
 
 
 async def render_plot(
@@ -125,14 +199,16 @@ async def render_plot(
     plot_spec: PlotSpec,
     act_queue: asyncio.Queue[str | KeyStroke],
 ) -> None:
-    min_value: float | None = None
-    max_value: float | None = None
     start_time = time.time()
 
-    buffers: dict[str, deque[float]] = {}
+    buffers: dict[str, Deque[float]] = {}
     for ex in plot_spec.extracts:
         buffers[ex.name] = deque(maxlen=settings.window)
-    time_queue: deque[float] = deque(maxlen=settings.window)
+    time_queue: Deque[float] = deque(maxlen=settings.window)
+    line_queue: Deque[str] = deque(maxlen=settings.window)
+
+    paused = False
+    view_index: int | None = None
 
     with Live(console=stdout, auto_refresh=False) as live:
         while True:
@@ -140,25 +216,142 @@ async def render_plot(
 
             match line:
                 case str() as frame:
-                    if not _render_stream_plot(
-                        settings,
-                        plot_spec,
-                        min_value,
-                        max_value,
-                        start_time,
-                        buffers,
-                        time_queue,
-                        frame,
-                        live,
+                    was_full = (
+                        time_queue.maxlen is not None
+                        and len(time_queue) == time_queue.maxlen
+                    )
+                    if not _append_sample(
+                        line=frame,
+                        plot_spec=plot_spec,
+                        start_time=start_time,
+                        buffers=buffers,
+                        time_queue=time_queue,
+                        line_queue=line_queue,
                     ):
                         continue
 
+                    if paused:
+                        if not time_queue:
+                            view_index = None
+                            continue
+
+                        if view_index is None:
+                            view_index = len(time_queue) - 1
+                        if was_full and view_index is not None and view_index > 0:
+                            view_index -= 1
+                        if view_index is not None and view_index >= len(time_queue):
+                            view_index = len(time_queue) - 1
+                        continue
+
+                    _render_view(
+                        live=live,
+                        settings=settings,
+                        plot_spec=plot_spec,
+                        buffers=buffers,
+                        time_queue=time_queue,
+                        line_queue=line_queue,
+                        end_index=None,
+                        paused=False,
+                    )
+
+                case None:
+                    continue
                 case KeyStroke(event=KeyEvent.CTRL_C) | KeyStroke(
                     event=KeyEvent.ESCAPE
                 ):
                     return
                 case KeyStroke(event=KeyEvent.CHARACTER, value="q"):
                     return
+                case KeyStroke(event=KeyEvent.CHARACTER, value=" "):
+                    paused = not paused
+                    if paused:
+                        if time_queue:
+                            view_index = len(time_queue) - 1
+                            _render_view(
+                                live=live,
+                                settings=settings,
+                                plot_spec=plot_spec,
+                                buffers=buffers,
+                                time_queue=time_queue,
+                                line_queue=line_queue,
+                                end_index=view_index,
+                                paused=True,
+                            )
+                        else:
+                            view_index = None
+                    else:
+                        view_index = None
+                        if time_queue:
+                            _render_view(
+                                live=live,
+                                settings=settings,
+                                plot_spec=plot_spec,
+                                buffers=buffers,
+                                time_queue=time_queue,
+                                line_queue=line_queue,
+                                end_index=None,
+                                paused=False,
+                            )
+                    continue
+                case KeyStroke(event=KeyEvent.ENTER):
+                    if not paused:
+                        continue
+                    paused = False
+                    view_index = None
+                    if time_queue:
+                        _render_view(
+                            live=live,
+                            settings=settings,
+                            plot_spec=plot_spec,
+                            buffers=buffers,
+                            time_queue=time_queue,
+                            line_queue=line_queue,
+                            end_index=None,
+                            paused=False,
+                        )
+                    continue
+                case KeyStroke(event=KeyEvent.CHARACTER, value="h"):
+                    if not paused or not time_queue:
+                        continue
+
+                    if view_index is None:
+                        view_index = len(time_queue) - 1
+
+                    times = list(time_queue)
+                    view_index = _step_backward(times, view_index, 1.0)
+
+                    _render_view(
+                        live=live,
+                        settings=settings,
+                        plot_spec=plot_spec,
+                        buffers=buffers,
+                        time_queue=time_queue,
+                        line_queue=line_queue,
+                        end_index=view_index,
+                        paused=True,
+                    )
+                    continue
+                case KeyStroke(event=KeyEvent.CHARACTER, value="l"):
+                    if not paused or not time_queue:
+                        continue
+
+                    if view_index is None:
+                        view_index = len(time_queue) - 1
+
+                    times = list(time_queue)
+                    view_index = _step_forward(times, view_index, 1.0)
+
+                    _render_view(
+                        live=live,
+                        settings=settings,
+                        plot_spec=plot_spec,
+                        buffers=buffers,
+                        time_queue=time_queue,
+                        line_queue=line_queue,
+                        end_index=view_index,
+                        paused=True,
+                    )
+                    continue
                 case KeyStroke() as ke:
                     stdout.print(f"[yellow]Ignored key event:[/yellow] {ke.value}")
                     continue
