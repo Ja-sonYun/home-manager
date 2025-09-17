@@ -1,9 +1,9 @@
 import asyncio
 import sys
 from collections.abc import AsyncIterator
+from typing import Literal
 
 from plot.text import remove_ansi
-
 
 _FRAME_BOUNDARIES: tuple[str, ...] = (
     "\x1b[2J\x1b[H",
@@ -88,3 +88,16 @@ async def iter_stdin_frames() -> AsyncIterator[str]:
     normalized = _normalize(frame)
     if normalized and normalized != prev:
         yield normalized
+
+
+async def queue_stdin(
+    queue: asyncio.Queue[str],
+    mode: Literal["lines", "frames"] = "lines",
+) -> None:
+    """Read from standard input and put lines or frames into the queue."""
+    reader = iter_stdin_frames if mode == "frames" else iter_stdin_lines
+    try:
+        async for item in reader():
+            await queue.put(item)
+    except (asyncio.CancelledError, GeneratorExit):
+        return
