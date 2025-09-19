@@ -1,9 +1,9 @@
-{ pkgs, lib, system, ... }:
+{ pkgs, system, ... }:
 
 pkgs.lib.cargo.mkCargoGlobalPackageDerivation {
   inherit pkgs system;
   name = "tmux-menu";
-  version = "0.1.15";
+  version = "0.1.17";
   rustEdition = "2021";
-  outputHash = "sha256-v9NOy7eWnkcPCjRBIVMW2zxfBpQlEC5ACga6z8E/aSQ=";
+  outputHash = "sha256-kB8pQHyxq0gtWUD/Rd/X1hBWcRq+Ud2B3zbfu+m36Jk=";
 }

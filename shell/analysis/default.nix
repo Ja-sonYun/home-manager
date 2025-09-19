@@ -10,6 +10,7 @@
     # Binary analysis
     radare2
     rizin
+    binsider
 
     # Cloud Infrastructure
     # checkov
