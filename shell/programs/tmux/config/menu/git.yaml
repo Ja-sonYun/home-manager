@@ -12,7 +12,14 @@ items:
   - Menu:
       name: "tig"
       shortcut: g
-      command: tig
+      command: _gen-close-hook tig && tig
+      session: true
+      session_name: "tig"
+      session_on_dir: true
+      run_on_git_root: true
+      environment:
+        MENU_POPUP: "1"
+        NO_WINDOW_MGNT: "1"
 
       position:
         w: 140
@@ -21,7 +28,14 @@ items:
   - Menu:
       name: "gitui"
       shortcut: u
-      command: gitui
+      command: _gen-close-hook gitui && gitui
+      session: true
+      session_name: "gitui"
+      session_on_dir: true
+      run_on_git_root: true
+      environment:
+        MENU_POPUP: "1"
+        NO_WINDOW_MGNT: "1"
 
       position:
         w: 140
@@ -30,7 +44,14 @@ items:
   - Menu:
       name: "gh dash"
       shortcut: d
-      command: gh dash
+      command: _gen-close-hook gh-dash && gh dash
+      session: true
+      session_name: "gh-dash"
+      session_on_dir: true
+      run_on_git_root: true
+      environment:
+        MENU_POPUP: "1"
+        NO_WINDOW_MGNT: "1"
 
       position:
         w: 150
