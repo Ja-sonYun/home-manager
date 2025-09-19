@@ -104,6 +104,7 @@ let
     (mkNvimPlugin inputs.quicker-nvim "quicker.nvim")
     (mkNvimPlugin inputs.claude-code-nvim "claude-code.nvim")
     (mkNvimPlugin inputs.winresizer "winresizer")
+    (mkNvimPlugin inputs.lensline-nvim "lensline.nvim")
   ];
 
   commonPackages = with pkgs; [

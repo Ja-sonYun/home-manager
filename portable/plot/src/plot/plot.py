@@ -102,6 +102,7 @@ def _series_snapshot(
     time_queue: Deque[float],
     line_queue: Deque[str],
     end_index: int | None,
+    window: int,
 ) -> tuple[list[str], list[list[float]], list[float], str]:
     times = list(time_queue)
     if not times:
@@ -109,11 +110,12 @@ def _series_snapshot(
 
     final_index = len(times) - 1 if end_index is None else end_index
     final_index = max(0, min(final_index, len(times) - 1))
+    start_index = max(0, final_index - window + 1)
 
     legends = list(buffers.keys())
     materialized = {name: list(series) for name, series in buffers.items()}
-    series = [materialized[name][: final_index + 1] for name in legends]
-    time_slice = times[: final_index + 1]
+    series = [materialized[name][start_index : final_index + 1] for name in legends]
+    time_slice = times[start_index : final_index + 1]
     lines = list(line_queue)
     line = lines[final_index] if lines else ""
 
@@ -136,6 +138,7 @@ def _render_view(
         time_queue=time_queue,
         line_queue=line_queue,
         end_index=end_index,
+        window=settings.window,
     )
 
     if not times or not series:
@@ -161,12 +164,13 @@ def _render_view(
     )
 
     if paused:
-        suffix = f"{line} [yellow](paused)[/yellow]" if line else "[yellow](paused)[/yellow]"
-        status = suffix
+        status = " [PAUSED] "
     else:
-        status = line
+        status = " [RUNNING] "
+    terminal_width = shutil.get_terminal_size((80, 24)).columns
+    status_line = status.center(terminal_width)
 
-    rendered = f"{rendered_plot}\n\n{status}"
+    rendered = f"{rendered_plot}\n\n{line}\n\n{status_line}"
     renderable = Text.from_ansi(rendered)
     live.update(renderable, refresh=True)
 
@@ -201,11 +205,13 @@ async def render_plot(
 ) -> None:
     start_time = time.time()
 
+    history_size = settings.window * 1000
+
     buffers: dict[str, Deque[float]] = {}
     for ex in plot_spec.extracts:
-        buffers[ex.name] = deque(maxlen=settings.window)
-    time_queue: Deque[float] = deque(maxlen=settings.window)
-    line_queue: Deque[str] = deque(maxlen=settings.window)
+        buffers[ex.name] = deque(maxlen=history_size)
+    time_queue: Deque[float] = deque(maxlen=history_size)
+    line_queue: Deque[str] = deque(maxlen=history_size)
 
     paused = False
     view_index: int | None = None
@@ -254,8 +260,6 @@ async def render_plot(
                         paused=False,
                     )
 
-                case None:
-                    continue
                 case KeyStroke(event=KeyEvent.CTRL_C) | KeyStroke(
                     event=KeyEvent.ESCAPE
                 ):
@@ -353,5 +357,4 @@ async def render_plot(
                     )
                     continue
                 case KeyStroke() as ke:
-                    stdout.print(f"[yellow]Ignored key event:[/yellow] {ke.value}")
                     continue

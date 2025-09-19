@@ -2,8 +2,8 @@
 
 stdenvNoCC.mkDerivation {
   pname = "yabai";
-  version = "tahoe-beta9";
-  src = ./yabai;
+  version = "ff42cea";
+  src = ./yabai-bin;
   dontUnpack = true;
 
   installPhase = ''
@@ -13,7 +13,7 @@ stdenvNoCC.mkDerivation {
   '';
 
   meta = with lib; {
-    description = "Yabai tahoe-beta9 binary override";
+    description = "";
     platforms = platforms.darwin;
     homepage = "https://github.com/koekeishiya/yabai";
   };

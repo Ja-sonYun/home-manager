@@ -20,7 +20,8 @@ class CommandGrammarFixer(BaseModel):
 async def generate() -> str:
     client = openai.AsyncClient(api_key=api_key)
     response = await client.beta.chat.completions.parse(
-        model="gpt-4o",
+        model="gpt-5-nano",
+        reasoning_effort="minimal",
         messages=[
             {
                 "role": "system",
@@ -38,7 +39,7 @@ async def generate() -> str:
         print("The input was not recognized as a valid shell command.", file=sys.stderr)
         sys.exit(1)
 
-    return event.command
+    return event.command.strip()
 
 
 if __name__ == "__main__":

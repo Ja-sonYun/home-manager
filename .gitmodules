@@ -1,3 +1,3 @@
-[submodule "pkgs/yabai/yabai-tahoe"]
-	path = pkgs/yabai/yabai-tahoe
-	url = git@github.com:tbiehn/yabai-tahoe.git
+[submodule "pkgs/yabai/yabai"]
+	path = pkgs/yabai/yabai
+	url = git@github.com:koekeishiya/yabai.git

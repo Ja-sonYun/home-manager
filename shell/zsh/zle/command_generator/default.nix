@@ -5,13 +5,15 @@
   ];
 
   programs.zleCommands = {
-    generate-shell-command-with-openai = {
+    _generate-shell-command-with-openai = {
       command =
         let
-          pythonEnv = pkgs.python312.withPackages (ps: with ps; [
-            openai
-            pydantic
-          ]);
+          pythonEnv = pkgs.python312.withPackages (
+            ps: with ps; [
+              openai
+              pydantic
+            ]
+          );
           python = "${pythonEnv}/bin/python";
           generator_py = toString ./generate_command.py;
         in
@@ -34,7 +36,8 @@
           RBUFFER=""
         '';
       bindkeys = ''
-        bindkey -M viins '^X^m' generate-shell-command-with-openai
+        bindkey -M viins '^X^m' _generate-shell-command-with-openai
+        bindkey -M viins '^Xm' _generate-shell-command-with-openai
       '';
     };
   };

@@ -22,7 +22,8 @@ async def generate() -> str:
 
     client = openai.AsyncClient(api_key=api_key)
     response = await client.beta.chat.completions.parse(
-        model="gpt-4o",
+        model="gpt-5-nano",
+        reasoning_effort="minimal",
         messages=[
             {
                 "role": "system",

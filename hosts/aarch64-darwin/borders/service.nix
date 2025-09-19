@@ -11,7 +11,7 @@ in
 {
   launchd.user.agents.jankyborders = {
     path = with pkgs; [
-      jankyborders-local
+      jankyborders
       config.environment.systemPath
     ];
 
@@ -20,9 +20,11 @@ in
         "${pkgs.jankyborders}/bin/borders"
       ]
       ++ (optionalArg "style" "round")
-      ++ (optionalArg "width" "3.0")
-      ++ (optionalArg "hidpi" "off")
+      ++ (optionalArg "width" "2.0")
+      ++ (optionalArg "hidpi" "on")
+      ++ (optionalArg "ax_focus" "off")
       ++ (optionalArg "active_color" "0xff6600cc")
+      ++ (optionalArg "background_color" "0xffa0a0a0")
       ++ (optionalArg "inactive_color" "0xffa0a0a0");
 
       KeepAlive = true;

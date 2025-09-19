@@ -5,13 +5,15 @@
   ];
 
   programs.zleCommands = {
-    fix-grammar-with-openai = {
+    _fix-grammar-with-openai = {
       command =
         let
-          pythonEnv = pkgs.python312.withPackages (ps: with ps; [
-            openai
-            pydantic
-          ]);
+          pythonEnv = pkgs.python312.withPackages (
+            ps: with ps; [
+              openai
+              pydantic
+            ]
+          );
           python = "${pythonEnv}/bin/python";
           better_grammar_py = toString ./better_grammar.py;
         in
@@ -30,8 +32,8 @@
           RBUFFER=""
         '';
       bindkeys = ''
-        bindkey -M viins '^X^o' fix-grammar-with-openai
-        bindkey -M viins '^Xo' fix-grammar-with-openai
+        bindkey -M viins '^X^o' _fix-grammar-with-openai
+        bindkey -M viins '^Xo' _fix-grammar-with-openai
       '';
     };
   };

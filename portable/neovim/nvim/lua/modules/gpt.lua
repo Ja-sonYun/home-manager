@@ -6,6 +6,7 @@ local uv = vim.uv or vim.loop
 --- Configuration for OpenAI API
 M.config = {
 	model = "gpt-5",
+	reasoning_effort = "minimum",
 	timeout = 30000, -- 30 seconds
 	retry_count = 2,
 	retry_delay = 1000, -- 1 second
@@ -62,6 +63,7 @@ local function build_payload(messages)
 		messages = messages,
 		max_tokens = M.config.max_tokens,
 		temperature = M.config.temperature,
+		reasoning_effort = M.config.reasoning_effort,
 		stream = false,
 	})
 end

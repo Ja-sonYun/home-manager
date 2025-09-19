@@ -64,6 +64,10 @@
       url = "github:simeji/winresizer";
       flake = false;
     };
+    lensline-nvim = {
+      url = "github:oribarilan/lensline.nvim";
+      flake = false;
+    };
   };
 
   outputs =
