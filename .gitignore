@@ -1,2 +1,11 @@
 result
 result/
+.DS_Store
+.claude
+.envrc
+.hooks
+.cache
+.local
+.direnv
+.pycache
+__pycache__

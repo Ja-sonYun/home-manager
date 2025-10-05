@@ -69,6 +69,7 @@
     nix-output-monitor
 
     devenv
+    awscli-local
   ];
 
   home.sessionVariables = {

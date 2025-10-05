@@ -71,6 +71,20 @@ let
       env = { };
     }
     {
+      name = "slack";
+      command = pkgs.writeShellScript "slack-mcp-wrapper" ''
+        SLACK_TOKEN=$(cat ${config.age.secrets.slack.path})
+        export SLACK_MCP_XOXC_TOKEN=$(echo $SLACK_TOKEN | awk -F: '{print $1}')
+        export SLACK_MCP_XOXD_TOKEN=$(echo $SLACK_TOKEN | awk -F: '{print $2}')
+        exec docker run -i --rm \
+          -e SLACK_MCP_XOXC_TOKEN \
+          -e SLACK_MCP_XOXD_TOKEN \
+          ghcr.io/korotovsky/slack-mcp-server mcp-server --transport stdio
+      '';
+      args = [ ];
+      env = { };
+    }
+    {
       name = "sequential-thinking";
       command = "${pkgs.custom.mcp.sequential-thinking}/bin/mcp-server-sequential-thinking";
       args = [ ];
@@ -128,7 +142,7 @@ in
     text = ''
       model = "gpt-5-codex"
 
-      approval_policy = "on-request"
+      approval_policy = "untrusted"
       sandbox_mode = "workspace-write"
 
       hide_agent_reasoning = false

@@ -4,7 +4,7 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   inherit pkgs;
   name = "playwright-mcp";
   packages = [
-    "@playwright/mcp@0.0.38"
+    "@playwright/mcp@0.0.41"
   ];
   exposedBinaries = [
     "mcp-server-playwright"

@@ -40,6 +40,7 @@
         mcp = final.callPackage ../pkgs/mcp { inherit userhome; };
         tmux = final.callPackage ../pkgs/tmux { system = final.stdenv.hostPlatform.system; };
       };
+      awscli-local = final.callPackage ../pkgs/awscli-local { };
     };
 
   # Override upstream packages using our local pkgs/* definitions

@@ -18,8 +18,15 @@ endif
 update-neovim:
 	cd ./portable/neovim && nix flake update
 
-update: update-neovim
+update-raw: update-neovim
 	nix flake update
+
+update:
+	@sh -c 'set -eu; \
+	orig_ulimit=$$(ulimit -n || echo 0); \
+	trap "ulimit -n $$orig_ulimit >/dev/null 2>&1 || true" EXIT; \
+	if [ "$$orig_ulimit" -lt 65536 ] 2>/dev/null; then ulimit -n 65536 || true; fi; \
+	$(MAKE) update-raw'
 
 add:
 	git add .

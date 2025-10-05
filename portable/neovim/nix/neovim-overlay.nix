@@ -102,9 +102,7 @@ let
     (mkNvimPlugin inputs.nvim-spider "nvim-spider")
     (mkNvimPlugin inputs.fidget-nvim "fidget.nvim")
     (mkNvimPlugin inputs.quicker-nvim "quicker.nvim")
-    (mkNvimPlugin inputs.claude-code-nvim "claude-code.nvim")
     (mkNvimPlugin inputs.winresizer "winresizer")
-    (mkNvimPlugin inputs.lensline-nvim "lensline.nvim")
   ];
 
   commonPackages = with pkgs; [
@@ -114,7 +112,7 @@ let
     gh
 
     # Required packages
-    nodejs_20 # For copilot
+    nodejs_22 # For copilot
 
     harper
     ctags

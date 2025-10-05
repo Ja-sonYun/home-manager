@@ -126,7 +126,6 @@ M.set_buffer_opts = function(opts)
 	end
 
 	vim.opt_local.shiftwidth = width
-	vim.opt_local.shiftwidth = width
 	vim.opt_local.tabstop = width
 	vim.opt_local.expandtab = true
 	vim.opt_local.listchars:append({

@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 
 pkgs.lib.pip.mkPipGlobalPackageDerivation {
   inherit pkgs;

@@ -62,8 +62,14 @@ EXPR
 )
 
 set +e
-BUILD_LOG=$(nix build --impure --expr "$BUILD_EXPR" -L 2>&1)
-BUILD_STATUS=$?
+LOG_FILE=$(mktemp)
+if ! nix build --impure --expr "$BUILD_EXPR" -L 2>&1 | tee "$LOG_FILE"; then
+  BUILD_STATUS=${PIPESTATUS[0]}
+else
+  BUILD_STATUS=0
+fi
+BUILD_LOG=$(cat "$LOG_FILE")
+rm -f "$LOG_FILE"
 set -e
 
 if [[ $BUILD_STATUS -eq 0 ]]; then

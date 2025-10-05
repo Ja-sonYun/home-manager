@@ -51,7 +51,6 @@
       # Logs and databases #
       ######################
       "*.log"
-      "*.sql"
       "*.sqlite"
 
       # OS generated files #
@@ -140,8 +139,17 @@
       branch.sort = "-committerdate";
       column.ui = "auto";
       tag.sort = "-version:refname";
-      diff.algorithm = "histogram";
       help.autocorrect = "prompt";
+
+      diff.algorithm = "histogram";
+      diff.tool = "nvimdiff";
+      difftool.prompt = false;
+      difftool.nvimdiff.cmd = "nvim -d \"$LOCAL\" \"$REMOTE\"";
+
+      merge.tool = "nvimdiff";
+      mergetool.prompt = false;
+      mergetool.keepBackup = false;
+      mergetool.nvimdiff.cmd = "nvim -d \"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\" -c 'wincmd J'";
     };
 
     # signing = {

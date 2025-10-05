@@ -5,10 +5,10 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   name = "pyright";
   pythonVersion = "311";
   packages = [
-    "pyright==1.1.405"
+    "pyright==1.1.406"
   ];
   exposedBinaries = [
     "pyright"
   ];
-  outputHash = "sha256-BMwTZP8REF9graVW8zmiMcEKQIOogfaIcfzJxykYrSA=";
+  outputHash = "sha256-0000000000000000000000000000000000000000000=";
 }

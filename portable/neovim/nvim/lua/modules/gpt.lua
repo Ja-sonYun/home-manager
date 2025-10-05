@@ -6,8 +6,8 @@ local uv = vim.uv or vim.loop
 --- Configuration for OpenAI API
 M.config = {
 	model = "gpt-5",
-	reasoning_effort = "minimum",
-	timeout = 30000, -- 30 seconds
+	reasoning_effort = "low",
+	timeout = 60000, -- 30 seconds
 	retry_count = 2,
 	retry_delay = 1000, -- 1 second
 }
@@ -119,14 +119,14 @@ local function create_request(api_key, payload, callback, retry_count)
 	-- curl arguments
 	local args = {
 		"-sS",
-		"-f",
+		"--fail-with-body",
 		"--max-time",
 		tostring(math.floor(M.config.timeout / 1000)),
 		"-H",
 		"Content-Type: application/json",
 		"-H",
-		"Authorization: Bearer " .. api_key,
-		"-d",
+		("Authorization: Bearer %s"):format(api_key),
+		"--data-binary",
 		payload,
 		"https://api.openai.com/v1/chat/completions",
 	}
@@ -146,7 +146,7 @@ local function create_request(api_key, payload, callback, retry_count)
 		-- Retry logic
 		if retry_count > 0 then
 			vim.schedule(function()
-				vim.notify("Retrying OpenAI request... (" .. retry_count .. " attempts left)", vim.log.levels.WARN)
+				vim.notify(("Retrying OpenAI request... (%d attempts left)"):format(retry_count), vim.log.levels.WARN)
 			end)
 
 			-- Retry after delay
@@ -186,13 +186,21 @@ local function create_request(api_key, payload, callback, retry_count)
 		end
 
 		vim.schedule(function()
+			if #chunks > 0 then
+				local function err_forward(msg)
+					on_error(msg)
+				end
+				process_response(chunks, callback, err_forward)
+				return
+			end
+
 			if code ~= 0 then
 				local error_info = table.concat(stderr_chunks)
 				on_error(("OpenAI request failed (exit %d): %s"):format(code, error_info))
 				return
 			end
 
-			process_response(chunks, callback, on_error)
+			on_error("Empty response from OpenAI")
 		end)
 	end)
 
@@ -233,7 +241,7 @@ local function create_request(api_key, payload, callback, retry_count)
 			if request.handle and not uv.is_closing(request.handle) then
 				uv.process_kill(request.handle, "sigterm")
 			end
-			on_error("Request timed out after " .. (M.config.timeout / 1000) .. " seconds")
+			on_error(("Request timed out after %d seconds"):format(M.config.timeout / 1000))
 		end
 	end)
 

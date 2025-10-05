@@ -56,16 +56,8 @@
       url = "github:stevearc/quicker.nvim";
       flake = false;
     };
-    claude-code-nvim = {
-      url = "github:greggh/claude-code.nvim";
-      flake = false;
-    };
     winresizer = {
       url = "github:simeji/winresizer";
-      flake = false;
-    };
-    lensline-nvim = {
-      url = "github:oribarilan/lensline.nvim";
       flake = false;
     };
   };
@@ -139,6 +131,7 @@
         packages = rec {
           default = nvim;
           nvim = pkgs.nvim-pkg;
+          nvim-dev = pkgs.nvim-dev;
         };
         devShells = {
           default = shell;

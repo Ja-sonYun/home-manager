@@ -18,6 +18,9 @@
     context7-api-key = {
       file = "${agenix-secrets}/context7-api-key.age";
     };
+    slack = {
+      file = "${agenix-secrets}/slack.age";
+    };
   };
 
   home.sessionVariables = {

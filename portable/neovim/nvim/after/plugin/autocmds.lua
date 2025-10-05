@@ -122,8 +122,8 @@ vim.api.nvim_create_autocmd("OptionSet", {
 	group = vim.api.nvim_create_augroup("SleuthDetected", { clear = true }),
 	pattern = { "shiftwidth", "expandtab", "tabstop", "softtabstop" },
 	callback = function()
-    if vim.b.is_code == true then
-      require("modules.utils").set_buffer_opts({ width = vim.bo.shiftwidth, is_code = true })
-    end
+		if vim.b.is_code == true then
+			require("modules.utils").set_buffer_opts({ width = vim.bo.shiftwidth, is_code = true })
+		end
 	end,
 })

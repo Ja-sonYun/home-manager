@@ -4,10 +4,10 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   inherit pkgs;
   name = "awslabs.aws-pricing-mcp-server";
   packages = [
-    "awslabs.aws-pricing-mcp-server==1.0.12"
+    "awslabs.aws-pricing-mcp-server==1.0.13"
   ];
   exposedBinaries = [
     "awslabs.aws-pricing-mcp-server"
   ];
-  outputHash = "sha256-Y5N954O+9zEmdSAREjUDc0u9yMF+PQaBboFtBNUX/20=";
+  outputHash = "sha256-du0iw9M5HlQnI6EZrj8wbNwuDxNEbHfCA+jAn0XMUoQ=";
 }
