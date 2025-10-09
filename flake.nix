@@ -45,8 +45,8 @@
     };
 
     neovim.url = "path:./portable/neovim";
-    say.url = "path:./portable/say";
-    plot.url = "path:./portable/plot";
+    say.url = "git+file:./portable/say";
+    plot.url = "git+file:./portable/plot";
 
     # Agenix for secret management
     agenix = {

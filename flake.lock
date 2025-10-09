@@ -731,14 +731,18 @@
         "uv2nix": "uv2nix_2"
       },
       "locked": {
-        "path": "./portable/plot",
-        "type": "path"
+        "lastModified": 1759952542,
+        "narHash": "sha256-C52tpEEylov7Y0Hh3blyWLRYwfD4dzvG69T6Z3/6lJM=",
+        "ref": "refs/heads/main",
+        "rev": "58e13cc7d6acdd0aaeb243e64fae944b56e10313",
+        "revCount": 1,
+        "type": "git",
+        "url": "file:./portable/plot"
       },
       "original": {
-        "path": "./portable/plot",
-        "type": "path"
-      },
-      "parent": []
+        "type": "git",
+        "url": "file:./portable/plot"
+      }
     },
     "pyproject-build-systems": {
       "inputs": {
@@ -931,14 +935,18 @@
         "uv2nix": "uv2nix_4"
       },
       "locked": {
-        "path": "./portable/say",
-        "type": "path"
+        "lastModified": 1759953176,
+        "narHash": "sha256-WH5yli5aHlPjG4h9JXGgikv3L+QSZtVhrV1M4tW7T1Y=",
+        "ref": "refs/heads/main",
+        "rev": "8b446603f40c7bafebb8c3005ae56c9dd01dfd0f",
+        "revCount": 1,
+        "type": "git",
+        "url": "file:./portable/say"
       },
       "original": {
-        "path": "./portable/say",
-        "type": "path"
-      },
-      "parent": []
+        "type": "git",
+        "url": "file:./portable/say"
+      }
     },
     "systems": {
       "locked": {
