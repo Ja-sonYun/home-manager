@@ -199,6 +199,8 @@ vim.keymap.set("n", "<leader>y", ":let @*=expand('%:p')<CR>:echo 'Copied to clip
 vim.keymap.set("n", "qo", ":copen<CR>")
 vim.keymap.set("n", "qd", ":Dispatch ")
 
+vim.keymap.set("n", "qu", ":UndotreeToggle<CR>")
+
 -----------------------------------------------------------
 -- Highlight
 -----------------------------------------------------------
@@ -214,13 +216,18 @@ vim.api.nvim_set_hl(0, "DiffChange", { ctermbg = 235, bold = true })
 vim.api.nvim_set_hl(0, "DiffText", { ctermbg = 238, bold = true, underline = true })
 vim.api.nvim_set_hl(0, "DiffDelete", { ctermbg = 52, ctermfg = 255, bold = true })
 
-vim.api.nvim_set_hl(0, "Folded", { ctermbg = 233, ctermfg = 5, bold = true, underline = true, italic = true })
-vim.api.nvim_set_hl(0, "FoldColumn", { ctermbg = 0, ctermfg = 5, bold = true })
+vim.api.nvim_set_hl(0, "Folded", { ctermbg = 248, ctermfg = 0, bold = true })
+vim.api.nvim_set_hl(0, "FoldColumn", { ctermbg = 248, ctermfg = 0, bold = true })
 
 vim.api.nvim_set_hl(0, "Substitute", { ctermbg = 3, ctermfg = 0, bold = true })
 
 vim.api.nvim_set_hl(0, "NormalFloat", { ctermbg = 236, bold = true })
+vim.api.nvim_set_hl(0, "Directory", { ctermfg = 6 })
 
 vim.api.nvim_create_user_command("BufOnly", function()
 	vim.cmd("%bd|e#|bd#")
 end, {})
+
+vim.cmd([[
+packadd cfilter
+]])

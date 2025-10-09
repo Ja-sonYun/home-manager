@@ -1,7 +1,3 @@
-if require("modules.plugin").mark_as_loaded("gitsign") then
-	return
-end
-
 vim.api.nvim_set_hl(0, "GitSignsAdd", { ctermbg = nil, ctermfg = "Green" })
 vim.api.nvim_set_hl(0, "GitSignsChange", { ctermbg = nil, ctermfg = "Yellow" })
 vim.api.nvim_set_hl(0, "GitSignsChangeDelete", { ctermbg = nil, ctermfg = "Yellow" })

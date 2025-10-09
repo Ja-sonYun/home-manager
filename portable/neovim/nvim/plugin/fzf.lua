@@ -1,6 +1,4 @@
-if require("modules.plugin").mark_as_loaded("fzf") then
-	return
-end
+vim.env.FZF_DEFAULT_OPTS = ((vim.env.FZF_DEFAULT_OPTS or "") .. " --multi --bind ctrl-s:select-all,ctrl-d:deselect-all")
 
 vim.g.fzf_layout = { down = "20%" }
 

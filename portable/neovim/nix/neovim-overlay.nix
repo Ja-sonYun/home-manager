@@ -64,46 +64,30 @@ let
   mkNeovim = pkgs.callPackage ./mkNeovim.nix { inherit pkgs-wrapNeovim; };
 
   all-plugins = with pkgs.vimPlugins; [
-    plenary-nvim
-
     nvim-treesitter.withAllGrammars
     nvim-treesitter-textobjects
     nvim-ts-context-commentstring
 
-    vim-tmux-navigator
+    marks-nvim
 
-    vim-eunuch
+    vim-tmux-navigator
     vim-commentary
     vim-fugitive
     vim-dispatch
     vim-repeat
     vim-abolish
-    vim-endwise
     vim-rhubarb
-    vim-sleuth
     vim-surround
-
+    undotree
     tagbar
-    rainbow-delimiters-nvim
-
-    marks-nvim
-    nvim-ts-autotag
-
-    markdown-preview-nvim
 
     (mkNvimPlugin inputs.copilot-vim "copilot.nvim")
     (mkNvimPlugin inputs.fzf-vim "fzf.vim")
     (mkNvimPlugin inputs.fzf "fzf")
-    (mkNvimPlugin inputs.nui-nvim "nui.nvim")
-    (mkNvimPlugin inputs.nvim-web-devicons-nvim "nvim-web-devicons")
     (mkNvimPlugin inputs.gitsigns-nvim "gitsigns.nvim")
-    (mkNvimPlugin inputs.vim-rooter "vim-rooter")
-    (mkNvimPlugin inputs.toggleterm-nvim "toggleterm.nvim")
-    (mkNvimPlugin inputs.nvim-spider "nvim-spider")
-    (mkNvimPlugin inputs.fidget-nvim "fidget.nvim")
-    (mkNvimPlugin inputs.quicker-nvim "quicker.nvim")
-    (mkNvimPlugin inputs.winresizer "winresizer")
   ];
+
+  extraLuaPaths = [ ];
 
   commonPackages = with pkgs; [
     git
@@ -268,7 +252,7 @@ in
   # returned by the overlay
   nvim-pkg = mkNeovim {
     plugins = all-plugins;
-    inherit extraPackages;
+    inherit extraPackages extraLuaPaths;
   };
 
   # This is meant to be used within a devshell.
@@ -276,7 +260,7 @@ in
   # the Nix store, it is loaded from $XDG_CONFIG_HOME/nvim-dev
   nvim-dev = mkNeovim {
     plugins = all-plugins;
-    inherit extraPackages;
+    inherit extraPackages extraLuaPaths;
     appName = "nvim-dev";
     wrapRc = false;
   };

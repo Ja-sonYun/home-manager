@@ -1,39 +1,53 @@
 require("modules.utils").set_buffer_opts({ width = 4, is_code = true })
 
-local python_executable, python_dir = require("modules.resolver").get_python_path()
+local resolver = require("modules.pylib")
+local python_executable, python_dir = resolver.get_python_path()
 
-require("modules.formatter").register("python", function()
+local function has_module(mod)
+	local cmd = {
+		python_executable,
+		"-c",
+		string.format("import importlib.util,sys;sys.exit(0 if importlib.util.find_spec('%s') else 1)", mod),
+	}
+	return (vim.system(cmd, { timeout = 1500 }):wait().code == 0)
+end
+
+require("formatter.lua.formatter").register("python", function()
 	if python_dir == nil then
-		return {
-			"black %",
-			"isort %",
-		}
+		if vim.fn.executable("pysen") == 1 then
+			return { { "pysen", "run_files", "format", "%" } }
+		elseif vim.fn.executable("ruff") == 1 then
+			return { { "ruff", "format", "%" } }
+		elseif vim.fn.executable("black") == 1 and vim.fn.executable("isort") == 1 then
+			return {
+				{ "isort", "%" },
+				{ "black", "%" },
+			}
+		else
+			return {
+				{ "isort", "%" },
+				{ "black", "%" },
+			}
+		end
 	end
 
-	local piplist = vim.fn.system(python_executable .. " -m pip list --format=freeze")
-	if piplist:find("pysen") then
-		local pysen = "PYSEN_IGNORE_GIT=1 " .. python_executable .. " -m pysen "
+	if has_module("pysen") then
+		return { { python_executable, "-m", "pysen", "run_files", "format", "%" } }
+	elseif has_module("ruff") then
+		return { { python_executable, "-m", "ruff", "format", "%" } }
+	elseif has_module("isort") and has_module("black") then
 		return {
-			pysen .. "run_files format %",
-		}
-	elseif piplist:find("ruff") then
-		local ruff = python_executable .. " -m ruff "
-		return {
-			ruff .. "format %",
-		}
-	elseif piplist:find("isort") and piplist:find("black") then
-		local isort = python_executable .. " -m isort "
-		local black = python_executable .. " -m black "
-		return {
-			isort .. "%",
-			black .. "%",
+			{ python_executable, "-m", "isort", "%" },
+			{ python_executable, "-m", "black", "%" },
 		}
 	else
 		return {
-			"isort %",
-			"black %",
+			{ "isort", "%" },
+			{ "black", "%" },
 		}
 	end
-end, { dir = python_dir, run_in_cwd = true })
+end, {
+	cwd = python_dir,
+})
 
 vim.keymap.set("n", "qp", ":Shell " .. python_executable .. " %<CR>", { buffer = true, nowait = true })

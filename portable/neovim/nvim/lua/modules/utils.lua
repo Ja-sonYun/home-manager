@@ -1,12 +1,12 @@
--- FROM: https://github.com/dpayne/CodeGPT.nvim/blob/master/lua/codegpt/utils.lua
-
 M = {}
 
+--- @return string
 function M.get_filetype()
 	local bufnr = vim.api.nvim_get_current_buf()
-	return vim.api.nvim_buf_get_option(bufnr, "filetype")
+	return vim.api.nvim_get_option_value("filetype", { buf = bufnr })
 end
 
+--- @return number, number, number, number
 function M.get_visual_selection()
 	local bufnr = vim.api.nvim_get_current_buf()
 
@@ -36,6 +36,7 @@ function M.get_visual_selection()
 	return start_row, start_col, end_row, end_col
 end
 
+--- @return string
 function M.get_selected_lines()
 	local bufnr = vim.api.nvim_get_current_buf()
 	local start_row, start_col, end_row, end_col = M.get_visual_selection()
@@ -43,15 +44,12 @@ function M.get_selected_lines()
 	return table.concat(lines, "\n")
 end
 
+--- @param lines string[]
 function M.insert_lines(lines)
 	local bufnr = vim.api.nvim_get_current_buf()
 	local line = vim.api.nvim_win_get_cursor(0)[1]
 	vim.api.nvim_buf_set_lines(bufnr, line, line, false, lines)
 	vim.api.nvim_win_set_cursor(0, { line + #lines, 0 })
-end
-
-function M.replace_lines(lines, bufnr, start_row, start_col, end_row, end_col)
-	vim.api.nvim_buf_set_text(bufnr, start_row, start_col, end_row, end_col, lines)
 end
 
 local function get_code_block(lines2)
@@ -83,14 +81,20 @@ function M.trim_to_code_block(lines)
 	return lines
 end
 
+--- @param response_text string
+--- @return string[]
 function M.parse_lines(response_text)
 	if vim.g["codegpt_write_response_to_err_log"] then
-		vim.api.nvim_err_write("ChatGPT response: \n" .. response_text .. "\n")
+		vim.notify("ChatGPT response: \n" .. response_text .. "\n", vim.log.levels.ERROR)
 	end
 
 	return vim.fn.split(response_text, "\n")
 end
 
+--- @param bufnr number
+--- @param start_row number
+--- @param end_row number
+--- @param new_lines string[]
 function M.fix_indentation(bufnr, start_row, end_row, new_lines)
 	local original_lines = vim.api.nvim_buf_get_lines(bufnr, start_row, end_row, true)
 	local min_indentation = math.huge
@@ -159,13 +163,15 @@ M.on_buffer_change = function(filetype, func)
 	})
 end
 
+--- @return string
 M.uuid = function()
 	local random = math.random
 	local template = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
-	return string.gsub(template, "[xy]", function(c)
+	local result = string.gsub(template, "[xy]", function(c)
 		local v = (c == "x") and random(0, 0xf) or random(8, 0xb)
 		return string.format("%x", v)
 	end)
+	return result
 end
 
 return M

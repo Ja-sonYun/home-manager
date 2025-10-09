@@ -9,3 +9,7 @@ vim.opt.listchars = {
 	trail = " ",
 	leadmultispace = "| ",
 }
+
+vim.cmd('wincmd J')
+vim.cmd('vertical resize')
+vim.cmd('horizontal resize 10')

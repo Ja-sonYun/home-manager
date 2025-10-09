@@ -28,6 +28,7 @@ with lib;
   # e.g. p: [p.jsregexp]
   extraLuaPackages ? p: [ ],
   extraPython3Packages ? p: [ ],
+  extraLuaPaths ? [ ],
   # Additional python 3 packages
   withPython3 ? true,
   # Build Neovim with Python 3 support?
@@ -135,47 +136,51 @@ let
   # It wraps the user init.lua, prepends the lua lib directory to the RTP
   # and prepends the nvim and after directory to the RTP
   # It also adds logic for bootstrapping dev plugins (for plugin developers)
-  initLua =
+  initLua = ''
+    vim.loader.enable()
+    -- prepend lua directory
+    vim.opt.rtp:prepend('${nvimRtp}/lua')
+  ''
+  # Wrap init.lua
+  + (builtins.readFile ../nvim/init.lua)
+
+  # Bootstrap/load dev plugins
+  + optionalString (devPlugins != [ ]) (
     ''
-      vim.loader.enable()
-      -- prepend lua directory
-      vim.opt.rtp:prepend('${nvimRtp}/lua')
+      local dev_pack_path = vim.fn.stdpath('data') .. '/site/pack/dev'
+      local dev_plugins_dir = dev_pack_path .. '/opt'
+      local dev_plugin_path
     ''
-    # Wrap init.lua
-    + (builtins.readFile ../nvim/init.lua)
-    # Bootstrap/load dev plugins
-    + optionalString (devPlugins != [ ]) (
-      ''
-        local dev_pack_path = vim.fn.stdpath('data') .. '/site/pack/dev'
-        local dev_plugins_dir = dev_pack_path .. '/opt'
-        local dev_plugin_path
-      ''
-      + strings.concatMapStringsSep "\n" (plugin: ''
-        dev_plugin_path = dev_plugins_dir .. '/${plugin.name}'
-        if vim.fn.empty(vim.fn.glob(dev_plugin_path)) > 0 then
-          vim.notify('Bootstrapping dev plugin ${plugin.name} ...', vim.log.levels.INFO)
-          vim.cmd('!${pkgs.git}/bin/git clone ${plugin.url} ' .. dev_plugin_path)
-        end
-        vim.cmd('packadd! ${plugin.name}')
-      '') devPlugins
-    )
-    # Prepend nvim and after directories to the runtimepath
-    # NOTE: This is done after init.lua,
-    # because of a bug in Neovim that can cause filetype plugins
-    # to be sourced prematurely, see https://github.com/neovim/neovim/issues/19008
-    # We prepend to ensure that user ftplugins are sourced before builtin ftplugins.
-    + ''
-      vim.opt.rtp:prepend('${nvimRtp}/nvim')
-      vim.opt.rtp:prepend('${nvimRtp}/after')
-    ''
-    + ''
-      vim.g.python3_host_prog = "${pythonHost}/bin/python"
-    '';
+    + strings.concatMapStringsSep "\n" (plugin: ''
+      dev_plugin_path = dev_plugins_dir .. '/${plugin.name}'
+      if vim.fn.empty(vim.fn.glob(dev_plugin_path)) > 0 then
+        vim.notify('Bootstrapping dev plugin ${plugin.name} ...', vim.log.levels.INFO)
+        vim.cmd('!${pkgs.git}/bin/git clone ${plugin.url} ' .. dev_plugin_path)
+      end
+      vim.cmd('packadd! ${plugin.name}')
+    '') devPlugins
+  )
+  # Prepend nvim and after directories to the runtimepath
+  # NOTE: This is done after init.lua,
+  # because of a bug in Neovim that can cause filetype plugins
+  # to be sourced prematurely, see https://github.com/neovim/neovim/issues/19008
+  # We prepend to ensure that user ftplugins are sourced before builtin ftplugins.
+  + ''
+    vim.opt.rtp:prepend('${nvimRtp}/nvim')
+    vim.opt.rtp:prepend('${nvimRtp}/after')
+  ''
+  + ''
+    vim.g.python3_host_prog = "${pythonHost}/bin/python"
+  '';
 
   # Add arguments to the Neovim wrapper script
   extraMakeWrapperArgs = builtins.concatStringsSep " " (
+    [
+      # Set default Lua library search path for lua-language-server
+      ''--set-default LUA_LS_LIB "${concatStringsSep ":" extraLuaPaths}"''
+    ]
     # Set the NVIM_APPNAME environment variable
-    (optional (
+    ++ (optional (
       appName != "nvim" && appName != null && appName != ""
     ) ''--set NVIM_APPNAME "${appName}"'')
     # Add external packages to the PATH

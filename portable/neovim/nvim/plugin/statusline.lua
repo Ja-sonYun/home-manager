@@ -1,7 +1,3 @@
-if require("modules.plugin").mark_as_loaded("statusline") then
-	return
-end
-
 -----------------------------------------------------------
 -- Statusline
 -----------------------------------------------------------

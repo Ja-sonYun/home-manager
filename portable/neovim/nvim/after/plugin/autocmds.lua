@@ -1,7 +1,3 @@
-if require("modules.plugin").mark_as_loaded("autocmds") then
-	return
-end
-
 -----------------------------------------------------------
 -- Highlight on yank
 -----------------------------------------------------------
@@ -85,6 +81,9 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 --   export VIM_ON_SAVE_HOOK_TRIGGER_RULES="*.py,*.js"  # Only trigger on Python/JS files
 --   export VIM_ON_SAVE_HOOK_TRIGGER_RULES="*.py"       # Only trigger on Python files
 -----------------------------------------------------------
+--- @param pattern string Comma-separated glob patterns
+--- @param filename string Current file name
+--- @return boolean
 local function is_file_in_glob(pattern, filename)
 	local patterns = vim.split(pattern, ",")
 	for _, pat in ipairs(patterns) do
@@ -114,16 +113,6 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 					vim.fn.system(vim.env.VIM_ON_SAVE_HOOK)
 				end
 			end
-		end
-	end,
-})
-
-vim.api.nvim_create_autocmd("OptionSet", {
-	group = vim.api.nvim_create_augroup("SleuthDetected", { clear = true }),
-	pattern = { "shiftwidth", "expandtab", "tabstop", "softtabstop" },
-	callback = function()
-		if vim.b.is_code == true then
-			require("modules.utils").set_buffer_opts({ width = vim.bo.shiftwidth, is_code = true })
 		end
 	end,
 })

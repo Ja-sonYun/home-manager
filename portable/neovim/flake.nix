@@ -20,44 +20,8 @@
       url = "github:junegunn/fzf";
       flake = false;
     };
-    nui-nvim = {
-      url = "github:MunifTanjim/nui.nvim";
-      flake = false;
-    };
-    nvim-web-devicons-nvim = {
-      url = "github:nvim-tree/nvim-web-devicons";
-      flake = false;
-    };
     gitsigns-nvim = {
       url = "github:lewis6991/gitsigns.nvim";
-      flake = false;
-    };
-    conform-nvim = {
-      url = "github:stevearc/conform.nvim";
-      flake = false;
-    };
-    vim-rooter = {
-      url = "github:airblade/vim-rooter";
-      flake = false;
-    };
-    toggleterm-nvim = {
-      url = "github:akinsho/toggleterm.nvim";
-      flake = false;
-    };
-    nvim-spider = {
-      url = "github:chrisgrieser/nvim-spider";
-      flake = false;
-    };
-    fidget-nvim = {
-      url = "github:j-hui/fidget.nvim";
-      flake = false;
-    };
-    quicker-nvim = {
-      url = "github:stevearc/quicker.nvim";
-      flake = false;
-    };
-    winresizer = {
-      url = "github:simeji/winresizer";
       flake = false;
     };
   };

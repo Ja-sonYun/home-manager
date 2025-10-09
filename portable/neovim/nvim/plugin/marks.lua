@@ -1,7 +1,3 @@
-if require("modules.plugin").mark_as_loaded("marks") then
-	return
-end
-
 require("marks").setup({
 	-- whether to map keybinds or not. default true
 	default_mappings = false,

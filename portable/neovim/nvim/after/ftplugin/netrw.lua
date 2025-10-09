@@ -25,6 +25,3 @@ vim.keymap.set("n", "<c-h>", ":TmuxNavigateLeft<cr>", { buffer = true, nowait = 
 vim.keymap.set("n", "<c-j>", ":TmuxNavigateDown<cr>", { buffer = true, nowait = true, silent = true, noremap = true })
 vim.keymap.set("n", "<c-k>", ":TmuxNavigateUp<cr>", { buffer = true, nowait = true, silent = true, noremap = true })
 vim.keymap.set("n", "<c-l>", ":TmuxNavigateRight<cr>", { buffer = true, nowait = true, silent = true, noremap = true })
-
--- Highlight
-vim.api.nvim_set_hl(0, "Directory", { ctermfg = 6 })

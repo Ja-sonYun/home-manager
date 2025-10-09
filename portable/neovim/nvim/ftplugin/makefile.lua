@@ -1,3 +1,3 @@
 require("modules.utils").set_buffer_opts({ width = 2, is_code = true })
 
-require("modules.formatter").register("makefile", "bake format %")
+require("formatter.lua.formatter").register("makefile", "bake format %")

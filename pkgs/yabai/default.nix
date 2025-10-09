@@ -2,7 +2,7 @@
 
 stdenvNoCC.mkDerivation {
   pname = "yabai";
-  version = "ff42cea";
+  version = "v7.1.16";
   src = ./yabai-bin;
   dontUnpack = true;
 

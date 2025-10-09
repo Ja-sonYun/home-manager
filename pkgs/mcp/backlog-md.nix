@@ -4,7 +4,7 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   inherit pkgs;
   name = "backlog-md";
   packages = [
-    "backlog.md@1.14.5"
+    "backlog.md@1.15.0"
   ];
   exposedBinaries = [
     "backlog"

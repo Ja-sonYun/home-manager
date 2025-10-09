@@ -1,7 +1,3 @@
-if require('modules.plugin').mark_as_loaded('shada') then
-  return
-end
-
 vim.opt.exrc = true
 vim.opt.secure = true
 

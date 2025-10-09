@@ -1,7 +1,3 @@
-if require("modules.plugin").mark_as_loaded("treesitter") then
-	return
-end
-
 local configs = require("nvim-treesitter.configs")
 vim.g.skip_ts_context_comment_string_module = true
 

@@ -1,9 +1,3 @@
-if require("modules.plugin").mark_as_loaded("gpt-utils") then
-	return
-end
-
-local uv = vim.uv or vim.loop
-
 --- Build and register Neovim user commands that leverage GPT.
 --- @param name string  Name of the :Command
 --- @param status_msg string  Verb for notifications ("Fixing", "Adding doc", ...)
@@ -30,7 +24,7 @@ local function make_command(name, status_msg, prompt_builder)
 			utils.fix_indentation(bufnr, srow, erow, lines)
 
 			if vim.api.nvim_buf_is_valid(bufnr) then
-				utils.replace_lines(lines, bufnr, srow, scol, erow, ecol)
+				vim.api.nvim_buf_set_text(ecol, bufnr, srow, scol, erow, lines)
 			else
 				vim.notify("Buffer is not valid anymore.", vim.log.levels.WARN)
 			end

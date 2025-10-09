@@ -1,7 +1,3 @@
-if require("modules.plugin").mark_as_loaded("vim-tmux-navigator") then
-	return
-end
-
 -- Check TMUX flag is set
 if vim.env.TMUX == nil then
 	vim.keymap.set("n", "<C-h>", "<C-w>h", { noremap = true, silent = true })

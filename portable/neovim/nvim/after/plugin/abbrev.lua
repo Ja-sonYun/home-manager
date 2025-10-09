@@ -1,7 +1,3 @@
-if require("modules.plugin").mark_as_loaded("abbrev") then
-	return
-end
-
 local function abolish(lhs, rhs, opts)
 	opts = opts or {}
 	local flags = {}
