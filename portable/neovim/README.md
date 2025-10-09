@@ -16,7 +16,7 @@ nix run 'github:Ja-sonYun/home-manager?dir=portable/neovim' \
 docker run -it --rm \
   -v nix-linux-store:/nix \
   -v nix-linux-store:/root/.cache/nix \
-  -v ${YOUR_WORKING_DIR}:/workspace \
+  -v ${PWD}:/workspace \
   -w /workspace \
   nixos/nix \
   nix run 'github:Ja-sonYun/home-manager?dir=portable/neovim' \
@@ -37,7 +37,7 @@ nix run 'github:Ja-sonYun/home-manager?dir=portable/neovim' --impure \
 docker run -it --rm \
   -v nix-linux-store:/nix \
   -v nix-linux-store:/root/.cache/nix \
-  -v ${YOUR_WORKING_DIR}:/workspace \
+  -v ${PWD}:/workspace \
   -w /workspace \
   -e USE_GO=1 \
   -e USE_RUST=1 \
