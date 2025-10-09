@@ -1,3 +1,3 @@
 require("modules.utils").set_buffer_opts({ width = 4, is_code = true })
 
-require("formatter.lua.formatter").register("go", "gofmt %")
+require("formatter").register("go", "gofmt %")

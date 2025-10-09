@@ -1,1 +1,1 @@
-require("formatter.lua.formatter").setup()
+require("formatter").setup()

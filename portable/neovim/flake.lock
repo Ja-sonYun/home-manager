@@ -275,6 +275,70 @@
         "type": "github"
       }
     },
+    "nvim-autocomp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1760005821,
+        "narHash": "sha256-JSkxApaUtA8AZkJ1jGbxi8UTU/TBuWIMoPtjSUsCwVE=",
+        "ref": "refs/heads/main",
+        "rev": "8c296f80f68387ff81f9a15a2cfb118b48468327",
+        "revCount": 5,
+        "type": "git",
+        "url": "file:./plugins/autocomp"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:./plugins/autocomp"
+      }
+    },
+    "nvim-formatter": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1759951038,
+        "narHash": "sha256-6z8PooZdflGuDOe4RH6QA1OfjTYj23BdcfD6SifTSSQ=",
+        "ref": "refs/heads/main",
+        "rev": "21bc63663e1bd3ac93f020d5ff2bda37f12794e7",
+        "revCount": 2,
+        "type": "git",
+        "url": "file:./plugins/formatter"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:./plugins/formatter"
+      }
+    },
+    "nvim-rooter": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1759951938,
+        "narHash": "sha256-Bw9Wed8BB5KYkqMVrDTnN7l/33mCYWlPEEWuyGpJAR0=",
+        "ref": "refs/heads/main",
+        "rev": "df2e56053f728ce44a4f03bd926d1ed610b5003c",
+        "revCount": 2,
+        "type": "git",
+        "url": "file:./plugins/rooter"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:./plugins/rooter"
+      }
+    },
+    "nvim-wordnav": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1759951565,
+        "narHash": "sha256-1nCQVPOxDUO2d06Yr8UBTRdvo2qVai12ombvLAeb27U=",
+        "ref": "refs/heads/main",
+        "rev": "4ee4ba0a4984eb8978ec6fe1aae326597e40cbbb",
+        "revCount": 1,
+        "type": "git",
+        "url": "file:./plugins/wordnav"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:./plugins/wordnav"
+      }
+    },
     "root": {
       "inputs": {
         "copilot-vim": "copilot-vim",
@@ -284,7 +348,11 @@
         "gen-luarc": "gen-luarc",
         "gitsigns-nvim": "gitsigns-nvim",
         "nixpkgs": "nixpkgs_2",
-        "nixpkgs-stable": "nixpkgs-stable_2"
+        "nixpkgs-stable": "nixpkgs-stable_2",
+        "nvim-autocomp": "nvim-autocomp",
+        "nvim-formatter": "nvim-formatter",
+        "nvim-rooter": "nvim-rooter",
+        "nvim-wordnav": "nvim-wordnav"
       }
     },
     "systems": {

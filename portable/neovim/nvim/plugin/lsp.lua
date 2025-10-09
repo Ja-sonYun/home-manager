@@ -1,7 +1,7 @@
 vim.o.complete = ".,t"
 vim.o.completeopt = "menu,menuone,noselect,noinsert,popup,fuzzy"
 
-require("autocomp.lua.autocomp").setup({
+require("autocomp").setup({
 	debounce_ms = 20,
 	path_trigger = "/",
 	lsp_triggers = { ".", ":", ">", "(", ",", "[" },

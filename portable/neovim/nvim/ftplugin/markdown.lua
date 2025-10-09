@@ -4,4 +4,4 @@ require("modules.utils").set_buffer_opts({ width = 2 })
 -- 	vim.opt_local.number = true
 -- end
 
-require("formatter.lua.formatter").register("markdown", "prettier --write %")
+require("formatter").register("markdown", "prettier --write %")

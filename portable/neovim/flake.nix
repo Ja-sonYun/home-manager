@@ -24,6 +24,23 @@
       url = "github:lewis6991/gitsigns.nvim";
       flake = false;
     };
+
+    nvim-autocomp = {
+      url = "git+file:./plugins/autocomp";
+      flake = false;
+    };
+    nvim-formatter = {
+      url = "git+file:./plugins/formatter";
+      flake = false;
+    };
+    nvim-rooter = {
+      url = "git+file:./plugins/rooter";
+      flake = false;
+    };
+    nvim-wordnav = {
+      url = "git+file:./plugins/wordnav";
+      flake = false;
+    };
   };
 
   outputs =

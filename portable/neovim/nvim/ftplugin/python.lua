@@ -12,7 +12,7 @@ local function has_module(mod)
 	return (vim.system(cmd, { timeout = 1500 }):wait().code == 0)
 end
 
-require("formatter.lua.formatter").register("python", function()
+require("formatter").register("python", function()
 	if python_dir == nil then
 		if vim.fn.executable("pysen") == 1 then
 			return { { "pysen", "run_files", "format", "%" } }

@@ -2,16 +2,16 @@
 	path = pkgs/yabai/yabai
 	url = git@github.com:koekeishiya/yabai.git
 [submodule "portable/neovim/nvim/lua/autocomp"]
-	path = portable/neovim/nvim/lua/autocomp
+	path = portable/neovim/plugins/autocomp
 	url = git@github.com:Ja-sonYun/nvim-autocomp.git
 [submodule "portable/neovim/nvim/lua/formatter"]
-	path = portable/neovim/nvim/lua/formatter
+	path = portable/neovim/plugins/formatter
 	url = git@github.com:Ja-sonYun/nvim-formatter.git
 [submodule "portable/neovim/nvim/lua/rooter"]
-	path = portable/neovim/nvim/lua/rooter
+	path = portable/neovim/plugins/rooter
 	url = git@github.com:Ja-sonYun/nvim-rooter.git
 [submodule "portable/neovim/nvim/lua/wordnav"]
-	path = portable/neovim/nvim/lua/wordnav
+	path = portable/neovim/plugins/wordnav
 	url = git@github.com:Ja-sonYun/nvim-wordnav.git
 [submodule "portable/plot"]
 	path = portable/plot
@@ -19,3 +19,6 @@
 [submodule "portable/say"]
 	path = portable/say
 	url = git@github.com:Ja-sonYun/say.git
+[submodule "shell/secrets/agenix"]
+	path = shell/secrets/agenix
+	url = git@github.com:Ja-sonYun/agenix-secrets.git

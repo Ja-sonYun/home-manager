@@ -71,7 +71,7 @@ return {
 		python = {},
 	},
 	before_init = function(_, config)
-		require("rooter.lua.rooter").wait_until_ready()
+		require("rooter").wait_until_ready()
 		local python_executable, _ = require("modules.pylib").get_python_path()
 		config.settings.python.pythonPath = python_executable
 	end,

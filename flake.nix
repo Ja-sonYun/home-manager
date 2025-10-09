@@ -44,9 +44,33 @@
       flake = false;
     };
 
-    neovim.url = "path:./portable/neovim";
+    # My packages
     say.url = "git+file:./portable/say";
     plot.url = "git+file:./portable/plot";
+
+    # My neovim plugins
+    neovim.url = "path:./portable/neovim";
+
+    neovim.inputs.nvim-autocomp.follows = "nvim-autocomp";
+    nvim-autocomp = {
+      url = "git+file:./portable/neovim/plugins/autocomp";
+      flake = false;
+    };
+    neovim.inputs.nvim-formatter.follows = "nvim-formatter";
+    nvim-formatter = {
+      url = "git+file:./portable/neovim/plugins/formatter";
+      flake = false;
+    };
+    neovim.inputs.nvim-rooter.follows = "nvim-rooter";
+    nvim-rooter = {
+      url = "git+file:./portable/neovim/plugins/rooter";
+      flake = false;
+    };
+    neovim.inputs.nvim-wordnav.follows = "nvim-wordnav";
+    nvim-wordnav = {
+      url = "git+file:./portable/neovim/plugins/wordnav";
+      flake = false;
+    };
 
     # Agenix for secret management
     agenix = {
@@ -54,7 +78,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     agenix-secrets = {
-      url = "github:Ja-sonYun/agenix-secrets/main";
+      url = "git+file:./shell/secrets/agenix";
       flake = false;
     };
   };

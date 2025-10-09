@@ -1,1 +1,1 @@
-require("wordnav.lua.wordnav").setup()
+require("wordnav").setup()

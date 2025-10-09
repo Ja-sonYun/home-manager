@@ -85,6 +85,11 @@ let
     (mkNvimPlugin inputs.fzf-vim "fzf.vim")
     (mkNvimPlugin inputs.fzf "fzf")
     (mkNvimPlugin inputs.gitsigns-nvim "gitsigns.nvim")
+
+    (mkNvimPlugin inputs.nvim-autocomp "nvim-autocomp")
+    (mkNvimPlugin inputs.nvim-formatter "nvim-formatter")
+    (mkNvimPlugin inputs.nvim-rooter "nvim-rooter")
+    (mkNvimPlugin inputs.nvim-wordnav "nvim-wordnav")
   ];
 
   extraLuaPaths = [ ];
