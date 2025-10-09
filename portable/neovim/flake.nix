@@ -26,19 +26,19 @@
     };
 
     nvim-autocomp = {
-      url = "git+file:./plugins/autocomp";
+      url = "github:Ja-sonYun/nvim-autocomp";
       flake = false;
     };
     nvim-formatter = {
-      url = "git+file:./plugins/formatter";
+      url = "github:Ja-sonYun/nvim-formatter";
       flake = false;
     };
     nvim-rooter = {
-      url = "git+file:./plugins/rooter";
+      url = "github:Ja-sonYun/nvim-rooter";
       flake = false;
     };
     nvim-wordnav = {
-      url = "git+file:./plugins/wordnav";
+      url = "github:Ja-sonYun/nvim-wordnav";
       flake = false;
     };
   };

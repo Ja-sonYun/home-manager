@@ -86,6 +86,7 @@ let
     (mkNvimPlugin inputs.fzf "fzf")
     (mkNvimPlugin inputs.gitsigns-nvim "gitsigns.nvim")
 
+    # My plugins
     (mkNvimPlugin inputs.nvim-autocomp "nvim-autocomp")
     (mkNvimPlugin inputs.nvim-formatter "nvim-formatter")
     (mkNvimPlugin inputs.nvim-rooter "nvim-rooter")
@@ -100,7 +101,6 @@ let
     ripgrep
     gh
 
-    # Required packages
     nodejs_22 # For copilot
 
     harper
