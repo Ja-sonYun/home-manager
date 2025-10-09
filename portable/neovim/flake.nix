@@ -53,9 +53,74 @@
     let
       systems = builtins.attrNames nixpkgs.legacyPackages;
 
+      boolEnv =
+        name: default:
+        let
+          v = builtins.getEnv name;
+        in
+        if v == "" then default else (v == "1" || v == "true" || v == "TRUE" || v == "yes" || v == "on");
+
+      explicitOptions =
+        let
+          envKeys = [
+            "USE_GO"
+            "USE_RUST"
+            "USE_PYTHON"
+            "USE_NODE"
+            "USE_LUA"
+            "USE_NIX"
+            "USE_TERRAFORM"
+            "USE_CXX"
+            "USE_MARKDOWN"
+            "USE_SHELL"
+            "USE_RUBY"
+            "USE_SWIFT"
+            "USE_MAKEFILE"
+            "USE_COPILOT"
+          ];
+          hasValue = key: builtins.getEnv key != "";
+        in
+        builtins.any hasValue envKeys;
+
+      config =
+        if explicitOptions then
+          {
+            useGo = boolEnv "USE_GO" false;
+            useRust = boolEnv "USE_RUST" false;
+            usePython = boolEnv "USE_PYTHON" false;
+            useNode = boolEnv "USE_NODE" false;
+            useLua = boolEnv "USE_LUA" false;
+            useNix = boolEnv "USE_NIX" false;
+            useTerraform = boolEnv "USE_TERRAFORM" false;
+            useCxx = boolEnv "USE_CXX" false;
+            useMarkdown = boolEnv "USE_MARKDOWN" false;
+            useShell = boolEnv "USE_SHELL" false;
+            useRuby = boolEnv "USE_RUBY" false;
+            useSwift = boolEnv "USE_SWIFT" false;
+            useMakefile = boolEnv "USE_MAKEFILE" false;
+            useCopilot = boolEnv "USE_COPILOT" false;
+          }
+        else
+          {
+            useGo = true;
+            useRust = true;
+            usePython = true;
+            useNode = true;
+            useLua = true;
+            useNix = true;
+            useTerraform = true;
+            useCxx = true;
+            useMarkdown = true;
+            useShell = true;
+            useRuby = true;
+            useSwift = true;
+            useMakefile = true;
+            useCopilot = true;
+          };
+
       # This is where the Neovim derivation is built.
       neovim-overlay = import ./nix/neovim-overlay.nix {
-        inherit inputs;
+        inherit inputs config;
         # neovim = {
         #   version = "0.11.0";
         #   sha256 = "sha256-UVMRHqyq3AP9sV79EkPUZnVkj0FpbS+XDPPOppp2yFE=";
@@ -64,20 +129,6 @@
         #       utf8proc
         #     ];
         # };
-        config = {
-          useGo = true;
-          useRust = true;
-          usePython = true;
-          useNode = true;
-          useLua = true;
-          useNix = true;
-          useTerraform = true;
-          useCxx = true;
-          useMarkdown = true;
-          useShell = true;
-          useRuby = true;
-          useSwift = true;
-        };
       };
     in
     flake-utils.lib.eachSystem systems (
@@ -105,6 +156,14 @@
             ln -fs ${pkgs.nvim-luarc-json} .luarc.json
             # allow quick iteration of lua configs
             ln -Tfns $PWD/nvim ~/.config/nvim-dev
+
+            # link plugins for development
+            mkdir -p ~/.config/nvim-plugins/site/pack/dev/start
+            for p in "$PWD"/plugins/*; do
+              ln -sfn "$p" ~/.config/nvim-plugins/site/pack/dev/start/$(basename "$p")
+            done
+
+            alias vi='nvim-dev' vim='nvim-dev'
           '';
         };
       in

@@ -13,6 +13,9 @@
     useMarkdown = false;
     useShell = false;
     useRuby = false;
+    useSwift = false;
+    useMakefile = false;
+    useCopilot = false;
   },
 }:
 final: prev:
@@ -63,30 +66,33 @@ let
   # This is the helper function that builds the Neovim derivation.
   mkNeovim = pkgs.callPackage ./mkNeovim.nix { inherit pkgs-wrapNeovim; };
 
-  all-plugins = with pkgs.vimPlugins; [
-    nvim-treesitter.withAllGrammars
-    nvim-treesitter-textobjects
-    nvim-ts-context-commentstring
+  all-plugins =
+    with pkgs.vimPlugins;
+    [
+      nvim-treesitter.withAllGrammars
+      nvim-treesitter-textobjects
+      nvim-ts-context-commentstring
 
-    marks-nvim
+      marks-nvim
 
-    vim-tmux-navigator
-    vim-commentary
-    vim-fugitive
-    vim-dispatch
-    vim-repeat
-    vim-abolish
-    vim-rhubarb
-    vim-surround
-    undotree
-    tagbar
+      vim-tmux-navigator
+      vim-commentary
+      vim-fugitive
+      vim-dispatch
+      vim-repeat
+      vim-abolish
+      vim-rhubarb
+      vim-surround
+      undotree
+      tagbar
 
-    (mkNvimPlugin inputs.copilot-vim "copilot.nvim")
-    (mkNvimPlugin inputs.fzf-vim "fzf.vim")
-    (mkNvimPlugin inputs.fzf "fzf")
-    (mkNvimPlugin inputs.gitsigns-nvim "gitsigns.nvim")
+      (mkNvimPlugin inputs.fzf "fzf")
+      (mkNvimPlugin inputs.fzf-vim "fzf.vim")
+      (mkNvimPlugin inputs.gitsigns-nvim "gitsigns.nvim")
+    ]
+    ++ (if config.useCopilot then [ (mkNvimPlugin inputs.copilot-vim "copilot.vim") ] else [ ]);
 
-    # My plugins
+  my-plugins-from-git = [
     (mkNvimPlugin inputs.nvim-autocomp "nvim-autocomp")
     (mkNvimPlugin inputs.nvim-formatter "nvim-formatter")
     (mkNvimPlugin inputs.nvim-rooter "nvim-rooter")
@@ -95,21 +101,32 @@ let
 
   extraLuaPaths = [ ];
 
-  commonPackages = with pkgs; [
-    git
-    cacert
-    ripgrep
-    gh
+  commonPackages =
+    with pkgs;
+    [
+      git
+      cacert
+      ripgrep
+      gh
+      fzf
 
-    nodejs_22 # For copilot
+      harper
+      ctags
 
-    harper
-    ctags
+      gnumake
 
-    mbake
+      gawk
+    ]
+    ++ (if config.useCopilot then [ pkgs.nodejs_22 ] else [ ]);
 
-    gawk
-  ];
+  makefilePackagesOpt =
+    if config.useMakefile then
+      with pkgs;
+      [
+        mbake
+      ]
+    else
+      [ ];
 
   nodePackagesOpt =
     if config.useNode then
@@ -250,13 +267,15 @@ let
     shellPackagesOpt
     rubyPackagesOpt
     swiftPackagesOpt
+    makefilePackagesOpt
   ];
 in
 {
   # This is the neovim derivation
   # returned by the overlay
   nvim-pkg = mkNeovim {
-    plugins = all-plugins;
+    # Load my plugins from git repos on nvim-pkg
+    plugins = all-plugins ++ my-plugins-from-git;
     inherit extraPackages extraLuaPaths;
   };
 
@@ -264,6 +283,7 @@ in
   # Instead of loading the lua Neovim configuration from
   # the Nix store, it is loaded from $XDG_CONFIG_HOME/nvim-dev
   nvim-dev = mkNeovim {
+    # Do not load my plugins from git repos on nvim-dev, load them from local
     plugins = all-plugins;
     inherit extraPackages extraLuaPaths;
     appName = "nvim-dev";

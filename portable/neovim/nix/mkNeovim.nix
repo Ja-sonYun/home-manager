@@ -14,10 +14,6 @@ with lib;
   # The Neovim package to wrap
   neovim-unwrapped ? pkgs-wrapNeovim.neovim-unwrapped,
   plugins ? [ ],
-  # List of plugins
-  # List of dev plugins (will be bootstrapped) - useful for plugin developers
-  # { name = <plugin-name>; url = <git-url>; }
-  devPlugins ? [ ],
   # Regexes for config files to ignore, relative to the nvim directory.
   # e.g. [ "^plugin/neogit.lua" "^ftplugin/.*.lua" ]
   ignoreConfigRegexes ? [ ],
@@ -144,22 +140,6 @@ let
   # Wrap init.lua
   + (builtins.readFile ../nvim/init.lua)
 
-  # Bootstrap/load dev plugins
-  + optionalString (devPlugins != [ ]) (
-    ''
-      local dev_pack_path = vim.fn.stdpath('data') .. '/site/pack/dev'
-      local dev_plugins_dir = dev_pack_path .. '/opt'
-      local dev_plugin_path
-    ''
-    + strings.concatMapStringsSep "\n" (plugin: ''
-      dev_plugin_path = dev_plugins_dir .. '/${plugin.name}'
-      if vim.fn.empty(vim.fn.glob(dev_plugin_path)) > 0 then
-        vim.notify('Bootstrapping dev plugin ${plugin.name} ...', vim.log.levels.INFO)
-        vim.cmd('!${pkgs.git}/bin/git clone ${plugin.url} ' .. dev_plugin_path)
-      end
-      vim.cmd('packadd! ${plugin.name}')
-    '') devPlugins
-  )
   # Prepend nvim and after directories to the runtimepath
   # NOTE: This is done after init.lua,
   # because of a bug in Neovim that can cause filetype plugins

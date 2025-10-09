@@ -1,3 +1,10 @@
+-----------------------------------------------------------
+-- Load development plugins
+-----------------------------------------------------------
+local site = vim.fn.expand("~/.config/nvim-plugins/site")
+vim.opt.packpath:prepend(site)
+
+-----------------------------------------------------------
 local constant = require("modules.constant")
 
 -----------------------------------------------------------
