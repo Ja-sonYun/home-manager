@@ -17,6 +17,7 @@ docker run -it --rm \
   -v nix-linux-store:/nix \
   -v nix-linux-store:/root/.cache/nix \
   -v ${YOUR_WORKING_DIR}:/workspace \
+  -w /workspace \
   nixos/nix \
   nix run 'github:Ja-sonYun/home-manager?dir=portable/neovim' \
     --extra-experimental-features nix-command \
@@ -37,6 +38,7 @@ docker run -it --rm \
   -v nix-linux-store:/nix \
   -v nix-linux-store:/root/.cache/nix \
   -v ${YOUR_WORKING_DIR}:/workspace \
+  -w /workspace \
   -e USE_GO=1 \
   -e USE_RUST=1 \
   -e USE_COPILOT=1 \
