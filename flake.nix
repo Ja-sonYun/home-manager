@@ -9,6 +9,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-prev.url = "github:NixOS/nixpkgs?rev=27ac93958969b5f3dccd654b402599cf3de633ac";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/release-25.05";
 
     home-manager = {
@@ -65,6 +66,7 @@
       self,
 
       nixpkgs,
+      nixpkgs-prev,
       home-manager,
 
       nixpkgs-stable,

@@ -1,8 +1,13 @@
 return {
-	cmd = { "ccls" },
+	cmd = {
+		"clangd",
+		"--background-index",
+		"--clang-tidy",
+		"--header-insertion=iwyu",
+		"--completion-style=detailed",
+		"--all-scopes-completion",
+	},
 	root_markers = {
-		".ccls",
-		".ccls-cache",
 		"compile_commands.json",
 		"compile_flags.txt",
 		"Makefile",

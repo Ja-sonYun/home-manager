@@ -110,7 +110,7 @@
             useNix = true;
             useTerraform = true;
             useCxx = true;
-            useMarkdown = true;
+            useMarkdown = false; # TODO: Marksman doesn't have cache yet
             useShell = true;
             useRuby = true;
             useSwift = true;

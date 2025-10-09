@@ -206,7 +206,6 @@ let
       with pkgs;
       [
         clang-tools
-        ccls
       ]
     else
       [ ];

@@ -9,5 +9,5 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   exposedBinaries = [
     "context7-mcp"
   ];
-  outputHash = "sha256-537o0Tmeq8xgIaHAHJ5OPsgOdNbnATdVRZIe/s5fvYk=";
+  outputHash = "sha256-YTON52KqUltnYFwmYYH49eHo1+tpPh9CqvhsHpXXUr8=";
 }

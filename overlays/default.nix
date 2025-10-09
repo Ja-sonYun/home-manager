@@ -1,11 +1,18 @@
 { inputs, ... }:
 {
-  stable-packages = final: prev: {
+  stable-packages = final: prev: rec {
     # Allow access stable package via `pkgs.stable.<package>`
     stable = import inputs.nixpkgs-stable {
       system = final.system;
       config.allowUnfree = true;
     };
+    _prev = import inputs.nixpkgs-stable {
+      system = final.system;
+      config.allowUnfree = true;
+    };
+
+    flock = _prev.flock;
+    gitui = _prev.gitui;
   };
 
   lib-injection = final: prev: {
