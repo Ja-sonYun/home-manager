@@ -97,6 +97,8 @@ let
     (mkNvimPlugin inputs.nvim-formatter "nvim-formatter")
     (mkNvimPlugin inputs.nvim-rooter "nvim-rooter")
     (mkNvimPlugin inputs.nvim-wordnav "nvim-wordnav")
+    (mkNvimPlugin inputs.nvim-bnqf "nvim-bnqf")
+    (mkNvimPlugin inputs.nvim-macroedit "nvim-macroedit")
   ];
 
   extraLuaPaths = [ ];

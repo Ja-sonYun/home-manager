@@ -41,6 +41,14 @@
       url = "github:Ja-sonYun/nvim-wordnav";
       flake = false;
     };
+    nvim-bnqf = {
+      url = "github:Ja-sonYun/nvim-bnqf";
+      flake = false;
+    };
+    nvim-macroedit = {
+      url = "github:Ja-sonYun/nvim-macroedit";
+      flake = false;
+    };
   };
 
   outputs =
@@ -148,8 +156,11 @@
             # Tools for Lua and Nix development, useful for editing files in this repo
             lua-language-server
             nil
-            stylua
+            luajit
             luajitPackages.luacheck
+            luajitPackages.luarocks_bootstrap
+            stylua
+
             nvim-dev
           ];
           shellHook = ''

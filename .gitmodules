@@ -22,3 +22,9 @@
 [submodule "shell/secrets/agenix"]
 	path = shell/secrets/agenix
 	url = git@github.com:Ja-sonYun/agenix-secrets.git
+[submodule "portable/neovim/plugins/macroedit"]
+	path = portable/neovim/plugins/macroedit
+	url = git@github.com:Ja-sonYun/nvim-macroedit.git
+[submodule "portable/neovim/plugins/bnqf"]
+	path = portable/neovim/plugins/bnqf
+	url = git@github.com:Ja-sonYun/nvim-bnqf.git

@@ -1,12 +1,15 @@
 { inputs, ... }:
 {
-  stable-packages = final: prev: rec {
+  stable-packages = final: prev: {
     # Allow access stable package via `pkgs.stable.<package>`
     stable = import inputs.nixpkgs-stable {
       system = final.system;
       config.allowUnfree = true;
     };
-    _prev = import inputs.nixpkgs-stable {
+  };
+
+  broken-on-unstable = final: prev: rec {
+    _prev = import inputs.nixpkgs-prev {
       system = final.system;
       config.allowUnfree = true;
     };
