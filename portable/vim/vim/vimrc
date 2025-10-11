@@ -1,0 +1,161 @@
+" ----- leader / builtins -----
+let g:mapleader = ','
+let g:did_install_default_menus = 1
+let g:loaded_sql_completion = 1
+
+" ----- mouse / clipboard -----
+set mouse=
+set clipboard=unnamedplus
+
+" ----- files / swap / backup / undo -----
+set noswapfile
+let backupdir = expand('~/.local/share/vim/backup//')
+let undodir   = expand('~/.local/share/vim/undo//')
+if !isdirectory(fnamemodify(backupdir, ':p'))
+  call mkdir(fnamemodify(backupdir, ':p'), 'p', 0700)
+endif
+if !isdirectory(fnamemodify(undodir, ':p'))
+  call mkdir(fnamemodify(undodir, ':p'), 'p', 0700)
+endif
+execute 'set backupdir=' . fnameescape(backupdir)
+set backup
+set backupcopy=yes
+execute 'set undodir=' . fnameescape(undodir)
+set undofile
+
+" ----- timing / editing -----
+set timeoutlen=400
+set hidden
+set history=100
+set lazyredraw
+set synmaxcol=240
+set updatetime=250
+
+" ----- syntax / ft / indent -----
+syntax on
+filetype plugin indent on
+
+" ----- colors -----
+" I don't like complex one
+" set termguicolors
+set background=light
+silent! colorscheme default-ir
+
+" ----- cursor -----
+let &t_SI = "\e[6 q"  " Insert: steady bar
+let &t_SR = "\e[4 q"  " Replace: steady underline
+let &t_EI = "\e[2 q"  " Normal: steady block
+
+" ----- ui -----
+set number
+set showmatch
+if exists('+signcolumn')
+  set signcolumn=auto
+endif
+if exists('+pumheight')
+  let &pumheight = 10
+endif
+set completeopt=menu,menuone,noselect,noinsert,popup,fuzzy
+
+" ----- search -----
+set ignorecase
+set smartcase
+set incsearch
+set hlsearch
+
+" ----- splits -----
+set splitright
+set splitbelow
+
+" ----- folding (safe fallback) -----
+set foldmethod=marker
+set nofoldenable
+
+" ----- wildignore / list / tabs -----
+set wildignorecase
+let &wildignore = join([
+      \ '*.o',
+      \ '*.obj',
+      \ '*.class',
+      \ '*.pyc',
+      \ '*.pyo',
+      \ '*.DS_Store',
+      \ '*.zip',
+      \ '*.tar',
+      \ '*.gz',
+      \ '*.bz2',
+      \ '*.7z',
+      \ 'node_modules/**',
+      \ 'dist/**',
+      \ 'build/**',
+      \ 'coverage/**',
+      \ '.git/**',
+      \ '.hg/**',
+      \ '.svn/**',
+      \ '*.lock',
+      \ '__pycache__/**',
+      \ '.mypy_cache/**',
+      \ '.pytest_cache/**'
+      \ ], ',')
+set expandtab
+set smartindent
+set tabstop=2
+set softtabstop=2
+set list
+let &listchars = join([
+      \ 'tab:> ',
+      \ 'extends:❯',
+      \ 'precedes:❮',
+      \ 'nbsp:&',
+      \ 'trail:~',
+      \ 'leadmultispace:|   '
+      \ ], ',')
+let &wildcharm = char2nr("\t")
+
+" ----- keymaps -----
+nnoremap <silent> <leader>a :nohl<CR>
+nnoremap <silent> <leader>w :write<CR>
+nnoremap <silent> <leader>r :edit<CR>
+
+nnoremap <leader><leader> <C-^>
+
+nnoremap <C-s>r :%s/\<<C-r><C-w>\>//gc<left><left><left>
+nnoremap <C-s>R :%s/\<<C-r><C-w>\>//g<left><left>
+vnoremap <C-s>r :s/\%V/gc<left><left><left>
+vnoremap <C-s>R :s/\%V/g<left><left>
+
+" Change * and #
+nnoremap * #N
+nnoremap # *N
+vnoremap # y:let @/='\V'.substitute(escape(@", '\'), '/', '\\/', 'g')<CR>n
+vnoremap * y:let @/='\V'.substitute(escape(@", '\'), '/', '\\/', 'g')<CR>N
+
+" Remap q and @ for macros
+noremap  <silent> q <Nop>
+noremap  <silent> @ <Nop>
+nnoremap <silent> @@ q
+nnoremap <silent> qq @
+
+" Tabs
+nnoremap <silent> to :tabnew<CR>
+nnoremap <silent> tq :tabclose<CR>
+nnoremap <silent> tn :tabnext<CR>
+nnoremap <silent> tp :tabprev<CR>
+
+" Paste from clipboard without overwriting register
+nnoremap <C-p> "0p
+vnoremap <C-p> "0p
+
+" Move around splits
+inoremap <C-h> <Left>
+inoremap <C-j> <Down>
+inoremap <C-k> <Up>
+inoremap <C-l> <Right>
+inoremap <C-a> <Esc>^i
+inoremap <C-e> <Esc>$a
+
+nnoremap <leader>y :let @*=expand('%:p')<CR>:echo 'Copied to clipboard'<CR>
+
+" ----- commands / packages -----
+command! BufOnly %bd | e# | bd#
+silent! packadd cfilter
