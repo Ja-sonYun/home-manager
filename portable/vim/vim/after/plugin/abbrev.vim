@@ -1,6 +1,3 @@
-" after/plugin/abolish.vim  (legacy Vimscript, NOT vim9script)
-silent! packadd abolish
-
 " --- General English typos ---
 Abolish teh the
 Abolish adn and
@@ -19,6 +16,11 @@ Abolish neccessary necessary
 Abolish resouce{,s} resource{}
 Abolish afterword{,s} afterward{}
 Abolish delimeter{,s} delimiter{}
+Abolish foriegn foreign
+Abolish goverment government
+Abolish gaurentee guarantee
+Abolish occured occurred
+Abolish practics practices
 
 " --- Desperate / separate ---
 Abolish {despa,sepe}rat{e,es,ed,ing,ely,ion,ions,or} {despe,sepa}rat{}
@@ -107,7 +109,3 @@ Abolish Postgresql PostgreSQL
 " --- Check ---
 Abolish cehck check
 Abolish healtch health
-
-" --- Command-line abbreviation ---
-cabbrev qq q!
-cabbrev ! Sh

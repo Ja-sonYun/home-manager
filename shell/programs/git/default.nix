@@ -19,9 +19,6 @@
     enable = true;
     lfs.enable = true;
 
-    userName = "Ja-sonYun";
-    userEmail = "killa30867@gmail.com";
-
     ignores = [
       # Compiled source #
       ###################
@@ -121,6 +118,7 @@
       "CLAUDE.md"
       "backlog"
       ".hooks"
+      "pyrefly.toml"
     ];
 
     includes = [
@@ -131,7 +129,29 @@
       # }
     ];
 
-    extraConfig = {
+    settings = {
+      user = {
+        name = "Ja-sonYun";
+        email = "killa30867@gmail.com";
+      };
+
+      alias = {
+        # common aliases
+        br = "branch";
+        co = "checkout";
+        st = "status";
+        ls = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate";
+        ll = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate --numstat";
+        cm = "commit -m";
+        ca = "commit -am";
+        dc = "diff --cached";
+        amend = "commit --amend -m";
+
+        # aliases for submodule
+        update = "submodule update --init --recursive";
+        foreach = "submodule foreach";
+      };
+
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
       pull.rebase = true;
@@ -142,43 +162,24 @@
       help.autocorrect = "prompt";
 
       diff.algorithm = "histogram";
-      diff.tool = "nvimdiff";
-      difftool.prompt = false;
-      difftool.nvimdiff.cmd = "nvim -d \"$LOCAL\" \"$REMOTE\"";
+      diff.tool = "vimdiff";
 
-      merge.tool = "nvimdiff";
+      difftool.prompt = false;
+      "difftool \"vimdiff\"".cmd = "vim -d \"$LOCAL\" \"$REMOTE\"";
+
+      merge.tool = "vimdiff";
       mergetool.prompt = false;
       mergetool.keepBackup = false;
-      mergetool.nvimdiff.cmd = "nvim -d \"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\" -c 'wincmd J'";
+      "mergetool \"vimdiff\"".cmd =
+        "vim -d \"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\" -c 'wincmd J'";
     };
+  };
 
-    # signing = {
-    #   key = "xxx";
-    #   signByDefault = true;
-    # };
-
-    delta = {
-      enable = true;
-      options = {
-        features = "side-by-side";
-      };
-    };
-
-    aliases = {
-      # common aliases
-      br = "branch";
-      co = "checkout";
-      st = "status";
-      ls = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate";
-      ll = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate --numstat";
-      cm = "commit -m";
-      ca = "commit -am";
-      dc = "diff --cached";
-      amend = "commit --amend -m";
-
-      # aliases for submodule
-      update = "submodule update --init --recursive";
-      foreach = "submodule foreach";
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options = {
+      features = "side-by-side";
     };
   };
 }

@@ -1,6 +1,6 @@
 function! ShowCtermColors(bg)
-  " bg = 0 → foreground colors
-  " bg = 1 → background colors
+  " bg = 0 -> foreground colors
+  " bg = 1 -> background colors
   for i in range(0, 255)
     if a:bg
       execute 'hi Col'.i.' ctermbg='.i

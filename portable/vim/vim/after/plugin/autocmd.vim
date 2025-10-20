@@ -6,7 +6,6 @@ augroup END
 
 
 " --- Remove trailing whitespace on save ---
-" now only runs if `b:do_trim_trail` exists and true
 augroup TrimTrailingWS
   autocmd!
   autocmd BufWritePre * if get(b:, 'do_trim_trail', 0) | silent! %s/\s\+$//e | endif
@@ -17,9 +16,9 @@ augroup END
 augroup ModifyRelativeNumber
   autocmd!
   autocmd BufLeave,FocusLost,InsertEnter,WinLeave,CmdlineEnter *
-        \ setlocal norelativenumber
+        \ if get(b:, 'autorel', 0) | setlocal norelativenumber | endif
   autocmd BufEnter,FocusGained,InsertLeave,WinEnter,CmdlineLeave *
-        \ setlocal number relativenumber
+        \ if get(b:, 'autorel', 0) | setlocal number relativenumber | endif
 augroup END
 
 " --- Open file at last edit position ---
@@ -54,4 +53,26 @@ function! s:MaybeRunOnSaveHook() abort
   elseif s:FileMatchesGlobs($VIM_ON_SAVE_HOOK_TRIGGER_RULES, l:f)
     call system($VIM_ON_SAVE_HOOK)
   endif
+  u
 endfunction
+
+" --- Dynamic indentation settings per buffer via b:indent ---
+augroup Indent
+  autocmd!
+  autocmd BufWinEnter * if getbufvar(bufnr(), 'indent', 0) |
+    \ let width = getbufvar(bufnr(), 'indent', 2) |
+    \ let trailspace = repeat(' ', width - 1) |
+    \ setlocal expandtab |
+    \ let &l:tabstop = width |
+    \ let &l:shiftwidth = width |
+    \ let &l:softtabstop = width |
+    \ let &l:listchars = join([
+    \   'tab:> ',
+    \   'extends:>',
+    \   'precedes:<',
+    \   'nbsp:&',
+    \   'trail:~',
+    \   'leadmultispace:.' .. trailspace
+    \ ], ',') |
+    \ endif
+augroup END

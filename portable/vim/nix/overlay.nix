@@ -17,6 +17,7 @@
     useSwift = false;
     useMakefile = false;
     useCopilot = false;
+    useHarper = false;
   },
 }:
 final: prev:
@@ -33,14 +34,21 @@ let
         doCheck = false;
       });
 
-  # Effective vim base. If a custom 'vim' is passed, use it. Else pkgs.vim-full.
-  effectiveVim = if vim == null then pkgs.vim-full else vim;
+  effectiveVim =
+    if vim != null then
+      vim
+    else
+      pkgs.vim-full.override {
+        darwinSupport = pkgs.stdenv.hostPlatform.isDarwin;
+        guiSupport = "none";
+      };
 
   allPlugins =
     with pkgs.vimPlugins;
     [
       # Plugins from nixpkgs
       fzf-vim
+      splitjoin-vim
       vim-tmux-navigator
       vim-commentary
       vim-surround
@@ -48,6 +56,8 @@ let
       vim-abolish
       vim-fugitive
       vim-rhubarb
+      vim-gitgutter
+
       undotree
       tagbar
     ]
@@ -97,9 +107,10 @@ let
   pythonPackagesOpt = pkgs.lib.optionals config.usePython (
     with pkgs;
     [
+      python312
       python312Packages.black
       python312Packages.isort
-      pyright
+      pyrefly
     ]
   );
 
@@ -169,6 +180,27 @@ let
     ]
   );
 
+  yamlPackagesOpt = pkgs.lib.optionals config.useYaml (
+    with pkgs;
+    [
+      yaml-language-server
+    ]
+  );
+
+  vimPackagesOpt = pkgs.lib.optionals config.useVim (
+    with pkgs;
+    [
+      vim-language-server
+    ]
+  );
+
+  awkPackagesOpt = pkgs.lib.optionals config.useAwk (
+    with pkgs;
+    [
+      awk-language-server
+    ]
+  );
+
   rubyPackagesOpt = pkgs.lib.optionals config.useRuby (
     with pkgs;
     [
@@ -185,6 +217,13 @@ let
     ]
   );
 
+  harperPackagesOpt = pkgs.lib.optionals config.useHarper (
+    with pkgs;
+    [
+      harper
+    ]
+  );
+
   extraPackages = pkgs.lib.concatLists [
     commonPackages
     nodePackagesOpt
@@ -197,9 +236,13 @@ let
     cxxPackagesOpt
     markdownPackagesOpt
     shellPackagesOpt
+    yamlPackagesOpt
+    vimPackagesOpt
+    awkPackagesOpt
     rubyPackagesOpt
     swiftPackagesOpt
     makefilePackagesOpt
+    harperPackagesOpt
   ];
 
   mkRC =
@@ -228,9 +271,9 @@ let
       dev ? false,
     }:
     let
-      vimPkg =
-        (effectiveVim.customize {
-          inherit name;
+      vimPkg = (
+        effectiveVim.customize {
+          name = "vim-core";
           vimrcConfig = {
             customRC = mkRC { inherit cfgDir dev; };
             packages.myplugins = {
@@ -238,21 +281,32 @@ let
               opt = [ ];
             };
           };
-        }).overrideAttrs
-          (old: {
-            meta = (old.meta or { }) // {
-              mainProgram = "vim";
-            };
-          });
+        }
+      );
+
+      vimBin = pkgs.lib.getBin vimPkg;
+      binPath = pkgs.lib.makeBinPath paths;
     in
-    pkgs.buildEnv {
-      inherit name;
-      paths = [ vimPkg ] ++ paths;
+    pkgs.symlinkJoin {
+      name = name;
+      paths = [
+        vimBin
+        vimPkg
+      ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        makeWrapper "$out/bin/vim-core" "$out/bin/${name}" \
+          --prefix PATH : ${binPath}
+
+        ln -sf "$out/bin/${name}" "$out/bin/vim"
+        ln -sf "$out/bin/${name}" "$out/bin/vi"
+      '';
+      meta.mainProgram = name;
     };
 
   vimPkg = mkVim {
     name = "vim-pkg";
-    cfgDir = toString ./vim;
+    cfgDir = toString ../vim;
     plugins = packagedPlugins;
     paths = extraPackages;
     dev = false;

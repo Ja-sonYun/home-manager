@@ -5,7 +5,7 @@ let g:loaded_sql_completion = 1
 
 " ----- mouse / clipboard -----
 set mouse=
-set clipboard=unnamedplus
+set clipboard+=unnamedplus,unnamed
 
 " ----- files / swap / backup / undo -----
 set noswapfile
@@ -24,12 +24,17 @@ execute 'set undodir=' . fnameescape(undodir)
 set undofile
 
 " ----- timing / editing -----
-set timeoutlen=400
+set timeoutlen=250
 set hidden
 set history=100
 set lazyredraw
-set synmaxcol=240
+set synmaxcol=3000
 set updatetime=250
+
+" ----- esc timing -----
+set ttimeout
+set ttimeoutlen=10
+set timeoutlen=400
 
 " ----- syntax / ft / indent -----
 syntax on
@@ -46,15 +51,15 @@ let &t_SI = "\e[6 q"  " Insert: steady bar
 let &t_SR = "\e[4 q"  " Replace: steady underline
 let &t_EI = "\e[2 q"  " Normal: steady block
 
+" ----- wildmenu -----
+set wildmenu
+set wildoptions=pum
+
 " ----- ui -----
 set number
 set showmatch
-if exists('+signcolumn')
-  set signcolumn=auto
-endif
-if exists('+pumheight')
-  let &pumheight = 10
-endif
+set signcolumn=yes
+let &pumheight = 10
 set completeopt=menu,menuone,noselect,noinsert,popup,fuzzy
 
 " ----- search -----
@@ -112,12 +117,27 @@ let &listchars = join([
       \ ], ',')
 let &wildcharm = char2nr("\t")
 
+" Netrw settings
+let g:netrw_list_hide = '^\./\=$\|^\.\./\=$'
+let g:netrw_hide = 1
+
 " ----- keymaps -----
 nnoremap <silent> <leader>a :nohl<CR>
 nnoremap <silent> <leader>w :write<CR>
 nnoremap <silent> <leader>r :edit<CR>
 
-nnoremap <leader><leader> <C-^>
+" Search for word under cursor
+nnoremap <silent> // :vimgrep /<C-R><C-W>/g %<CR>
+xnoremap <silent> // y:execute 'vimgrep /' .. escape(@", '/\') .. '/g %'<CR>
+
+" Navigate
+nnoremap <silent> ]q :cnext<CR>
+nnoremap <silent> [q :cprev<CR>
+nnoremap <silent> ]l :lnext<CR>
+nnoremap <silent> [l :lprev<CR>
+
+" Remap , to \
+nnoremap <leader>, ,
 
 nnoremap <C-s>r :%s/\<<C-r><C-w>\>//gc<left><left><left>
 nnoremap <C-s>R :%s/\<<C-r><C-w>\>//g<left><left>
@@ -142,20 +162,44 @@ nnoremap <silent> tq :tabclose<CR>
 nnoremap <silent> tn :tabnext<CR>
 nnoremap <silent> tp :tabprev<CR>
 
-" Paste from clipboard without overwriting register
-nnoremap <C-p> "0p
-vnoremap <C-p> "0p
-
-" Move around splits
-inoremap <C-h> <Left>
-inoremap <C-j> <Down>
-inoremap <C-k> <Up>
-inoremap <C-l> <Right>
+" Move cursor to start/end in insert mode
 inoremap <C-a> <Esc>^i
 inoremap <C-e> <Esc>$a
 
+" Quickfix
+nnoremap <silent> qn :cnext<CR>
+nnoremap <silent> qp :cprev<CR>
+nnoremap <silent> qo :copen<CR>
+
+" Marks (use only `, and swap ' and m)
+noremap <silent> ' <Nop>
+noremap <silent> ` <Nop>
+noremap <silent> m <Nop>
+nnoremap <silent> m `
+nnoremap <silent> ' m
+nnoremap <silent> mm :marks<CR>
+nnoremap dm :delmarks<Space>
+
+" Undo tree
+nnoremap <silent> qu :UndotreeToggle<CR>
+
 nnoremap <leader>y :let @*=expand('%:p')<CR>:echo 'Copied to clipboard'<CR>
+
+" Formatter
+function! s:Fmt() abort
+  " Keep cursor position
+  let v = winsaveview()
+  normal! ggVGgq
+  call winrestview(v)
+endfunction
+nnoremap <silent><nowait> gq :<C-u>call <SID>Fmt()<CR>
+
+" delete to black-hole, then put before cursor
+xnoremap p "_dP
 
 " ----- commands / packages -----
 command! BufOnly %bd | e# | bd#
 silent! packadd cfilter
+
+" ----- my records -----
+let @k = "'t$a;mt"

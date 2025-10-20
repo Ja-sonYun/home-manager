@@ -8,6 +8,8 @@
   };
 
   inputs = {
+    self.submodules = true;
+
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-prev.url = "github:NixOS/nixpkgs?rev=27ac93958969b5f3dccd654b402599cf3de633ac";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/release-25.05";
@@ -30,7 +32,6 @@
     # Nix-Homebrew to install casks
     nix-homebrew = {
       url = "github:zhaofengli/nix-homebrew";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
     homebrew-bundle = {
       url = "github:homebrew/homebrew-bundle";
@@ -46,9 +47,9 @@
     };
 
     # My packages
-    say.url = "git+file:./portable/say";
-    plot.url = "git+file:./portable/plot";
-    neovim.url = "path:./portable/neovim";
+    say.url = ./portable/say;
+    plot.url = ./portable/plot;
+    vim.url = ./portable/vim;
 
     # Agenix for secret management
     agenix = {
@@ -56,7 +57,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     agenix-secrets = {
-      url = "git+file:./shell/secrets/agenix";
+      url = ./shell/secrets/agenix;
       flake = false;
     };
   };
@@ -78,7 +79,7 @@
       homebrew-core,
       homebrew-cask,
 
-      neovim,
+      vim,
       say,
 
       agenix,

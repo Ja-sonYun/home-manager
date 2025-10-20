@@ -59,8 +59,8 @@
 
     cookiecutter
 
-    # My nvim config
-    nvim-pkg
+    # My vim config
+    vim-pkg
     say
     plot
 
@@ -73,14 +73,13 @@
   ];
 
   home.sessionVariables = {
-    EDITOR = "${pkgs.nvim-pkg}/bin/nvim";
+    EDITOR = "${pkgs.vim-pkg}/bin/vim";
     # PAGER = "${pkgs.moar}/bin/moar";
     FLAKE_TEMPLATES_DIR = "${configDir}/templates";
   };
 
   home.shellAliases = {
-    vi = "nvim";
-    vim = "nvim";
+    vi = "vim";
     cat = "bat";
     gsed = "sed";
     watch = "hwatch";

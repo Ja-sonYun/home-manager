@@ -28,7 +28,7 @@
       });
   };
 
-  neovim = inputs.neovim.overlays.default;
+  vim = inputs.vim.overlays.default;
   say = inputs.say.overlays.default;
   plot = inputs.plot.overlays.default;
 

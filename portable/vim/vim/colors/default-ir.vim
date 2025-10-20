@@ -18,3 +18,16 @@ function! s:FixMissingCtermFg()
 endfunction
 
 call s:FixMissingCtermFg()
+
+highlight StatusLineTerm term=bold,reverse cterm=bold ctermfg=0 ctermbg=2 gui=bold guifg=bg guibg=DarkGreen
+highlight StatusLineTermNC term=reverse ctermfg=0 ctermbg=2 guifg=bg guibg=DarkGreen
+highlight SignColumn term=standout ctermfg=4 ctermbg=0 guifg=DarkBlue guibg=Black
+
+highlight link diffAdded       MatchParen
+highlight link diffChanged     WarningMsg
+highlight link diffRemoved     ErrorMsg
+
+" GitGutter highlights
+highlight GitGutterAdd    ctermfg=2
+highlight GitGutterChange ctermfg=3
+highlight GitGutterDelete ctermfg=1

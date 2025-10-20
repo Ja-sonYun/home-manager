@@ -6,14 +6,13 @@
 
   time.timeZone = "Asia/Tokyo";
 
-  environment.variables.EDITOR = "nvim";
+  environment.variables.EDITOR = "vim";
   environment.systemPath = [ ];
   environment.systemPackages = with pkgs; [
     git
-    nvim-pkg
+    vim-pkg
   ];
   environment.shellAliases = {
-    vi = "nvim";
-    vim = "nvim";
+    vi = "vim";
   };
 }

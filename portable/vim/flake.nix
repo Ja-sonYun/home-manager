@@ -53,6 +53,10 @@
             "USE_SWIFT"
             "USE_MAKEFILE"
             "USE_COPILOT"
+            "USE_HARPER"
+            "USE_YAML"
+            "USE_VIM"
+            "USE_AWK"
           ];
           hasVal = key: builtins.getEnv key != "";
         in
@@ -75,6 +79,10 @@
             useSwift = boolEnv "USE_SWIFT" false;
             useMakefile = boolEnv "USE_MAKEFILE" false;
             useCopilot = boolEnv "USE_COPILOT" false;
+            useHarper = boolEnv "USE_HARPER" false;
+            useYaml = boolEnv "USE_YAML" false;
+            useVim = boolEnv "USE_VIM" false;
+            useAwk = boolEnv "USE_AWK" false;
           }
         else
           {
@@ -92,6 +100,10 @@
             useSwift = true;
             useMakefile = true;
             useCopilot = true;
+            useHarper = true;
+            useYaml = true;
+            useVim = true;
+            useAwk = true;
           };
     in
     {
@@ -105,7 +117,7 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = self.overlays;
+            overlays = [ self.overlays.default ];
             config.allowUnfree = true;
           };
         in
@@ -113,7 +125,6 @@
           default = pkgs.vim-pkg;
           vim = pkgs.vim-pkg;
           vim-dev = pkgs.vim-dev;
-          vim-with-tools = pkgs.vim-with-tools;
         }
       );
 
@@ -122,7 +133,7 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [self.overlays.default];
+            overlays = [ self.overlays.default ];
             config.allowUnfree = true;
           };
         in
