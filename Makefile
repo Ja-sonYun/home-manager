@@ -15,10 +15,10 @@ ifdef TRACE
 NIX_TRACE_ARGS := --show-trace
 endif
 
-update-neovim:
-	cd ./portable/neovim && nix flake update
+update-vim:
+	cd ./portable/vim && nix flake update
 
-update-raw: update-neovim
+update-raw: update-vim
 	nix flake update
 
 update:
@@ -32,7 +32,7 @@ add:
 	git add .
 
 lock: add
-	nix flake lock --update-input neovim $(nix-features-flag)
+	nix flake lock --update-input vim $(nix-features-flag)
 
 ifeq ($(SYSTEM),Darwin)
 build: add lock
