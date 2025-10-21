@@ -110,7 +110,7 @@ let
       python312
       python312Packages.black
       python312Packages.isort
-      pyrefly
+      pyright
     ]
   );
 

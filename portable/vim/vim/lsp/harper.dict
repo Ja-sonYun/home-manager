@@ -630,3 +630,7 @@ offset
 ZonedDateTime
 ISOFormat
 RFCFormat
+eslint
+prettier
+black
+no
