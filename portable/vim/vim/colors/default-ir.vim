@@ -31,3 +31,6 @@ highlight link diffRemoved     ErrorMsg
 highlight GitGutterAdd    ctermfg=2
 highlight GitGutterChange ctermfg=3
 highlight GitGutterDelete ctermfg=1
+
+highlight Folded     term=standout ctermfg=4 ctermbg=0 guifg=DarkBlue guibg=Black
+highlight FoldColumn term=standout ctermfg=4 ctermbg=0 guifg=DarkBlue guibg=Black

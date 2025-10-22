@@ -6,7 +6,5 @@ function! script#Setup(name, script) abort
   call writefile(l:scripts, l:tmp)
   call system('chmod +x ' . shellescape(l:tmp))
 
-  autocmd VimLeave * ++once call delete(l:tmp)
-
   return l:tmp
 endfunction
