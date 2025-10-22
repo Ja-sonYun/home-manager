@@ -26,7 +26,7 @@ set undofile
 " ----- timing / editing -----
 set timeoutlen=250
 set hidden
-set history=100
+set history=500
 set lazyredraw
 set synmaxcol=3000
 set updatetime=250
@@ -55,9 +55,15 @@ let &t_EI = "\e[2 q"  " Normal: steady block
 set wildmenu
 set wildoptions=pum
 
+" ----- terminal -----
+set t_ti=
+set t_te=
+
 " ----- ui -----
+set wrap
 set number
 set showmatch
+set smoothscroll
 set signcolumn=yes
 let &pumheight = 10
 set completeopt=menu,menuone,noselect,noinsert,popup,fuzzy
@@ -184,15 +190,6 @@ nnoremap dm :delmarks<Space>
 nnoremap <silent> qu :UndotreeToggle<CR>
 
 nnoremap <leader>y :let @*=expand('%:p')<CR>:echo 'Copied to clipboard'<CR>
-
-" Formatter
-function! s:Fmt() abort
-  " Keep cursor position
-  let v = winsaveview()
-  normal! ggVGgq
-  call winrestview(v)
-endfunction
-nnoremap <silent><nowait> gq :<C-u>call <SID>Fmt()<CR>
 
 " delete to black-hole, then put before cursor
 xnoremap p "_dP

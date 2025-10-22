@@ -1,7 +1,7 @@
 vim9script
 
 const script_dir = expand('<sfile>:p:h')
-const workspace_dict_path = script_dir .. '/harper.dict'
+const workspace_dict_path = script_dir .. '/../misc/harper.dict'
 const user_dict_path = expand('~/.local/share/harper/harper.dict')
 
 def g:LspConfig_harper(): dict<any>

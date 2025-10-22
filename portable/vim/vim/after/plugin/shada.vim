@@ -16,6 +16,12 @@ function! s:per_root_path() abort
   return root . '/' . base . '_' . hash . ext
 endfunction
 
+function! s:clear_histories() abort
+  for t in [':', '/', '=', '@']
+    call histdel(t)
+  endfor
+endfunction
+
 function! s:apply_per_root() abort
   if s:per_root_ready
     silent! wviminfo!
@@ -25,6 +31,7 @@ function! s:apply_per_root() abort
   let &viminfofile = file
 
   if filereadable(file)
+    call s:clear_histories()
     silent! rviminfo!
   endif
 
@@ -33,7 +40,7 @@ endfunction
 
 augroup PerRootViminfo
   autocmd!
-  autocmd VimEnter * call s:apply_per_root()
+  autocmd VimEnter   * call s:apply_per_root()
   autocmd DirChanged * call s:apply_per_root()
   autocmd VimLeavePre * silent! wviminfo!
 augroup END

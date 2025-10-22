@@ -47,7 +47,6 @@ let
     with pkgs.vimPlugins;
     [
       # Plugins from nixpkgs
-      fzf-vim
       splitjoin-vim
       vim-tmux-navigator
       vim-commentary
@@ -286,18 +285,22 @@ let
 
       vimBin = pkgs.lib.getBin vimPkg;
       binPath = pkgs.lib.makeBinPath paths;
+      wrapper = pkgs.writeShellScriptBin name ''
+        export PATH=${pkgs.lib.escapeShellArg binPath}:"$PATH"
+        trap 'echo -ne "[?1049l"' EXIT
+        echo -n "[?1049h"
+        "${vimPkg}/bin/vim-core" "$@"
+      '';
     in
     pkgs.symlinkJoin {
       name = name;
       paths = [
         vimBin
         vimPkg
+        wrapper
       ];
       nativeBuildInputs = [ pkgs.makeWrapper ];
       postBuild = ''
-        makeWrapper "$out/bin/vim-core" "$out/bin/${name}" \
-          --prefix PATH : ${binPath}
-
         ln -sf "$out/bin/${name}" "$out/bin/vim"
         ln -sf "$out/bin/${name}" "$out/bin/vi"
       '';

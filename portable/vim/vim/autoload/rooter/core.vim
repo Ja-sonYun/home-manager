@@ -3,6 +3,8 @@ vim9script
 import autoload 'utils/path.vim' as p
 import autoload 'utils/dict.vim' as d
 
+g:rooter_busy = false
+
 const DEFAULT = {
   buftypes: ['', 'nofile', 'nowrite', 'acwrite'],
   patterns: ['.git', 'Makefile', 'package.json'],
@@ -39,20 +41,28 @@ def Activate(): bool
 enddef
 
 def Rooter(): void
+  if g:rooter_busy
+    return
+  endif
+  g:rooter_busy = true
+
   if !Activate()
+    g:rooter_busy = false
     return
   endif
   const root = FindRoot()
   if root.String() !=# ''
     execute 'cd' fnameescape(root.String())
   endif
+
+  g:rooter_busy = false
 enddef
 
 export def Setup(opt: dict<any> = {}): void
   Config = d.DeepMerge(copy(DEFAULT), opt)
   augroup Rooter
     autocmd!
-    autocmd VimEnter,BufEnter,BufWritePost * Rooter()
+    autocmd VimEnter,BufEnter,BufWritePost,DirChanged * Rooter()
   augroup END
 enddef
 

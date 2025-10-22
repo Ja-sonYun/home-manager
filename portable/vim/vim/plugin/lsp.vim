@@ -98,20 +98,25 @@ def LoadLspOptions(): dict<any>
   }
 enddef
 
+def LspMakeBufMaps(): void
+  if exists('b:lsp_bufmaps_done') | return | endif
+  b:lsp_bufmaps_done = 1
+  nnoremap <buffer><silent> gd <Cmd>LspGotoDefinition<CR>
+  nnoremap <buffer><silent> go <Cmd>LspShowReferences<CR>
+  nnoremap <buffer><silent> K  <Cmd>LspHover<CR>
+  nnoremap <buffer><silent> J  <Cmd>LspDiagCurrent<CR>
+  nnoremap <buffer><silent> gI <Cmd>LspGotoImpl<CR>
+  nnoremap <buffer><silent> gD <Cmd>LspGotoDeclaration<CR>
+  nnoremap <buffer><silent> grn <Cmd>LspRename<CR>
+  nnoremap <buffer><silent> gca <Cmd>LspCodeAction<CR>
+  nnoremap <buffer><silent> ]d <Cmd>LspDiag next<CR>
+  nnoremap <buffer><silent> [d <Cmd>LspDiag prev<CR>
+  nnoremap <buffer><silent> g== <Cmd>LspFormat<CR>
+enddef
+
 augroup LspSetup
   autocmd!
   autocmd User LspSetup call LspOptionsSet(LoadLspOptions())
   autocmd User LspSetup call LspAddServer(LoadAllLspConfigs())
+  autocmd User LspAttached call LspMakeBufMaps()
 augroup END
-
-nnoremap <silent> gd <Cmd>LspGotoDefinition<CR>
-nnoremap <silent> go <Cmd>LspShowReferences<CR>
-nnoremap <silent> K  <Cmd>LspHover<CR>
-nnoremap <silent> J  <Cmd>LspDiagCurrent<CR>
-nnoremap <silent> gI <Cmd>LspGotoImpl<CR>
-nnoremap <silent> gD <Cmd>LspGotoDeclaration<CR>
-nnoremap <silent> grn <Cmd>LspRename<CR>
-nnoremap <silent> gca <Cmd>LspCodeAction<CR>
-nnoremap <silent> ]d <Cmd>LspDiag next<CR>
-nnoremap <silent> [d <Cmd>LspDiag prev<CR>
-nnoremap <silent> g== <Cmd>LspFormat<CR>
