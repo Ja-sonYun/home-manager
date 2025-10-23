@@ -55,10 +55,6 @@ let &t_EI = "\e[2 q"  " Normal: steady block
 set wildmenu
 set wildoptions=pum
 
-" ----- terminal -----
-set t_ti=
-set t_te=
-
 " ----- ui -----
 set wrap
 set number
@@ -130,19 +126,19 @@ let g:netrw_list_hide = '^\./\=$\|^\.\./\=$'
 let g:netrw_hide = 1
 
 " ----- keymaps -----
-nnoremap <silent> <leader>a :nohl<CR>
-nnoremap <silent> <leader>w :write<CR>
-nnoremap <silent> <leader>r :edit<CR>
+nnoremap <silent> <leader>a <Cmd>nohl<CR>
+nnoremap <silent> <leader>w <Cmd>write<CR>
+nnoremap <silent> <leader>r <Cmd>edit<CR>
 
 " Search for word under cursor
-nnoremap <silent> // :vimgrep /<C-R><C-W>/g %<CR>
+nnoremap <silent> // <Cmd>vimgrep /<C-R><C-W>/g %<CR>
 xnoremap <silent> // y:execute 'vimgrep /' .. escape(@", '/\') .. '/g %'<CR>
 
 " Navigate
-nnoremap <silent> ]q :cnext<CR>
-nnoremap <silent> [q :cprev<CR>
-nnoremap <silent> ]l :lnext<CR>
-nnoremap <silent> [l :lprev<CR>
+nnoremap <silent> ]q <Cmd>cnext<CR>
+nnoremap <silent> [q <Cmd>cprev<CR>
+nnoremap <silent> ]l <Cmd>lnext<CR>
+nnoremap <silent> [l <Cmd>lprev<CR>
 
 nnoremap <C-s>r :%s/\<<C-r><C-w>\>//gc<left><left><left>
 nnoremap <C-s>R :%s/\<<C-r><C-w>\>//g<left><left>
@@ -162,19 +158,19 @@ nnoremap <silent> @@ q
 nnoremap <silent> qq @
 
 " Tabs
-nnoremap <silent> to :tabnew<CR>
-nnoremap <silent> tq :tabclose<CR>
-nnoremap <silent> tn :tabnext<CR>
-nnoremap <silent> tp :tabprev<CR>
+nnoremap <silent> to <Cmd>tabnew<CR>
+nnoremap <silent> tq <Cmd>tabclose<CR>
+nnoremap <silent> tn <Cmd>tabnext<CR>
+nnoremap <silent> tp <Cmd>tabprev<CR>
 
 " Move cursor to start/end in insert mode
 inoremap <C-a> <Esc>^i
 inoremap <C-e> <Esc>$a
 
 " Quickfix
-nnoremap <silent> qn :cnext<CR>
-nnoremap <silent> qp :cprev<CR>
-nnoremap <silent> qo :copen<CR>
+nnoremap <silent> qn <Cmd>cnext<CR>
+nnoremap <silent> qp <Cmd>cprev<CR>
+nnoremap <silent> qo <Cmd>copen<CR>
 
 " Marks (use only `, and swap ' and m)
 noremap <silent> ' <Nop>
@@ -182,13 +178,13 @@ noremap <silent> ` <Nop>
 noremap <silent> m <Nop>
 nnoremap <silent> m `
 nnoremap <silent> ' m
-nnoremap <silent> mm :marks<CR>
+nnoremap <silent> mm <Cmd>marks<CR>
 nnoremap dm :delmarks<Space>
 
 " Undo tree
-nnoremap <silent> qu :UndotreeToggle<CR>
+nnoremap <silent> qu <Cmd>UndotreeToggle<CR>
 
-nnoremap <leader>y :let @*=expand('%:p')<CR>:echo 'Copied to clipboard'<CR>
+nnoremap <leader>y <Cmd>let @*=expand('%:p')<CR>:echo 'Copied to clipboard'<CR>
 
 " delete to black-hole, then put before cursor
 xnoremap p "_dP

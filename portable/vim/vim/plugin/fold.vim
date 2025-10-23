@@ -1,21 +1,25 @@
-function! s:HasAnyFold()
+vim9script
+
+def FoldPluginHasAnyFold(): bool
   for lnum in range(1, line('$'))
     if foldlevel(lnum) > 0
-      return v:true
+      return true
     endif
   endfor
-  return v:false
-endfunction
+  return false
+enddef
 
-function! s:AutoFoldColumn()
-  if s:HasAnyFold()
-    setlocal foldcolumn=1
+def FoldPluginAutoFoldColumn()
+  if FoldPluginHasAnyFold()
+    &l:foldcolumn = 1
   else
-    setlocal foldcolumn=0
+    &l:foldcolumn = 0
   endif
-endfunction
+enddef
 
 augroup AutoFoldColumn
   autocmd!
-  autocmd CursorHold,BufWinEnter,WinEnter * call s:AutoFoldColumn()
+  autocmd CursorHold,BufWinEnter,WinEnter * FoldPluginAutoFoldColumn()
 augroup END
+
+defcompile

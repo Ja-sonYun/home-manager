@@ -40,9 +40,9 @@ enddef
 
 def AttachTermMappings(): void
   tnoremap <buffer> <Esc> <C-\><C-n>
-  nnoremap <silent><buffer> q     <Cmd>bdelete!<CR>
-  nnoremap <silent><buffer> <C-c> <Cmd>bdelete!<CR>
-  nnoremap <silent><buffer> <leader>qf :cexpr getline(1, line('$') - 2)<CR>:q<CR>:copen<CR>
+  nnoremap <silent><buffer> q          <Cmd>bdelete!<CR>
+  nnoremap <silent><buffer> <C-c>      <Cmd>bdelete!<CR>
+  nnoremap <silent><buffer> <leader>qf <Cmd>cexpr getline(1, line('$') - 2)<CR>:q<CR>:copen<CR>
 enddef
 
 def AttachQuitHandlers(): void

@@ -1,1 +1,1 @@
-nnoremap <silent> <leader>t :TagbarToggle<CR>
+nnoremap <silent> <leader>t <Cmd>TagbarToggle<CR>

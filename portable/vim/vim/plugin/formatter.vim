@@ -7,4 +7,5 @@ function! s:Fmt() abort
   normal! ggVGgq
   call winrestview(v)
 endfunction
-nnoremap <silent><nowait> gq :<C-u>call <SID>Fmt()<CR>
+
+nnoremap <silent><nowait> gq <Cmd>call <SID>Fmt()<CR>

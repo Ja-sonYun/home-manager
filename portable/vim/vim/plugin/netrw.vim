@@ -6,4 +6,4 @@ let g:netrw_keepdir = 0
 let g:netrw_liststyle = 0
 let g:netrw_special_syntax = 1
 
-nnoremap <silent> <leader>f :Explore<CR>
+nnoremap <silent> <leader>f <Cmd>Explore<CR>

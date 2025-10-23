@@ -32,5 +32,6 @@ nnoremap <space>f :find
 nnoremap <space>r :grep 
 nnoremap <space>l :lgrep  %<left><left>
 nnoremap <space>c :compiler 
-nnoremap <space>m :make 
+nnoremap <space>m :make! 
 nnoremap <space>e :!
+nnoremap <space>g :vimgrep // **/*.*<left><left><left><left><left><left><left><left>

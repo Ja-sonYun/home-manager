@@ -19,27 +19,27 @@ def SetupMappings()
   var m = Config.mappings
 
   var ekey = get(m.next_end, 'keys')
-  execute 'nnoremap <silent> ' .. ekey .. ' <Cmd>vim9cmd wordnav#core#NextSubwordEnd(v:count1, false)<CR>'
-  execute 'xnoremap <silent> ' .. ekey .. ' <Cmd>vim9cmd wordnav#core#NextSubwordEnd(v:count1, true)<CR>'
-  execute 'onoremap <silent> ' .. ekey .. ' <Cmd>vim9cmd wordnav#core#NextSubwordEnd(v:count1, true)<CR>'
+  execute 'nnoremap <silent> ' .. ekey .. ' <ScriptCmd>NextSubwordEnd(v:count1, false)<CR>'
+  execute 'xnoremap <silent> ' .. ekey .. ' <ScriptCmd>NextSubwordEnd(v:count1, true)<CR>'
+  execute 'onoremap <silent> ' .. ekey .. ' <ScriptCmd>NextSubwordEnd(v:count1, true)<CR>'
 
   var wkey = get(m.next_start, 'keys')
-  execute 'nnoremap <silent> ' .. wkey .. ' <Cmd>vim9cmd wordnav#core#NextSubwordStart(v:count1, false)<CR>'
-  execute 'xnoremap <silent> ' .. wkey .. ' <Cmd>vim9cmd wordnav#core#NextSubwordStart(v:count1, true)<CR>'
-  execute 'onoremap <silent> ' .. wkey .. ' <Cmd>vim9cmd wordnav#core#NextSubwordStart(v:count1, true)<CR>'
+  execute 'nnoremap <silent> ' .. wkey .. ' <ScriptCmd>NextSubwordStart(v:count1, false)<CR>'
+  execute 'xnoremap <silent> ' .. wkey .. ' <ScriptCmd>NextSubwordStart(v:count1, true)<CR>'
+  execute 'onoremap <silent> ' .. wkey .. ' <ScriptCmd>NextSubwordStart(v:count1, true)<CR>'
 
   var bkey = get(m.prev_start, 'keys')
-  execute 'nnoremap <silent> ' .. bkey .. ' <Cmd>vim9cmd wordnav#core#PrevSubwordStart(v:count1, false)<CR>'
-  execute 'xnoremap <silent> ' .. bkey .. ' <Cmd>vim9cmd wordnav#core#PrevSubwordStart(v:count1, true)<CR>'
-  execute 'onoremap <silent> ' .. bkey .. ' <Cmd>vim9cmd wordnav#core#PrevSubwordStart(v:count1, true)<CR>'
+  execute 'nnoremap <silent> ' .. bkey .. ' <ScriptCmd>PrevSubwordStart(v:count1, false)<CR>'
+  execute 'xnoremap <silent> ' .. bkey .. ' <ScriptCmd>PrevSubwordStart(v:count1, true)<CR>'
+  execute 'onoremap <silent> ' .. bkey .. ' <ScriptCmd>PrevSubwordStart(v:count1, true)<CR>'
 
   var gkey = get(m.next_uscore, 'keys')
-  execute 'nnoremap <silent> ' .. gkey .. ' <Cmd>vim9cmd wordnav#core#NextUnderscoreInIdentifier(v:count1, false)<CR>'
-  execute 'xnoremap <silent> ' .. gkey .. ' <Cmd>vim9cmd wordnav#core#NextUnderscoreInIdentifier(v:count1, true)<CR>'
-  execute 'onoremap <silent> ' .. gkey .. ' <Cmd>vim9cmd wordnav#core#NextUnderscoreInIdentifier(v:count1, true)<CR>'
+  execute 'nnoremap <silent> ' .. gkey .. ' <ScriptCmd>NextUnderscoreInIdentifier(v:count1, false)<CR>'
+  execute 'xnoremap <silent> ' .. gkey .. ' <ScriptCmd>NextUnderscoreInIdentifier(v:count1, true)<CR>'
+  execute 'onoremap <silent> ' .. gkey .. ' <ScriptCmd>NextUnderscoreInIdentifier(v:count1, true)<CR>'
 
   var okey = get(m.op_till_uscore, 'keys')
-  execute 'onoremap <silent> ' .. okey .. ' <Cmd>vim9cmd wordnav#core#NextUnderscoreInIdentifier(1, true)<CR>'
+  execute 'onoremap <silent> ' .. okey .. ' <ScriptCmd>NextUnderscoreInIdentifier(1, true)<CR>'
 enddef
 
 def GetLine0(row0: number): string

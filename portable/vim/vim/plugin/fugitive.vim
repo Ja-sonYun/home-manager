@@ -1,3 +1,3 @@
-nnoremap <silent> <leader>gg :Git<CR>
-nnoremap <silent> <leader>gb :Git blame<CR>
-nnoremap <silent> <leader>gd :Git diff<CR>
+nnoremap <silent> <leader>gg <Cmd>Git<CR>
+nnoremap <silent> <leader>gb <Cmd>Git blame<CR>
+nnoremap <silent> <leader>gd <Cmd>Git diff<CR>

@@ -48,4 +48,4 @@ function! s:Explore(args) abort
   endif
 endfunction
 
-nnoremap <silent> <leader>f :Explore<CR>
+nnoremap <silent> <leader>f <Cmd>Explore<CR>

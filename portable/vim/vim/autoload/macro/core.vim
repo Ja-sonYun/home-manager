@@ -109,5 +109,5 @@ export def Setup(cfg: dict<any> = {}): void
   command! -nargs=? MacroEdit call OpenMacroEditorWindow(<f-args>)
   command!          MacroList call ListMacros()
 
-  execute 'nnoremap <silent> ' .. Config.keybinding .. ' :MacroEdit<CR>'
+  execute 'nnoremap <silent> ' .. Config.keybinding .. ' <Cmd>MacroEdit<CR>'
 enddef

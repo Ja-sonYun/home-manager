@@ -1,20 +1,44 @@
 vim9script
 
-g:last_char = ''
-g:last_dir  = 1
+g:last_pat = ''
+g:last_dir = 1
+
+def DrainCharNonBlocking(): string
+  var t = getchar(0)
+  if t == 0
+    return ''
+  endif
+  if type(t) == v:t_number
+    return nr2char(t)
+  endif
+  return string(t)
+enddef
+
+def IsAsciiAlnum(ch: string): bool
+  if ch ==# ''
+    return false
+  endif
+  if char2nr(ch) > 127
+    return false
+  endif
+  return ch =~# '^[A-Za-z0-9]$'
+enddef
 
 def DoMove(forward: bool, isVisual: bool): void
-  var c = g:last_char
+  var pat = g:last_pat
   var lnum = line('.')
   var pos = col('.')
   var found: bool = false
-  var idx: number  = -1
+  var idx: number = -1
 
   if forward
     while lnum <= line('$')
-      var txt   = getline(lnum)
+      var txt = getline(lnum)
       var start = (lnum == line('.')) ? pos : 0
-      idx = stridx(txt, c, start)
+      if start < 0
+        start = 0
+      endif
+      idx = stridx(txt, pat, start)
       if idx >= 0
         found = true
         break
@@ -24,11 +48,12 @@ def DoMove(forward: bool, isVisual: bool): void
   else
     while lnum >= 1
       var txt = getline(lnum)
-      var stopcol = (lnum == line('.')) ? pos - 2 : strlen(txt)
+      var stopcol = (lnum == line('.')) ? pos - 2 : strlen(txt) - 1
       if stopcol < 0
-        stopcol = strlen(txt)
+        stopcol = strlen(txt) - 1
       endif
-      idx = strridx(txt[0 : stopcol], c)
+      var slice = (stopcol >= 0) ? txt[0 : stopcol] : ''
+      idx = strridx(slice, pat)
       if idx >= 0
         found = true
         break
@@ -38,7 +63,7 @@ def DoMove(forward: bool, isVisual: bool): void
   endif
 
   if !found
-    echom 'not found: ' .. c
+    echom 'not found: ' .. pat
     return
   endif
 
@@ -53,18 +78,33 @@ def DoMove(forward: bool, isVisual: bool): void
   endif
 enddef
 
+def BuildPattern(initial: string): string
+  if IsAsciiAlnum(initial)
+    var c2 = nr2char(getchar())
+    if c2 ==# "\<Esc>"
+      return ''
+    endif
+    return initial .. c2
+  endif
+  return initial
+enddef
+
 def StartMove(forward: bool, isVisual: bool): void
   var c = nr2char(getchar())
   if c ==# "\<Esc>"
     return
   endif
-  g:last_char = c
-  g:last_dir  = forward ? 1 : -1
+  var pat = BuildPattern(c)
+  if pat ==# ''
+    return
+  endif
+  g:last_pat = pat
+  g:last_dir = forward ? 1 : -1
   DoMove(forward, isVisual)
 enddef
 
 def RepeatMove(reverse: bool, isVisual: bool): void
-  if g:last_char ==# ''
+  if g:last_pat ==# ''
     echom 'no previous f/F search'
     return
   endif
