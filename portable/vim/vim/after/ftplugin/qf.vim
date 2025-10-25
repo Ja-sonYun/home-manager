@@ -5,6 +5,7 @@ setlocal statusline=%n\ %f%=%L\ lines
 nnoremap <buffer><silent><nowait> q <Cmd>q<CR>
 nnoremap <buffer><silent><nowait> <C-c> <Cmd>q<CR>
 nnoremap <buffer><silent><nowait> l <CR><Cmd>wincmd p<CR>
+nnoremap <buffer> <leader>f <Nop>
 
 nnoremap <buffer><nowait> f :Cfilter 
 nnoremap <buffer><nowait> F :Cfilter! 

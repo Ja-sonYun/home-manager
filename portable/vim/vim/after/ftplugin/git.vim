@@ -1,5 +1,4 @@
-nnoremap <buffer> <nowait> q <Cmd>q<CR>
-nnoremap <buffer> <nowait> <C-c> <Cmd>q<CR>
+nnoremap <buffer> <leader>f <Nop>
 
 setlocal signcolumn=no
 setlocal bufhidden=wipe
