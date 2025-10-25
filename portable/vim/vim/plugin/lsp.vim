@@ -65,7 +65,7 @@ def LoadLspOptions(): dict<any>
     # completionTextEdit: true,
     # diagVirtualTextAlign: 'above',
     # diagVirtualTextWrap: 'default',
-    # noNewlineInCompletion: false,
+    noNewlineInCompletion: true,
     # omniComplete: null,
     # omniCompleteAllowBare: false,
     # outlineOnRight: false,
@@ -112,6 +112,7 @@ def LspMakeBufMaps(): void
   nnoremap <buffer><silent> ]d <Cmd>LspDiag next<CR>
   nnoremap <buffer><silent> [d <Cmd>LspDiag prev<CR>
   nnoremap <buffer><silent> g== <Cmd>LspFormat<CR>
+  inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
 enddef
 
 augroup LspSetup

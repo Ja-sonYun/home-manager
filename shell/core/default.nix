@@ -5,6 +5,8 @@
 }:
 {
   home.packages = with pkgs; [
+    git-wrapped
+
     # archives
     zip
     xz
@@ -28,7 +30,7 @@
     gnused
     gnutar
     gawk
-    moar
+    moor
     zstd
     caddy
     gnupg
@@ -74,7 +76,7 @@
 
   home.sessionVariables = {
     EDITOR = "${pkgs.vim-pkg}/bin/vim";
-    # PAGER = "${pkgs.moar}/bin/moar";
+    # PAGER = "${pkgs.moor}/bin/moor";
     FLAKE_TEMPLATES_DIR = "${configDir}/templates";
   };
 

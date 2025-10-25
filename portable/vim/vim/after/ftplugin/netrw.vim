@@ -9,6 +9,12 @@ nmap <buffer> m R
 nmap <buffer> r <Cmd>e . <bar> echo 'Reloaded.'<CR>
 nmap <buffer> t <Nop>
 nmap <buffer> v v$h
+nmap <buffer> b qb
+nmap <buffer> f qf
+nmap <buffer> F qF
+nmap <buffer> L qL
+
+nmap <buffer> s <Nop>
 
 nmap <buffer><nowait><silent> q         <Cmd>Rex<CR>
 nmap <buffer><nowait><silent> <C-c>     <Cmd>Rex<CR>

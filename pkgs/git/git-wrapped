@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+git='%%GIT%%/bin/git'
+
+if [ "$1" = "restore" ]; then
+    staged=false
+    for arg in "$@"; do
+        [ "$arg" = "--staged" ] && staged=true && break
+    done
+
+    if [ "$staged" = false ]; then
+        echo "Checking for uncommitted changes..."
+        if ! $git diff --quiet; then
+            echo "Stashing uncommitted changes before git restore..."
+            if ! $git stash push -m "auto-pre-restore" --keep-index; then
+                echo "Error: stash failed. Aborting restore." >&2
+                exit 1
+            fi
+        fi
+    fi
+fi
+
+if [ "$1" = "reset" ] && [ "$2" = "--hard" ]; then
+    if ! $git diff --quiet || ! $git diff --cached --quiet; then
+        echo "Stashing uncommitted changes before git reset --hard..."
+        if ! $git stash push -m "auto-pre-reset-hard" --include-untracked >/dev/null 2>&1; then
+            echo "Error: stash failed. Aborting reset." >&2
+            exit 1
+        fi
+    fi
+fi
+
+exec $git "$@"

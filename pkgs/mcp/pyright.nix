@@ -5,7 +5,7 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   name = "pyright";
   pythonVersion = "311";
   packages = [
-    "pyright==1.1.406"
+    "pyright==1.1.407"
   ];
   exposedBinaries = [
     "pyright"

@@ -11,8 +11,11 @@ function! UnsetAltScreen()
 endfun
 
 function! SetAltScreen()
-  let &t_ti = g:altscreen_save_t_ti
-  let &t_te = g:altscreen_save_t_te
+  try
+    let &t_ti = g:altscreen_save_t_ti
+    let &t_te = g:altscreen_save_t_te
+  catch
+  endtry
 endfun
 
 function! AltScreenControlZ()

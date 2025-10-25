@@ -77,7 +77,7 @@ let
   commonPackages =
     with pkgs;
     [
-      git
+      (if pkgs ? git-wrapped then pkgs.git-wrapped else pkgs.git)
       cacert
       ripgrep
       gh
@@ -86,7 +86,7 @@ let
       gnumake
       gawk
     ]
-    ++ pkgs.lib.optionals config.useCopilot [ pkgs.nodejs_22 ];
+    ++ pkgs.lib.optionals config.useCopilot [ (nodejs_22.override { enableNpm = false; }) ];
 
   makefilePackagesOpt = pkgs.lib.optionals config.useMakefile (
     with pkgs;

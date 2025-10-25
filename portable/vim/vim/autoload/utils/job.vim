@@ -1,14 +1,14 @@
 vim9script
 
-export enum JobOutMode
+export enum OutMode
   nl, raw, raw_esc
 endenum
 
-export enum JobStatus
+export enum Status
   none, run, fail, dead
 endenum
 
-export class JobResult
+export class Result
   var out: list<string> = []
   var err: list<string> = []
   var code: number = -1
@@ -30,7 +30,7 @@ export class Job
 
   def new(argv: list<string>, opts: dict<any> = {})
     var buf = get(opts, 'buf', 0)
-    var out_mode = get(opts, 'out_mode', JobOutMode.nl).name
+    var out_mode = get(opts, 'out_mode', OutMode.nl).name
     var env = get(opts, 'env', {})
     var cwd = get(opts, 'cwd', '')
     var timeout = get(opts, 'timeout', 0)
@@ -79,17 +79,17 @@ export class Job
     this._is_started = true
   enddef
 
-  def Status(): JobStatus
+  def Status(): Status
     if !this._is_started
-      return JobStatus.none
+      return Status.none
     endif
     var s = job_status(this.job)
     if s ==# 'run'
-      return JobStatus.run
+      return Status.run
     elseif s ==# 'fail'
-      return JobStatus.fail
+      return Status.fail
     else
-      return JobStatus.dead
+      return Status.dead
     endif
   enddef
 
@@ -104,7 +104,7 @@ export class Job
 
   def IsRunning(): bool
     this._GuardStarted()
-    return this.Status() ==# JobStatus.run
+    return this.Status() ==# Status.run
   enddef
 
   def Stdin(data: string): void
@@ -119,12 +119,12 @@ export class Job
     this.exit_code = -1
   enddef
 
-  def Result(): JobResult
+  def Result(): Result
     this._GuardStarted()
-    return JobResult.new(this.stdout, this.stderr, this.exit_code)
+    return Result.new(this.stdout, this.stderr, this.exit_code)
   enddef
 
-  def Join(timeout_ms: number = -1): JobResult
+  def Join(timeout_ms: number = -1): Result
     this._GuardStarted()
     var t0 = reltime()
     while this.IsRunning()
@@ -134,6 +134,20 @@ export class Job
       sleep 10m
     endwhile
     return this.Result()
+  enddef
+
+  def WaitAsync(interval_ms: number = 50, cb: any = v:none): void
+    this._GuardStarted()
+    var self = this
+    var timer_id = timer_start(interval_ms, (_) => {
+      if self.IsRunning()
+        timer_start(interval_ms, (_) => self.WaitAsync(interval_ms, cb))
+      else
+        if type(cb) != v:t_none
+          call(cb, [self.stdout, self.stderr, self.exit_code])
+        endif
+      endif
+    })
   enddef
 
   def CloseIn(): void

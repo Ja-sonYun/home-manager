@@ -1,92 +1,21 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
-
-# Config
-ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
-PLACEHOLDER_HASH="sha256-0000000000000000000000000000000000000000000="
-
-RUN_BUILD=1
-DEBUG=0
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-    --no-build)
-        RUN_BUILD=0
-        shift
-        ;;
-    --debug)
-        DEBUG=1
-        shift
-        ;;
-    *)
-        echo "Unknown option: $1" >&2
-        exit 1
-        ;;
-    esac
-done
 
 require_cmd() { command -v "$1" >/dev/null 2>&1 || {
     echo "Missing command: $1" >&2
     exit 1
 }; }
-require_cmd rg
-require_cmd sed
 require_cmd jq
-require_cmd nix
 require_cmd curl
-
-# Debug logger
-debug() { if [[ "$DEBUG" -eq 1 ]]; then echo "[DEBUG] $*" >&2; fi; }
-
-# Enable xtrace when debugging
-if [[ "$DEBUG" -eq 1 ]]; then
-    set -x
-fi
-
-# Escape helpers for safe sed usage (kept for future use, not needed with current patterns)
-escape_sed_pat() { printf '%s' "$1" | sed -e 's/[\/&]/\\&/g'; }
-escape_sed_repl() { printf '%s' "$1" | sed -e 's/[\/&]/\\&/g'; }
-
-# Cross-platform in-place sed (GNU/BSD)
-sed_inplace() {
-    local script="$1"
-    shift
-    local file="$1"
-    debug "sed_inplace on ${file}: ${script}"
-    if sed --version >/dev/null 2>&1; then
-        sed -i -e "$script" "$file"
-    else
-        sed -i '' -e "$script" "$file"
-    fi
-}
-
-# Choose a sed delimiter that doesn't appear in pattern or replacement
-pick_delim() {
-    local a="$1" b="$2"
-    local candidates='|#~%^:@,;!/+'
-    local i ch
-    for ((i = 0; i < ${#candidates}; i++)); do
-        ch="${candidates:i:1}"
-        case "$a$b" in
-        *"$ch"*) ;;
-        *)
-            printf '%s' "$ch"
-            return 0
-            ;;
-        esac
-    done
-    printf '|'
-}
-
-# URL-encode npm package path component (scope/name)
-urlencode_npm_pkg() {
-    # encode '@' and '/' for npm registry path
-    printf '%s' "$1" | sed -e 's/@/%40/g' -e 's/\//%2F/g'
-}
+require_cmd sed
 
 latest_pypi_version() {
     local name="$1"
     curl -sL "https://pypi.org/pypi/${name}/json" | jq -r '.info.version'
+}
+
+urlencode_npm_pkg() {
+    printf '%s' "$1" | sed -e 's/@/%40/g' -e 's/\//%2F/g'
 }
 
 latest_npm_version() {
@@ -96,270 +25,62 @@ latest_npm_version() {
     curl -sL "https://registry.npmjs.org/${enc}" | jq -r '."dist-tags".latest'
 }
 
-prefetch_npm_hash() {
-    local name="$1"
-    shift
-    local -a pkgs=("$@")
-    local system
-    system=$(nix eval --raw --impure --expr 'builtins.currentSystem')
-
-    local tmpfile
-    tmpfile=$(mktemp /tmp/prefetch-npm.XXXXXX.nix)
-
-    {
-        echo "let"
-        echo "  pkgs = import <nixpkgs> { };"
-        echo "  npmLib = import ${ROOT_DIR}/libs/npm { inherit pkgs system; };"
-        echo "in npmLib.mkNpmGlobalPackageDerivation {"
-        echo "  inherit pkgs;"
-        echo "  name = \"prefetch\";"
-        printf "  packages = ["
-        for p in "${pkgs[@]}"; do printf " \"%s\"" "$p"; done
-        echo " ];"
-        echo "  exposedBinaries = [ ];"
-        echo "  outputHash = \"${PLACEHOLDER_HASH}\";"
-        echo "}"
-    } >"$tmpfile"
-
-    set +e
-    local out
-    out=$(nix build --impure --expr "(import ${tmpfile})" -L 2>&1)
-    local status=$?
-    rm -f "$tmpfile"
-    set -e
-
-    if [[ $status -eq 0 ]]; then
-        echo "" # should not happen with placeholder
-        return 0
-    fi
-
-    # parse 'got:    sha256-...'
-    printf '%s\n' "$out" | sed -n 's/.*got: *\(sha256-[A-Za-z0-9+/=]\+\).*/\1/p' | tail -n1
-}
-
-prefetch_pip_hash() {
-    local pythonVersion="$1"
-    shift
-    local -a preInstall=()
-    if [[ "$1" == "--pre" ]]; then
-        shift
-        preInstall=("$1")
-        shift
-    fi
-    local -a pkgs=("$@")
-
-    local tmpfile
-    tmpfile=$(mktemp /tmp/prefetch-pip.XXXXXX.nix)
-
-    {
-        echo "let"
-        echo "  pkgs = import <nixpkgs> { };"
-        echo "  pipLib = import ${ROOT_DIR}/libs/pip { inherit pkgs; };"
-        echo "in pipLib.mkPipGlobalPackageDerivation {"
-        echo "  inherit pkgs;"
-        echo "  name = \"prefetch\";"
-        echo "  pythonVersion = \"${pythonVersion}\";"
-        if [[ ${#preInstall[@]} -gt 0 ]]; then
-            printf "  preInstall = ["
-            for p in "${preInstall[@]}"; do printf " \"%s\"" "$p"; done
-            echo " ];"
-        fi
-        printf "  packages = ["
-        for p in "${pkgs[@]}"; do printf " \"%s\"" "$p"; done
-        echo " ];"
-        echo "  exposedBinaries = [ ];"
-        echo "  outputHash = \"${PLACEHOLDER_HASH}\";"
-        echo "}"
-    } >"$tmpfile"
-
-    set +e
-    local out
-    out=$(nix build --impure --expr "(import ${tmpfile})" -L 2>&1)
-    local status=$?
-    rm -f "$tmpfile"
-    set -e
-
-    if [[ $status -eq 0 ]]; then
-        echo ""
-        return 0
-    fi
-
-    printf '%s\n' "$out" | sed -n 's/.*got: *\(sha256-[A-Za-z0-9+/=]\+\).*/\1/p' | tail -n1
-}
-
-# Extract array items from a Nix list string region
-extract_nix_string_array() {
-    # expects content between brackets containing quoted strings
-    sed -n 's/.*\"\(.*\)\".*/\1/p' | sed 's/\"\s\+\"/\n/g'
-}
-
-update_happened=0
-
-process_npm_file() {
+update_versions_in_file() {
     local file="$1"
-    local content packages_block
-    packages_block=$(awk '/packages\s*=\s*\[/{flag=1;next}/\]/{flag=0}flag' "$file" | sed -n 's/.*"\(.*\)".*/\1/p')
+    local updated=0
 
-    local -a pkgs=()
-    while IFS= read -r line; do
-        [[ -z "$line" ]] && continue
-        pkgs+=("$line")
-    done <<<"$packages_block"
-
-    debug "npm pkgs parsed from ${file}: ${#pkgs[@]} items -> ${pkgs[*]}"
-
-    local changed=0
-    for i in "${!pkgs[@]}"; do
-        local full="${pkgs[$i]}"
-        # split by last '@'
-        local base ver
-        base="${full%@*}"
-        ver="${full##*@}"
-        # skip if no version
-        if [[ "$base" == "$full" ]]; then
-            continue
-        fi
-        local latest
-        latest=$(latest_npm_version "$base" || true)
-        if [[ -n "$latest" && "$latest" != "$ver" ]]; then
-            # replace version part within quotes to avoid complex escaping
-            local sed_script
-            sed_script="s|\"${base}@[^\"]*\"|\"${base}@${latest}\"|"
-            debug "npm sed: base=${base} ver=${ver} latest=${latest} script='${sed_script}' file='${file}'"
-            sed_inplace "$sed_script" "$file"
-            changed=1
-            update_happened=1
-            pkgs[$i]="${base}@${latest}"
-            echo "Updated npm ${base}: ${ver} -> ${latest} in ${file}"
-        fi
-    done
-
-    if [[ $changed -eq 1 ]]; then
-        # reset outputHash to placeholder
-        local d1
-        d1=$(pick_delim "${PLACEHOLDER_HASH}" "")
-        local script1="s${d1}outputHash = \"sha256-[A-Za-z0-9+/=]\\+\";${d1}outputHash = \"${PLACEHOLDER_HASH}\";${d1}"
-        debug "reset outputHash with delim='${d1}' script='${script1}' file='${file}'"
-        sed_inplace "${script1}" "$file"
-
-        # prefetch new hash for current list
-        local got
-        got=$(prefetch_npm_hash "prefetch" "${pkgs[@]}")
-        if [[ -n "$got" ]]; then
-            local d2
-            d2=$(pick_delim "${got}" "")
-            local script2="s${d2}outputHash = \"${PLACEHOLDER_HASH}\";${d2}outputHash = \"${got}\";${d2}"
-            debug "apply outputHash with delim='${d2}' script='${script2}' file='${file}'"
-            sed_inplace "${script2}" "$file"
-            echo "Updated outputHash for ${file}: ${got}"
-        else
-            echo "WARN: Could not prefetch hash for ${file}" >&2
-        fi
-    fi
-}
-
-process_pip_file() {
-    local file="$1"
-    # get pythonVersion if present
-    local pyv
-    pyv=$(sed -n 's/.*pythonVersion\s*=\s*\"\([0-9]\+\)\".*/\1/p' "$file" | head -n1 || true)
-    [[ -z "$pyv" ]] && pyv="312"
-
-    # preInstall (optional, single-line support)
-    local pre
-    pre=$(awk '/preInstall\s*=\s*\[/{flag=1;next}/\]/{if(flag){print;};flag=0}flag' "$file" | sed -n 's/.*"\(.*\)".*/\1/p' | head -n1 || true)
-
-    # extract package list
-    local packages_block
-    packages_block=$(awk '/packages\s*=\s*\[/{flag=1;next}/\]/{flag=0}flag' "$file" | sed -n 's/.*"\(.*\)".*/\1/p')
-
-    local -a pkgs=()
-    while IFS= read -r p; do
-        [[ -z "$p" ]] && continue
-        pkgs+=("$p")
-    done <<<"$packages_block"
-
-    debug "pip pkgs parsed from ${file}: ${#pkgs[@]} items -> ${pkgs[*]}"
-
-    local changed=0
-    for i in "${!pkgs[@]}"; do
-        local full="${pkgs[$i]}"
-        # skip VCS or url installs
-        if [[ "$full" == git+* ]]; then
-            continue
-        fi
-        if [[ "$full" == *"=="* ]]; then
-            local name="${full%%==*}"
-            local ver="${full##*==}"
-            local latest
-            latest=$(latest_pypi_version "$name" || true)
+    if grep -q 'mkNpmGlobalPackageDerivation' "$file"; then
+        awk '/packages\s*=\s*\[/{flag=1;next}/\]/{flag=0}flag' "$file" \
+        | sed -n 's/.*"\(.*\)".*/\1/p' | while read -r line; do
+            [[ -z "$line" ]] && continue
+            base="${line%@*}"
+            ver="${line##*@}"
+            [[ "$base" == "$line" ]] && continue
+            latest=$(latest_npm_version "$base" || true)
             if [[ -n "$latest" && "$latest" != "$ver" ]]; then
-                local pscript="s|\"${name}==[^\"]*\"|\"${name}==${latest}\"|"
-                debug "pip sed: name=${name} ver=${ver} latest=${latest} script='${pscript}' file='${file}'"
-                sed_inplace "${pscript}" "$file"
-                changed=1
-                update_happened=1
-                pkgs[$i]="${name}==${latest}"
-                echo "Updated pip ${name}: ${ver} -> ${latest} in ${file}"
+                sed -i "s|\"${base}@${ver}\"|\"${base}@${latest}\"|" "$file"
+                echo "Updated npm ${base}: ${ver} -> ${latest}"
+                echo "$file" >> "$UPDATED_LIST"
+                updated=1
             fi
-        fi
-    done
-
-    if [[ $changed -eq 1 ]]; then
-        local d3
-        d3=$(pick_delim "${PLACEHOLDER_HASH}" "")
-        local script3="s${d3}outputHash = \"sha256-[A-Za-z0-9+/=]\\+\";${d3}outputHash = \"${PLACEHOLDER_HASH}\";${d3}"
-        debug "reset outputHash (pip) delim='${d3}' script='${script3}' file='${file}'"
-        sed_inplace "${script3}" "$file"
-        local got
-        if [[ -n "$pre" ]]; then
-            got=$(prefetch_pip_hash "$pyv" --pre "$pre" "${pkgs[@]}")
-        else
-            got=$(prefetch_pip_hash "$pyv" "${pkgs[@]}")
-        fi
-        if [[ -n "$got" ]]; then
-            local d4
-            d4=$(pick_delim "${got}" "")
-            local script4="s${d4}outputHash = \"${PLACEHOLDER_HASH}\";${d4}outputHash = \"${got}\";${d4}"
-            debug "apply outputHash (pip) delim='${d4}' script='${script4}' file='${file}'"
-            sed_inplace "${script4}" "$file"
-            echo "Updated outputHash for ${file}: ${got}"
-        else
-            echo "WARN: Could not prefetch hash for ${file}" >&2
-        fi
+        done
     fi
+
+    if grep -q 'mkPipGlobalPackageDerivation' "$file"; then
+        awk '/packages\s*=\s*\[/{flag=1;next}/\]/{flag=0}flag' "$file" \
+        | sed -n 's/.*"\(.*\)".*/\1/p' | while read -r line; do
+            [[ -z "$line" ]] && continue
+            [[ "$line" == git+* ]] && continue
+            if [[ "$line" == *"=="* ]]; then
+                name="${line%%==*}"
+                ver="${line##*==}"
+                latest=$(latest_pypi_version "$name" || true)
+                if [[ -n "$latest" && "$latest" != "$ver" ]]; then
+                    sed -i "s|\"${name}==${ver}\"|\"${name}==${latest}\"|" "$file"
+                    echo "Updated pip ${name}: ${ver} -> ${latest}"
+                    echo "$file" >> "$UPDATED_LIST"
+                    updated=1
+                fi
+            fi
+        done
+    fi
+    return $updated
 }
 
 main() {
-    local -a files=()
-    # find candidate files (skip tmux-menu); avoid bash 4+ mapfile for macOS
-    while IFS= read -r f; do
-        files+=("$f")
-    done < <(rg -l "pkgs\\.lib\\.(pip|npm|cargo)\\.mk(.*)GlobalPackageDerivation" -g '!**/tmux-menu/**' "$ROOT_DIR")
+    local root="${1:-.}"
+    UPDATED_LIST=$(mktemp)
+    trap 'rm -f "$UPDATED_LIST"' EXIT
 
-    for f in "${files[@]}"; do
-        if rg -q "pkgs\\.lib\\.npm\\.mkNpmGlobalPackageDerivation" "$f"; then
-            debug "Processing NPM file: ${f}"
-            process_npm_file "$f"
-        elif rg -q "pkgs\\.lib\\.pip\\.mkPipGlobalPackageDerivation" "$f"; then
-            debug "Processing PIP file: ${f}"
-            process_pip_file "$f"
-        else
-            # cargo or others: skip per requirements
-            continue
-        fi
+    grep -rl 'mk.*GlobalPackageDerivation' "$root" | while read -r f; do
+        update_versions_in_file "$f" || true
     done
 
-    if [[ $RUN_BUILD -eq 1 ]]; then
-        echo "Running make build (this may stage files due to Makefile)..." >&2
-        make -C "$ROOT_DIR" build || true
-    fi
-
-    if [[ $update_happened -eq 1 ]]; then
-        echo "Updates applied. Review changes and commit if desired." >&2
-    else
-        echo "No updates necessary. All packages are current." >&2
-    fi
+    sort -u "$UPDATED_LIST" | while read -r changed; do
+        echo "Running ./scripts/update-output-hash $changed"
+        ./scripts/update-output-hash "$changed"
+    done
 }
 
 main "$@"
+

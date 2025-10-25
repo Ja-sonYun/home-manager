@@ -1,6 +1,6 @@
 vim9script
 
-export class SignSpec
+export class Spec
   var kind: string
   var text: string = ''
   var texthl: string = ''
@@ -25,7 +25,7 @@ export class SignSpec
   enddef
 endclass
 
-export class SignItem
+export class Item
   var kind: string
   var lnum: number
   var key: string = ''
@@ -51,7 +51,7 @@ class Placed
   enddef
 endclass
 
-class SignState
+class State
   public var placed: dict<Placed> = {}
 
   def Clear(group: string, buf: number): void
@@ -67,10 +67,10 @@ export class SignCol
   static var spec_hash: dict<string> = {}
 
   public var group: string
-  public var kinds: dict<SignSpec> = {}
-  public var state: dict<SignState> = {}
+  public var kinds: dict<Spec> = {}
+  public var state: dict<State> = {}
 
-  def new(this.group, specs: list<SignSpec>)
+  def new(this.group, specs: list<Spec>)
     for spec in specs
       this.kinds[spec.kind] = spec
     endfor
@@ -93,12 +93,12 @@ export class SignCol
     SignCol.spec_hash[this.group] = h
   enddef
 
-  def GetState(buf: number): SignState
+  def GetState(buf: number): State
     var sb = string(buf)
     if has_key(this.state, sb)
       return this.state[sb]
     endif
-    var st = SignState.new()
+    var st = State.new()
     this.state[sb] = st
     return st
   enddef
@@ -118,13 +118,13 @@ export class SignCol
     return l
   enddef
 
-  def Update(buf: number, entries: list<SignItem>): void
+  def Update(buf: number, entries: list<Item>): void
     if buf <= 0
       return
     endif
 
     var sb = string(buf)
-    var st: SignState = this.GetState(buf)
+    var st: State = this.GetState(buf)
     var placed: dict<Placed> = st.placed
 
     var info = get(getbufinfo(buf), 0, {})

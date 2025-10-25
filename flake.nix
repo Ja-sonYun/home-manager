@@ -49,7 +49,10 @@
     # My packages
     say.url = ./portable/say;
     plot.url = ./portable/plot;
-    vim.url = ./portable/vim;
+    vim = {
+      url = ./portable/vim;
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Agenix for secret management
     agenix = {

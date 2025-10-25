@@ -30,18 +30,6 @@ in
         printf '%s\n' "$out"
       '';
     };
-    git = {
-      source = true;
-      # To apply cd in a sourced script, we need to wrap the original command
-      command = ''
-        if [[ "$1" == wt ]]; then
-          shift
-          git-wt "$@"
-        else
-          command git "$@"
-        fi
-      '';
-    };
   };
 
   home.shellAliases = {

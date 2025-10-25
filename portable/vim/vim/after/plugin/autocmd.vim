@@ -31,7 +31,7 @@ augroup END
 " --- Dynamic on-save hook via environment variables ---
 augroup OnSaveHook
   autocmd!
-  autocmd BufWritePost * call s:MaybeRunOnSaveHook()
+  autocmd BufWritePost * call <SID>MaybeRunOnSaveHook()
 augroup END
 
 function! s:FileMatchesGlobs(globs, fname) abort

@@ -51,6 +51,7 @@
         tmux = final.callPackage ../pkgs/tmux { system = final.stdenv.hostPlatform.system; };
       };
       awscli-local = final.callPackage ../pkgs/awscli-local { };
+      git-wrapped = final.callPackage ../pkgs/git { };
     };
 
   # Override upstream packages using our local pkgs/* definitions

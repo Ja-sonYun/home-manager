@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   ...
 }:
 {
@@ -17,6 +18,7 @@
 
   programs.git = {
     enable = true;
+    package = pkgs.git-wrapped;
     lfs.enable = true;
 
     ignores = [
@@ -119,6 +121,7 @@
       "backlog"
       ".hooks"
       "pyrefly.toml"
+      ".vim_vars.json"
     ];
 
     includes = [
@@ -170,8 +173,7 @@
       merge.tool = "vimdiff";
       mergetool.prompt = false;
       mergetool.keepBackup = false;
-      "mergetool \"vimdiff\"".cmd =
-        "vim -d \"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\" -c 'wincmd J'";
+      "mergetool \"vimdiff\"".cmd = "vim -d \"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\" -c 'wincmd J'";
     };
   };
 

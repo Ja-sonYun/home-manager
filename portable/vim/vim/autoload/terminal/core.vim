@@ -79,69 +79,32 @@ def StartTerminal(cmd: string, height: number, qf: bool = false): bool
   b:prev_hidden = prev_hidden
   set hidden
 
-  const safe_cmd = ShellPrompt(cmd)
-  var outputs = []
-  var pending = ''
-
-  def DrainPending(include_tail: bool): void
-    if !qf
-      return
-    endif
-    if empty(pending) && !include_tail
-      return
-    endif
-    var parts = split(pending, "\n", 1)
-    if !include_tail
-      pending = remove(parts, len(parts) - 1)
-    else
-      pending = ''
-    endif
-    if empty(parts)
-      return
-    endif
-    for line in parts
-      if empty(line)
-        continue
-      endif
-      const cleaned = StripAnsi(line)
-      if !empty(cleaned)
-        outputs += [cleaned]
-      endif
-    endfor
-  enddef
-
-  def TrimPrompt(): void
-    if len(outputs) > 1
-      outputs = outputs[0 : len(outputs) - 2]
-    else
-      outputs = []
-    endif
-  enddef
-
-  def AppendOutput(ch: any, msg: string): void
-    if !qf || empty(msg)
-      return
-    endif
-    pending ..= msg
-    DrainPending(false)
-  enddef
+  var wrapped_cmd = cmd
+  var teetemp = ''
+  if qf
+    teetemp = tempname()
+    wrapped_cmd = printf(
+          \ "echo '$ %s\n---------'; %s | tee %s && sed -i -r 's/\\x1B\\[[0-9;]*[mK]//g' %s",
+          \ shellescape(cmd, 1),
+          \ cmd,
+          \ fnameescape(teetemp),
+          \ fnameescape(teetemp))
+  endif
+  const safe_cmd = ShellPrompt(wrapped_cmd)
 
   try
     term_start(['sh', '-c', safe_cmd], {
       curwin: true,
-      out_cb: AppendOutput,
-      err_cb: AppendOutput,
       exit_cb: (job: job, status: number) => {
-        if qf
-          DrainPending(true)
-          if !empty(outputs)
-            TrimPrompt()
-            call setqflist([], 'r', {'lines': outputs, 'efm': &errorformat})
-          endif
-        endif
         CloseBuffer(buf, prev_ls)
         if qf
-          execute 'copen'
+          def LoadQuickfix(_: number): void
+            execute 'cgetfile ' .. fnameescape(teetemp)
+            call delete(teetemp)
+            execute 'copen'
+          enddef
+
+          call timer_start(0, LoadQuickfix)
         endif
       },
     })
@@ -164,12 +127,12 @@ def StartTerminal(cmd: string, height: number, qf: bool = false): bool
   return true
 enddef
 
-export def Run(cmd: string, height: number = 15, qf: bool = false): void
+export def Run(cmd: string, height: number = 10, qf: bool = false): void
   const resolved = ExpandFileMods(cmd)
   StartTerminal(resolved, max([3, height]), qf)
 enddef
 
-export def Make(args: string = '', height: number = 15): void
+export def Make(args: string = '', height: number = 10): void
   execute 'cclose'
   var cmd = &makeprg
   if empty(cmd)
