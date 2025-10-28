@@ -13,7 +13,7 @@ augroup END
 " --- Remove trailing whitespace on save ---
 augroup TrimTrailingWS
   autocmd!
-  autocmd BufWritePre * if get(b:, 'do_trim_trail', 0) | silent! %s/\s\+$//e | endif
+  autocmd BufWritePre * if get(b:, 'trimtrail', 0) | silent! %s/\s\+$//e | endif
 augroup END
 
 
