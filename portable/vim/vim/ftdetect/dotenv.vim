@@ -1,1 +1,4 @@
-autocmd BufRead,BufNewFile .env,.env.*,*.env,.env.*.* set filetype=dotenv
+autocmd BufRead,BufNewFile *.env.* set filetype=dotenv
+autocmd BufRead,BufNewFile .env.* set filetype=dotenv
+autocmd BufRead,BufNewFile *.env set filetype=dotenv
+autocmd BufRead,BufNewFile .env set filetype=dotenv

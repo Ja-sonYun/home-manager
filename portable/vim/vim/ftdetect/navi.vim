@@ -1,1 +1,1 @@
-au BufRead,BufNewFile *.cheat set filetype=navi
+autocmd BufRead,BufNewFile *.cheat set filetype=navi

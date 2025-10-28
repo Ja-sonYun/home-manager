@@ -60,7 +60,6 @@ let
       vim-fugitive
       vim-rhubarb
       vim-gitgutter
-      vim-polyglot
 
       undotree
       tagbar
