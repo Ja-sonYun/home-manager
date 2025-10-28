@@ -84,7 +84,7 @@ def StartTerminal(cmd: string, height: number, qf: bool = false): bool
   if qf
     teetemp = tempname()
     wrapped_cmd = printf(
-          \ "echo '$ %s\n---------'; %s | tee %s && sed -i -r 's/\\x1B\\[[0-9;]*[mK]//g' %s",
+          \ "echo \"$ %s\n---------\"; %s | tee %s && sed -i -r 's/\\x1B\\[[0-9;]*[mK]//g' %s",
           \ shellescape(cmd, 1),
           \ cmd,
           \ fnameescape(teetemp),
