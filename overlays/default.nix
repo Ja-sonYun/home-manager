@@ -8,16 +8,6 @@
     };
   };
 
-  broken-on-unstable = final: prev: rec {
-    _prev = import inputs.nixpkgs-prev {
-      system = final.system;
-      config.allowUnfree = true;
-    };
-
-    flock = _prev.flock;
-    gitui = _prev.gitui;
-  };
-
   lib-injection = final: prev: {
     # Inject custom libs into the lib namespace
     lib =
@@ -51,7 +41,7 @@
         tmux = final.callPackage ../pkgs/tmux { system = final.stdenv.hostPlatform.system; };
       };
       awscli-local = final.callPackage ../pkgs/awscli-local { };
-      git-wrapped = final.callPackage ../pkgs/git { };
+      git-wrapped = final.callPackage ../pkgs/git-wrapped { };
     };
 
   # Override upstream packages using our local pkgs/* definitions

@@ -4,7 +4,7 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   inherit pkgs;
   name = "claude-code";
   packages = [
-    "@anthropic-ai/claude-code@2.0.27"
+    "@anthropic-ai/claude-code@2.0.28"
   ];
   exposedBinaries = [
     "claude"
@@ -25,5 +25,5 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
       # Use global env rather than coreutils's env
       sed -i '1s@^#!/.*/env.*@#!/usr/bin/env -S ${node}/bin/node --no-warnings --enable-source-maps @' node_modules/claude-code/lib/node_modules/@anthropic-ai/claude-code/cli.js
     '';
-  outputHash = "sha256-0000000000000000000000000000000000000000000=";
+  outputHash = "sha256-7dAtcq8wHX6nA5/G0BDt8NUII8Kugblqn+bSArKGH90=";
 }
