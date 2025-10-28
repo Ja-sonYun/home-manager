@@ -23,8 +23,9 @@ let &l:listchars = join([
       \ 'leadmultispace:| '
       \ ], ',')
 
-wincmd J
-vertical resize
-resize 20
-
 setlocal winfixheight winfixwidth
+
+augroup FugitiveLocal
+  autocmd! * <buffer>
+  autocmd BufWinEnter <buffer> if &filetype ==# 'fugitive' | wincmd J | vertical resize | resize 20 | endif
+augroup END

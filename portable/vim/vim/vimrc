@@ -157,8 +157,9 @@ noremap  <silent> @ <Nop>
 nnoremap <silent> @@ q
 nnoremap <silent> qq @
 
-" Indent all
-nnoremap == gg=G
+" Format things
+nnoremap <silent><nowait> == <Cmd>call utils#Preserve('normal! gg=G')<CR>
+nnoremap <silent><nowait> gq <Cmd>call utils#Preserve('normal! ggVGgq')<CR>
 
 " Tabs
 nnoremap <silent> to <Cmd>tabnew<CR>
