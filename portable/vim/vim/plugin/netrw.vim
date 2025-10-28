@@ -1,3 +1,8 @@
+if exists("g:loaded_user_netrw")
+  finish
+endif
+let g:loaded_user_netrw = 1
+
 let g:netrw_preview = 1
 let g:netrw_use_errorwindow = 0
 let g:netrw_winsize = 30

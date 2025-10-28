@@ -1,3 +1,7 @@
+if !exists("current_compiler") || current_compiler !=# "pytest"
+  finish
+endif
+
 let venv_pytest = getcwd() . '/.venv/bin/pytest'
 if executable(venv_pytest)
   let pytest = venv_pytest

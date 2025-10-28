@@ -11,6 +11,7 @@
   ];
 
   programs.jujutsu = {
+    package = pkgs.jujutsu;
     enable = true;
 
     ediff = false;

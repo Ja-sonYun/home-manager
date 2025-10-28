@@ -1,3 +1,8 @@
+if exists("g:loaded_after_netrw")
+  finish
+endif
+let g:loaded_after_netrw = 1
+
 if exists('*netrw#BrowseX')
   delfunction netrw#BrowseX
 endif

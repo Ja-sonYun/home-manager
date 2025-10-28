@@ -1,3 +1,7 @@
+if !exists("current_compiler") || current_compiler !=# "ruff"
+  finish
+endif
+
 let venv_ruff = getcwd() . '/.venv/bin/ruff'
 if executable(venv_ruff)
   let ruff = venv_ruff

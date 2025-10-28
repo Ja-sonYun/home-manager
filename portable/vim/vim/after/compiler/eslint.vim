@@ -1,3 +1,7 @@
+if !exists("current_compiler") || current_compiler !=# "eslint"
+  finish
+endif
+
 " Find eslint in order: local node_modules, global npx, global pnpm, global yarn, global eslint
 let local_eslint = getcwd() . '/node_modules/.bin/eslint'
 

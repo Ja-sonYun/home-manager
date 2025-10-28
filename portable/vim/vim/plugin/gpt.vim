@@ -1,5 +1,10 @@
 vim9script
 
+if exists('g:loaded_user_gpt')
+  finish
+endif
+g:loaded_user_gpt = true
+
 import autoload 'utils/gpt.vim' as gpt
 
 def GenerateReplacer(prompt: string, system_prompt: string): func<void>

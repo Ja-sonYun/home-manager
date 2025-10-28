@@ -62,7 +62,7 @@
     cookiecutter
 
     # My vim config
-    vim-pkg
+    vim-dev
     say
     plot
 
@@ -75,7 +75,7 @@
   ];
 
   home.sessionVariables = {
-    EDITOR = "${pkgs.vim-pkg}/bin/vim";
+    EDITOR = "${pkgs.vim-dev}/bin/vim";
     # PAGER = "${pkgs.moor}/bin/moor";
     FLAKE_TEMPLATES_DIR = "${configDir}/templates";
   };

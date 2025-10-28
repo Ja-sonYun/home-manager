@@ -1,5 +1,10 @@
 vim9script
 
+if exists('g:loaded_user_statusline')
+  finish
+endif
+g:loaded_user_statusline = true
+
 def g:GetScrollbar(): string
   var sbar_chars = ['▇', '▆', '▅', '▄', '▃', '▂', '▁']
   var cur_line = line('.')

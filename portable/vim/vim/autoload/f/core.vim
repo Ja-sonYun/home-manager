@@ -68,10 +68,12 @@ def DoMove(forward: bool, isVisual: bool): void
   endif
 
   if isVisual
-    var vpos = getpos('v')
-    var vline = vpos[1]
-    var vcol = vpos[2]
-    var seq = '' .. vline .. 'G0' .. (vcol - 1) .. 'l' .. 'v' .. lnum .. 'G0' .. idx .. 'l'
+    const vpos = getpos('v')
+    const vline = vpos[1]
+    const vcol = vpos[2]
+    const movline = vline .. 'G0'
+    const movcol = (vcol - 1) == 0 ? '' : (vcol - 1) .. 'l'
+    const seq = '' .. movline .. movcol .. 'v' .. lnum .. 'G0' .. idx .. 'l'
     feedkeys(seq, 'nx')
   else
     cursor(lnum, idx + 1)

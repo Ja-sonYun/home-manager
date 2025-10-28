@@ -1,5 +1,10 @@
 vim9script
 
+if exists('g:loaded_user_lsp')
+  finish
+endif
+g:loaded_user_lsp = true
+
 const SCRIPT_DIR = fnamemodify(expand('<script>'), ':p:h')
 const LSP_DIR = simplify(SCRIPT_DIR .. '/../lsp')
 

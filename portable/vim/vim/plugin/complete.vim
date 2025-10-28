@@ -1,3 +1,8 @@
+if exists("g:loaded_user_complete")
+  finish
+endif
+let g:loaded_user_complete = 1
+
 let g:usercomplete = []
 
 function! UserListComplete(findstart, base) abort

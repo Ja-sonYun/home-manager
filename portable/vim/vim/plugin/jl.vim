@@ -1,3 +1,8 @@
+if exists("g:loaded_user_jl")
+  finish
+endif
+let g:loaded_user_jl = 1
+
 function! s:NextFileJump(forward) abort
   let start = expand('%:p')
   let max = 100

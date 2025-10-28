@@ -1,3 +1,8 @@
+if exists("g:loaded_after_abbrev")
+  finish
+endif
+let g:loaded_after_abbrev = 1
+
 " --- General English typos ---
 Abolish teh the
 Abolish adn and
@@ -109,3 +114,5 @@ Abolish Postgresql PostgreSQL
 " --- Check ---
 Abolish cehck check
 Abolish healtch health
+
+Abolish cosnt const

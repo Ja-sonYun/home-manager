@@ -1,5 +1,10 @@
 vim9script
 
+if exists('g:loaded_user_yankhighlight')
+  finish
+endif
+g:loaded_user_yankhighlight = true
+
 def HighlightedYank(hlgroup = 'IncSearch', duration = 1000, in_visual = true)
   if v:event.operator !=? 'y'
     return

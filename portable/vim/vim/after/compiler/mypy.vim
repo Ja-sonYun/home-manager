@@ -1,3 +1,7 @@
+if !exists("current_compiler") || current_compiler !=# "mypy"
+  finish
+endif
+
 let venv_mypy = getcwd() . '/.venv/bin/mypy'
 
 if executable(venv_mypy)

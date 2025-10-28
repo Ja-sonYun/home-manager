@@ -1,3 +1,8 @@
+if exists("g:loaded_user_color")
+  finish
+endif
+let g:loaded_user_color = 1
+
 function! ShowCtermColors(bg)
   " bg = 0 -> foreground colors
   " bg = 1 -> background colors

@@ -1,3 +1,8 @@
+if exists("g:loaded_after_autocmd")
+  finish
+endif
+let g:loaded_after_autocmd = 1
+
 " --- Don't auto-comment new lines ---
 augroup NoAutoComment
   autocmd!
@@ -56,13 +61,18 @@ function! s:MaybeRunOnSaveHook() abort
   u
 endfunction
 
-" --- Dynamic indentation settings per buffer via b:indent ---
+" --- Dynamic indentation settings per buffer via b:indent and b:usetab ---
 augroup Indent
   autocmd!
   autocmd BufWinEnter * if getbufvar(bufnr(), 'indent', 0) |
     \ let width = getbufvar(bufnr(), 'indent', 2) |
+    \ let usetab = getbufvar(bufnr(), 'usetab', 0) |
     \ let trailspace = repeat(' ', width - 1) |
-    \ setlocal expandtab |
+    \ if usetab |
+    \   setlocal noexpandtab |
+    \ else |
+    \   setlocal expandtab |
+    \ endif |
     \ let &l:tabstop = width |
     \ let &l:shiftwidth = width |
     \ let &l:softtabstop = width |
@@ -76,3 +86,4 @@ augroup Indent
     \ ], ',') |
     \ endif
 augroup END
+

@@ -1,3 +1,8 @@
+if exists("g:loaded_user_dv")
+  finish
+endif
+let g:loaded_user_dv = 1
+
 let s:last_dir = ''
 let s:dir_var_store = {}
 

@@ -2,7 +2,8 @@
   description = "Vim derivation";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/release-25.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     vim-lsp = {
       url = "github:yegappan/lsp";
@@ -11,7 +12,12 @@
   };
 
   outputs =
-    { self, nixpkgs, ... }:
+    {
+      self,
+      nixpkgs,
+      nixpkgs-unstable,
+      ...
+    }:
     let
       systems = [
         "x86_64-linux"
@@ -105,6 +111,15 @@
             useVim = true;
             useAwk = true;
           };
+      mkPkgs =
+        system:
+        import nixpkgs {
+          inherit system;
+          overlays = [
+            self.overlays.default
+          ];
+          config.allowUnfree = true;
+        };
     in
     {
       overlays.default = import ./nix/overlay.nix {
@@ -115,11 +130,7 @@
       packages = forAllSystems (
         system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [ self.overlays.default ];
-            config.allowUnfree = true;
-          };
+          pkgs = mkPkgs system;
         in
         {
           default = pkgs.vim-pkg;
@@ -131,11 +142,7 @@
       devShells = forAllSystems (
         system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [ self.overlays.default ];
-            config.allowUnfree = true;
-          };
+          pkgs = mkPkgs system;
         in
         {
           default = pkgs.mkShell {

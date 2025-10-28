@@ -23,10 +23,14 @@
 final: prev:
 let
   pkgs = final;
+  unstable = import inputs.nixpkgs-unstable {
+    inherit (final) system;
+    config.allowUnfree = true;
+  };
 
   mkVimPlugin =
     src: pname:
-    (pkgs.vimUtils.buildVimPlugin {
+    (unstable.vimUtils.buildVimPlugin {
       inherit pname src;
       version = src.lastModifiedDate or "0";
     }).overrideAttrs
@@ -38,13 +42,13 @@ let
     if vim != null then
       vim
     else
-      pkgs.vim-full.override {
+      unstable.vim-full.override {
         darwinSupport = pkgs.stdenv.hostPlatform.isDarwin;
         guiSupport = "none";
       };
 
   allPlugins =
-    with pkgs.vimPlugins;
+    with unstable.vimPlugins;
     [
       # Plugins from nixpkgs
       splitjoin-vim
@@ -56,6 +60,7 @@ let
       vim-fugitive
       vim-rhubarb
       vim-gitgutter
+      vim-polyglot
 
       undotree
       tagbar
@@ -89,7 +94,7 @@ let
     ++ pkgs.lib.optionals config.useCopilot [ (nodejs_22.override { enableNpm = false; }) ];
 
   makefilePackagesOpt = pkgs.lib.optionals config.useMakefile (
-    with pkgs;
+    with unstable;
     [
       mbake
     ]

@@ -1,3 +1,8 @@
+if exists("g:loaded_user_altscreen")
+  finish
+endif
+let g:loaded_user_altscreen = 1
+
 function! UnsetAltScreen()
   let g:altscreen_save_t_ti = &t_ti
   let g:altscreen_save_t_te = &t_te

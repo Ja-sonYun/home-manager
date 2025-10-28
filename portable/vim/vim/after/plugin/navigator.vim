@@ -1,3 +1,8 @@
+if exists("g:loaded_after_navigator")
+  finish
+endif
+let g:loaded_after_navigator = 1
+
 " --- tmux-aware window navigation ---
 if empty($TMUX)
   " inside plain terminal

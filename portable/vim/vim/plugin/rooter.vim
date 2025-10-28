@@ -1,5 +1,10 @@
 vim9script
 
+if exists('g:loaded_user_rooter')
+  finish
+endif
+g:loaded_user_rooter = true
+
 import autoload 'rooter/core.vim'
 
 const ROOT_MARKERS = [

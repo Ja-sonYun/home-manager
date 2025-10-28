@@ -11,8 +11,13 @@ if [ "$1" = "restore" ]; then
     if [ "$staged" = false ]; then
         echo "Checking for uncommitted changes..."
         if ! $git diff --quiet; then
-            echo "Stashing uncommitted changes before git restore..."
-            if ! $git stash push -m "auto-pre-restore" --keep-index; then
+            echo "Backing up current diff (stash copy, keep working tree)..."
+            if $git stash push -m "auto-pre-restore" --keep-index >/dev/null 2>&1; then
+                $git stash apply 'stash@{0}' >/dev/null 2>&1 || {
+                    echo "Warning: failed to re-apply stash." >&2
+                }
+                echo "Diff safely copied to stash and working tree preserved."
+            else
                 echo "Error: stash failed. Aborting restore." >&2
                 exit 1
             fi

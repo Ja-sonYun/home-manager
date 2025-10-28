@@ -1,6 +1,12 @@
+if exists("b:current_syntax")
+  finish
+endif
+
 syntax match Comment "^\s*#.*$"
 syntax match Statement "^\s*export\>"
 syntax match Identifier "^\s*\%(export\s\+\)\=\zs\h\w*\ze\s*="
 syntax match String "=\s*\zs\"[^\"#]*\""
 syntax match String "=\s*\zs'[^'#]*'"
 syntax match String "=\s*\zs[^# \t][^#]*"
+
+let b:current_syntax = "dotenv"

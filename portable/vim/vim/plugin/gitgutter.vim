@@ -1,3 +1,8 @@
+if exists("g:loaded_user_gitgutter")
+  finish
+endif
+let g:loaded_user_gitgutter = 1
+
 let g:gitgutter_map_keys = 0
 let g:gitgutter_set_sign_backgrounds = 1
 let g:gitgutter_preview_win_floating = 1

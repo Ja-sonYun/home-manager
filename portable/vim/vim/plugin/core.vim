@@ -1,3 +1,8 @@
+if exists("g:loaded_user_core")
+  finish
+endif
+let g:loaded_user_core = 1
+
 set shellpipe=>%s\ 2>&1
 set shellredir=>%s\ 2>&1
 

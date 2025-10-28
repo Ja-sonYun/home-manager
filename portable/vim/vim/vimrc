@@ -157,6 +157,9 @@ noremap  <silent> @ <Nop>
 nnoremap <silent> @@ q
 nnoremap <silent> qq @
 
+" Indent all
+nnoremap == gg=G
+
 " Tabs
 nnoremap <silent> to <Cmd>tabnew<CR>
 nnoremap <silent> tq <Cmd>tabclose<CR>

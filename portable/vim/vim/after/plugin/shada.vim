@@ -1,3 +1,8 @@
+if exists("g:loaded_after_shada")
+  finish
+endif
+let g:loaded_after_shada = 1
+
 let s:per_root_ready = 0
 
 function! s:state_dir_and_ext() abort
