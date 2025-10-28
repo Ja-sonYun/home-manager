@@ -1,8 +1,8 @@
-if exists("b:did_ftplugin")
+if exists("b:did_user_ftplugin")
   finish
 endif
 
-let b:did_ftplugin = 1
+let b:did_user_ftplugin = 1
 
 let b:indent = 2
 let b:autorel = 1
