@@ -3,6 +3,9 @@ if exists("g:loaded_after_autocmd")
 endif
 let g:loaded_after_autocmd = 1
 
+let g:noncode_buftypes = ['terminal', 'nofile', 'prompt', 'quickfix', 'help']
+
+
 " --- Don't auto-comment new lines ---
 augroup NoAutoComment
   autocmd!
@@ -21,10 +24,15 @@ augroup END
 augroup ModifyRelativeNumber
   autocmd!
   autocmd BufLeave,FocusLost,InsertEnter,WinLeave,CmdlineEnter *
-        \ if get(b:, 'autorel', 0) | setlocal norelativenumber | endif
+        \ if index(g:noncode_buftypes, &buftype) < 0 |
+        \   if &number && &relativenumber | setlocal norelativenumber | endif |
+        \ endif
   autocmd BufEnter,FocusGained,InsertLeave,WinEnter,CmdlineLeave *
-        \ if get(b:, 'autorel', 0) | setlocal number relativenumber | endif
+        \ if index(g:noncode_buftypes, &buftype) < 0 |
+        \   if &number && !&relativenumber | setlocal relativenumber | endif |
+        \ endif
 augroup END
+
 
 " --- Open file at last edit position ---
 augroup OpenFileAtLastPosition
@@ -58,13 +66,12 @@ function! s:MaybeRunOnSaveHook() abort
   elseif s:FileMatchesGlobs($VIM_ON_SAVE_HOOK_TRIGGER_RULES, l:f)
     call system($VIM_ON_SAVE_HOOK)
   endif
-  u
 endfunction
 
 " --- Dynamic indentation settings per buffer via b:indent and b:usetab ---
 augroup Indent
   autocmd!
-  autocmd BufWinEnter * if getbufvar(bufnr(), 'indent', 0) |
+  autocmd BufWinEnter * if index(g:noncode_buftypes, &buftype) < 0 |
     \ let width = getbufvar(bufnr(), 'indent', 2) |
     \ let usetab = getbufvar(bufnr(), 'usetab', 0) |
     \ let trailspace = repeat(' ', width - 1) |
@@ -73,6 +80,7 @@ augroup Indent
     \ else |
     \   setlocal expandtab |
     \ endif |
+    \ setlocal list |
     \ let &l:tabstop = width |
     \ let &l:shiftwidth = width |
     \ let &l:softtabstop = width |
@@ -85,5 +93,5 @@ augroup Indent
     \   'leadmultispace:.' .. trailspace
     \ ], ',') |
     \ endif
+  autocmd TerminalWinOpen * setlocal nolist
 augroup END
-

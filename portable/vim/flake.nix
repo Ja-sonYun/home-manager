@@ -15,7 +15,6 @@
     {
       self,
       nixpkgs,
-      nixpkgs-unstable,
       ...
     }:
     let

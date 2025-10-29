@@ -99,6 +99,7 @@
         }
 
         chpwd() {
+            [[ -n "$VIM" ]] && return
             local old_hooks=""
             local new_hooks=""
 
@@ -130,6 +131,7 @@
         }
 
         zshexit() {
+            [[ -n "$VIM" ]] && return
             local current_hooks=$(find_hooks_dir "$PWD")
 
             if [[ -n "$current_hooks" && -d "$current_hooks/on_exit" ]]; then

@@ -3,6 +3,8 @@ vim9script
 g:_shell_buffer_opened = false
 g:_shell_current_wid = -1
 
+g:_term_wids = {}
+
 def ExpandFileMods(s: string): string
   var r = s
   r = substitute(r, '%:S', expand('%:S'), 'g')
@@ -20,9 +22,6 @@ def CloseBuffer(buf: number, prev_status: number): void
   if bufexists(buf)
     execute 'bdelete!' buf
   endif
-enddef
-
-def RestoreLaststatus(prev: number): void
 enddef
 
 def ShellPrompt(cmd: string): string
@@ -56,7 +55,13 @@ def AttachQuitHandlers(): void
   augroup END
 enddef
 
-def StartTerminal(cmd: string, height: number, qf: bool = false): bool
+def UpdateLocalSet(): void
+  setlocal nonumber norelativenumber nocursorline signcolumn=no
+  setlocal bufhidden=wipe nobuflisted
+  setlocal nolist
+enddef
+
+def ShTerm(cmd: string, height: number, qf: bool = false): bool
   if g:_shell_buffer_opened
     echohl ErrorMsg
     echomsg 'Shell already opened!'
@@ -68,9 +73,7 @@ def StartTerminal(cmd: string, height: number, qf: bool = false): bool
   execute 'resize ' .. height
   const buf = bufnr()
 
-  setlocal nonumber norelativenumber nocursorline signcolumn=no
-  setlocal bufhidden=wipe
-  setlocal nobuflisted
+  UpdateLocalSet()
 
   const prev_ls = &laststatus
   b:prev_laststatus = prev_ls
@@ -127,9 +130,54 @@ def StartTerminal(cmd: string, height: number, qf: bool = false): bool
   return true
 enddef
 
+export def Term(cmd: string = ''): bool
+  new
+  const wid = win_getid()
+  const buf = bufnr()
+
+  UpdateLocalSet()
+
+  const ExitCb = (job: job, status: number) => {
+    if has_key(g:_term_wids, wid)
+      call remove(g:_term_wids, wid)
+    endif
+    if bufexists(buf)
+      execute 'silent! bdelete!' buf
+    endif
+  }
+
+  try
+    if empty(cmd)
+      term_start($SHELL, {
+        curwin: true,
+        exit_cb: ExitCb,
+      })
+    else
+      const resolved = ExpandFileMods(cmd)
+      const safecmd = ShellPrompt(resolved)
+      term_start(['sh', '-c', safecmd], {
+        curwin: true,
+        exit_cb: ExitCb,
+      })
+    endif
+  catch
+    echohl ErrorMsg
+    echomsg 'Failed to start terminal: ' .. v:exception
+    echohl None
+    if bufexists(buf)
+      execute 'bdelete!' buf
+    endif
+    return false
+  endtry
+
+  g:_term_wids[wid] = true
+  startinsert
+  return true
+enddef
+
 export def Run(cmd: string, height: number = 10, qf: bool = false): void
   const resolved = ExpandFileMods(cmd)
-  StartTerminal(resolved, max([3, height]), qf)
+  ShTerm(resolved, max([3, height]), qf)
 enddef
 
 export def Make(args: string = '', height: number = 10): void
@@ -145,13 +193,16 @@ export def Make(args: string = '', height: number = 10): void
 enddef
 
 def RunWindowRunning(): void
-  if g:_shell_current_wid != win_getid()
+  if &buftype !=# 'terminal'
     return
   endif
-  try
-    win_execute(g:_shell_current_wid, 'noautocmd normal! i')
-  catch
-  endtry
+  const wid = win_getid()
+  if g:_shell_current_wid == wid || has_key(g:_term_wids, wid)
+    try
+      win_execute(wid, 'noautocmd normal! i')
+    catch
+    endtry
+  endif
 enddef
 
 export def Setup(): void
@@ -160,6 +211,9 @@ export def Setup(): void
   }
   command! -nargs=* -complete=shellcmd Make {
     Make(<q-args>)
+  }
+  command! -nargs=* -complete=shellcmd Term {
+    Term(<q-args>)
   }
 
   augroup TerminalShellWindowFocus
@@ -170,3 +224,4 @@ export def Setup(): void
 enddef
 
 defcompile
+

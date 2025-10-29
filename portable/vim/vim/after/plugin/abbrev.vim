@@ -3,6 +3,11 @@ if exists("g:loaded_after_abbrev")
 endif
 let g:loaded_after_abbrev = 1
 
+" --- Command-line abbreviations ---
+cnoreabbrev <expr> term  (getcmdtype() == ':' && getcmdline() =~# '^term$')     ? 'Term'      : 'term'
+cnoreabbrev <expr> make  (getcmdtype() == ':' && getcmdline() =~# '^make$')     ? 'Make'      : 'make'
+cnoreabbrev <expr> comp  (getcmdtype() == ':' && getcmdline() =~# '^comp\s*$')  ? 'compiler'  : 'comp'
+
 " --- General English typos ---
 Abolish teh the
 Abolish adn and
@@ -116,3 +121,4 @@ Abolish cehck check
 Abolish healtch health
 
 Abolish cosnt const
+Abolish funtion function
