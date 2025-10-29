@@ -29,7 +29,7 @@ update:
 	orig_ulimit=$$(ulimit -n || echo 0); \
 	trap "ulimit -n $$orig_ulimit >/dev/null 2>&1 || true" EXIT; \
 	if [ "$$orig_ulimit" -lt 65536 ] 2>/dev/null; then ulimit -n 65536 || true; fi; \
-	$(MAKE) update-raw'
+		$(MAKE) update-raw'
 	$(MAKE) update-pkgs
 
 add:
@@ -43,7 +43,7 @@ build: add lock
 	$(NIX) build .#darwinConfigurations.$(HOSTNAME).system $(nix-features-flag) $(NIX_TRACE_ARGS)
 
 deploy: build
-	sudo ./result/sw/bin/darwin-rebuild switch --flake .#$(HOSTNAME) $(NIX_TRACE_ARGS)
+	nix run nixpkgs#nh darwin switch .#darwinConfigurations.$(HOSTNAME)
 
 show-derivations:
 	nix show-derivation .#darwinConfigurations.$(HOSTNAME).system $(nix-features-flag)
@@ -54,10 +54,8 @@ install:
 	sh <(curl -L https://nixos.org/nix/install) --daemon
 
 deploy: add lock
-	nix run nixpkgs#home-manager $(nix-features-flag) -- \
-	switch --flake .#$(HOSTNAME) $(NIX_TRACE_ARGS) $(nix-features-flag)
+	nix run nixpkgs#nh home switch .#homeConfigurations.$(HOSTNAME)n
 endif
 
 clean:
-	nix store gc --debug
-	nix-collect-garbage -d
+	nix run nixpkgs#nh clean

@@ -7,4 +7,4 @@ let b:indent = 2
 let b:autorel = 1
 let b:trimtrail = v:true
 
-Formatter bake
+Formatter mbake

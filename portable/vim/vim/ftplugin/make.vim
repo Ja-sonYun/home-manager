@@ -8,4 +8,4 @@ let b:autorel = 1
 let b:usetab = v:true
 let b:trimtrail = v:true
 
-Formatter bake
+Formatter mbake

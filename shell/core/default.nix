@@ -39,7 +39,6 @@
 
     # productivity
     glow # markdown previewer in terminal
-    nix-search-cli
     viu
 
     lazygit
@@ -66,8 +65,7 @@
     say
     plot
 
-    nix-tree
-    nix-index
+    nh
     nix-output-monitor
 
     devenv
