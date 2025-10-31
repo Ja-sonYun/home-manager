@@ -4,10 +4,10 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   inherit pkgs;
   name = "backlog-md";
   packages = [
-    "backlog.md@1.18.0"
+    "backlog.md@1.18.5"
   ];
   exposedBinaries = [
     "backlog"
   ];
-  outputHash = "sha256-9DGcOO/9k+2AHVKZKwOc1HW0hc5t0oxDy2lCCAZLTVY=";
+  outputHash = "sha256-T13IIsUCrgw1niGexIFENkhsEGH3DsCqtohdUKtLg54=";
 }
