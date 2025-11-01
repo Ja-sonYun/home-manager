@@ -98,11 +98,11 @@
           configDir = "/Users/jasonyun/dotfiles";
           cacheDir = "/Users/jasonyun/.nixcache/jasony";
         };
-        "JasonYuns-MacBook-Server" = {
+        "Jasons-MacBook-Server" = {
           system = "aarch64-darwin";
           username = "jasonyun";
           useremail = "jason@abex.dev";
-          hostname = "JasonYuns-MacBook-Server";
+          hostname = "Jasons-MacBook-Server";
           userhome = "/Users/jasonyun";
           configDir = "/Users/jasonyun/dotfiles";
           cacheDir = "/Users/jasonyun/.nixcache/jasony";
@@ -255,8 +255,8 @@
           {
             machine = "main";
           };
-      darwinConfigurations."JasonYuns-MacBook-Server" =
-        mkAarch64DarwinHomeConfiguration "JasonYuns-MacBook-Server"
+      darwinConfigurations."Jasons-MacBook-Server" =
+        mkAarch64DarwinHomeConfiguration "Jasons-MacBook-Server"
           {
             machine = "server";
           };
