@@ -1,12 +1,18 @@
 {
   username,
   userhome,
+  machine,
   ...
 }:
 {
-  imports = [
-    ./taskwarrior
-  ];
+  imports = (
+    if machine == "main" then
+      [
+        ./taskwarrior
+      ]
+    else
+      [ ]
+  );
 
   # Home Manager needs a bit of information about you and the
   # paths it should manage.

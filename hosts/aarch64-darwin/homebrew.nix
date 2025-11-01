@@ -63,7 +63,8 @@ let
         "macfuse"
       ]
     else
-      [ ]
+      [
+      ]
   );
 
   taps = [
@@ -86,11 +87,17 @@ in
       autoUpdate = false;
     };
     # will not be uninstalled when removed
-    masApps = {
-      # Xcode = 497799835;
-      # Transporter = 1450874784;
-      # VN = 1494451650;
-    };
+    masApps =
+      { }
+      // (
+        if machine == "main" then
+          {
+          }
+        else
+          {
+            Amphetamine = 937984704;
+          }
+      );
     onActivation = {
       # "zap" removes manually installed brews and casks
       cleanup = "zap";
