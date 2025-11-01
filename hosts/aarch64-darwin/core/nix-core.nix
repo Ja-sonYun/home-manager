@@ -12,7 +12,6 @@
 
     # substituers that will be considered before the official ones(https://cache.nixos.org)
     substituters = [
-      "s3://abex-nix-cache?region=ap-northeast-1"
       "https://nix-community.cachix.org"
     ];
     trusted-public-keys = [
