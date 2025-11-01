@@ -167,8 +167,8 @@ in
       set = {}
       include_only = []
 
-      [tools]
-      web_search = true
+      [features]
+      web_search_request = true
 
       ${codexMcpServersConfig}
     '';

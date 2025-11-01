@@ -98,6 +98,15 @@
           configDir = "/Users/jasonyun/dotfiles";
           cacheDir = "/Users/jasonyun/.nixcache/jasony";
         };
+        "JasonYuns-MacBook-Server" = {
+          system = "aarch64-darwin";
+          username = "jasonyun";
+          useremail = "jason@abex.dev";
+          hostname = "JasonYuns-MacBook-Server";
+          userhome = "/Users/jasonyun";
+          configDir = "/Users/jasonyun/dotfiles";
+          cacheDir = "/Users/jasonyun/.nixcache/jasony";
+        };
         "linux-devel" = {
           system = "x86_64-linux";
           username = "vagrant";
@@ -196,11 +205,11 @@
       mkAarch64DarwinHomeConfiguration =
         hostname:
         opts@{
+          machine ? "main", # "main" or "server"
         }:
         let
-          hostname = "JasonYuns-MacBook-Pro";
           pkgs = mkPkgsProvider system;
-          specialArgs = mkSpecialArgs hostname pkgs;
+          specialArgs = (mkSpecialArgs hostname pkgs) // opts;
           system = specialArgs.system;
         in
         darwin.lib.darwinSystem {
@@ -244,6 +253,12 @@
       darwinConfigurations."JasonYuns-MacBook-Pro" =
         mkAarch64DarwinHomeConfiguration "JasonYuns-MacBook-Pro"
           {
+            machine = "main";
+          };
+      darwinConfigurations."JasonYuns-MacBook-Server" =
+        mkAarch64DarwinHomeConfiguration "JasonYuns-MacBook-Server"
+          {
+            machine = "server";
           };
 
       homeConfigurations."linux-devel" = mkX86_64LinuxHomeConfiguration "linux-devel" {
