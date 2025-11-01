@@ -9,6 +9,6 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   exposedBinaries = [
     "awslabs.aws-documentation-mcp-server"
   ];
-  outputHash = "sha256-JfcEIGra0i+MTgVsOhIRuJonsjX1Yjye9JQ+0pbyyyw=";
+  outputHash = "sha256-KtWX2nG9xgS313do+ybeWirCCETr4Vtiy5AUuuichYM=";
 }
 

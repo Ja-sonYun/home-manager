@@ -9,5 +9,5 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   exposedBinaries = [
     "mcp-server-sequential-thinking"
   ];
-  outputHash = "sha256-wuSmIkmCNdj+q9XMsD7RMBpQHqCIRnWZnQAyP3ISpxM=";
+  outputHash = "sha256-a8uoRytoHD299VcMNqAvLL7VA7b6cgwiiYFgs1CKlwo=";
 }

@@ -9,5 +9,5 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   exposedBinaries = [
     "codex"
   ];
-  outputHash = "sha256-kRoid1ejTPnxluU1Cv7v/n7AFhRZHg32hHY1HT+t0Hw=";
+  outputHash = "sha256-iBiPSZe5Cwew3G1em2enQPh1FoNRmzwUKZ+JCVZfVSQ=";
 }

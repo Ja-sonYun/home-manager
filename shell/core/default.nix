@@ -69,7 +69,9 @@
     nix-output-monitor
 
     devenv
+    awscli
     awscli-local
+    cloudflared
   ];
 
   home.sessionVariables = {

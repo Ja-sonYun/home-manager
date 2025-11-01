@@ -11,5 +11,5 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   exposedBinaries = [
     "awslocal"
   ];
-  outputHash = "sha256-WV1euKASzDTDkKk5+5vAp06gf+JAkNE1DTWtiTSfiuY=";
+  outputHash = "sha256-Xcwgs4bFjoZXDH5DDBIEUVdtkiRAUZwagLoEYPIItD4=";
 }

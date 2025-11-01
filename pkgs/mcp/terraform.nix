@@ -9,5 +9,5 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   exposedBinaries = [
     "awslabs.terraform-mcp-server"
   ];
-  outputHash = "sha256-/yMrjD8azcNp/HLtGlOAsgaNYO7q7rudKnveIH4xWXE=";
+  outputHash = "sha256-yhXLhjnovoOx1NQCOQvXZ4/8cq+9CR+1Et2111hQwuA=";
 }
