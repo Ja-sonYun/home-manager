@@ -9,7 +9,8 @@ else
   NIX := nom
 endif
 
-nix-features-flag := --extra-experimental-features 'nix-command flakes'
+NIX_CONFIG ?= experimental-features = nix-command flakes
+export NIX_CONFIG
 
 ifdef TRACE
 NIX_TRACE_ARGS := --show-trace
@@ -36,17 +37,17 @@ add:
 	git add .
 
 lock: add
-	nix flake lock --update-input vim $(nix-features-flag)
+	nix flake lock --update-input vim
 
 ifeq ($(SYSTEM),Darwin)
 build: add lock
-	$(NIX) build .#darwinConfigurations.$(HOSTNAME).system $(nix-features-flag) $(NIX_TRACE_ARGS)
+	$(NIX) build .#darwinConfigurations.$(HOSTNAME).system $(NIX_TRACE_ARGS)
 
 deploy: build
 	nix run nixpkgs#nh darwin switch .#darwinConfigurations.$(HOSTNAME)
 
 show-derivations:
-	nix show-derivation .#darwinConfigurations.$(HOSTNAME).system $(nix-features-flag)
+	nix show-derivation .#darwinConfigurations.$(HOSTNAME).system
 endif
 
 ifeq ($(SYSTEM),Linux)
@@ -54,7 +55,7 @@ install:
 	sh <(curl -L https://nixos.org/nix/install) --daemon
 
 deploy: add lock
-	nix run nixpkgs#nh home switch .#homeConfigurations.$(HOSTNAME)n
+	nix run nixpkgs#nh home switch .#homeConfigurations.$(HOSTNAME)
 endif
 
 clean:
