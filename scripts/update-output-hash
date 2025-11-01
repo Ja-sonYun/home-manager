@@ -63,7 +63,7 @@ EXPR
 
 set +e
 LOG_FILE=$(mktemp)
-if ! nix build --impure --expr "$BUILD_EXPR" -L 2>&1 | tee "$LOG_FILE"; then
+if ! nix build --extra-experimental-features 'nix-command flakes' --impure --expr "$BUILD_EXPR" -L 2>&1 | tee "$LOG_FILE"; then
   BUILD_STATUS=${PIPESTATUS[0]}
 else
   BUILD_STATUS=0
