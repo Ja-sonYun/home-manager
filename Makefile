@@ -16,13 +16,16 @@ ifdef TRACE
 NIX_TRACE_ARGS := --show-trace
 endif
 
+ignore-hash:
+	git update-index --assume-unchanged pkgs/hash.nix
+
 update-vim:
 	cd ./portable/vim && nix flake update
 
 update-raw: update-vim
 	nix flake update
 
-update-pkgs:
+update-pkgs: ignore-hash
 	@./scripts/update-versions
 
 update:
