@@ -1,7 +1,10 @@
 { pkgs, lib, ... }:
+let
+  outputHash = (import ../hash.nix)."mcp/aws-documentation.nix";
+in
 
 pkgs.lib.pip.mkPipGlobalPackageDerivation {
-  inherit pkgs;
+  inherit pkgs outputHash;
   name = "awslabs.aws-documentation-mcp-server";
   packages = [
     "awslabs.aws-documentation-mcp-server==1.1.9"
@@ -9,6 +12,4 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   exposedBinaries = [
     "awslabs.aws-documentation-mcp-server"
   ];
-  outputHash = "sha256-KtWX2nG9xgS313do+ybeWirCCETr4Vtiy5AUuuichYM=";
 }
-

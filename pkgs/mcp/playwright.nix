@@ -1,7 +1,10 @@
 { pkgs, lib, ... }:
+let
+  outputHash = (import ../hash.nix)."mcp/playwright.nix";
+in
 
 pkgs.lib.npm.mkNpmGlobalPackageDerivation {
-  inherit pkgs;
+  inherit pkgs outputHash;
   name = "playwright-mcp";
   packages = [
     "@playwright/mcp@0.0.45"
@@ -9,7 +12,6 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   exposedBinaries = [
     "mcp-server-playwright"
   ];
-  outputHash = "sha256-Rj5fbZBL0MBHidK4t2Dbp6K2B/JEaun/aHxypRLmrUo=";
   postInstall = ''
     binary_path=$(readlink -f $out/bin/mcp-server-playwright)
     rm -f $out/bin/mcp-server-playwright

@@ -1,7 +1,10 @@
 { pkgs, ... }:
+let
+  outputHash = (import ../hash.nix)."awscli-local/default.nix";
+in
 
 pkgs.lib.pip.mkPipGlobalPackageDerivation {
-  inherit pkgs;
+  inherit pkgs outputHash;
   name = "awscli";
   pythonVersion = "312";
   packages = [
@@ -11,5 +14,4 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   exposedBinaries = [
     "awslocal"
   ];
-  outputHash = "sha256-Xcwgs4bFjoZXDH5DDBIEUVdtkiRAUZwagLoEYPIItD4=";
 }

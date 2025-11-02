@@ -1,7 +1,10 @@
 { pkgs, lib, ... }:
+let
+  outputHash = (import ../hash.nix)."mcp/context7.nix";
+in
 
 pkgs.lib.npm.mkNpmGlobalPackageDerivation {
-  inherit pkgs;
+  inherit pkgs outputHash;
   name = "context7-mcp";
   packages = [
     "@upstash/context7-mcp@1.0.26"
@@ -9,5 +12,4 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   exposedBinaries = [
     "context7-mcp"
   ];
-  outputHash = "sha256-kxYXOFGr98EXK+Lp2UvipfK9z+LAWhf7CGtnQuNn4a8=";
 }

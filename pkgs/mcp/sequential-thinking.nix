@@ -1,7 +1,10 @@
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
+let
+  outputHash = (import ../hash.nix)."mcp/sequential-thinking.nix";
+in
 
 pkgs.lib.npm.mkNpmGlobalPackageDerivation {
-  inherit pkgs;
+  inherit pkgs outputHash;
   name = "sequential-thinking-mcp-server";
   packages = [
     "@modelcontextprotocol/server-sequential-thinking@2025.7.1"
@@ -9,5 +12,4 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   exposedBinaries = [
     "mcp-server-sequential-thinking"
   ];
-  outputHash = "sha256-a8uoRytoHD299VcMNqAvLL7VA7b6cgwiiYFgs1CKlwo=";
 }

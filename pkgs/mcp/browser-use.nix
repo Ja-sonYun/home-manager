@@ -1,7 +1,10 @@
 { pkgs, ... }:
+let
+  outputHash = (import ../hash.nix)."mcp/browser-use.nix";
+in
 
 pkgs.lib.pip.mkPipGlobalPackageDerivation {
-  inherit pkgs;
+  inherit pkgs outputHash;
   name = "browser-use";
   pythonVersion = "311";
   packages = [
@@ -10,7 +13,6 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   exposedBinaries = [
     "browser-use"
   ];
-  outputHash = "sha256-uRdBcyNb12aj/yD0mUO+mU4GhjYQroti6ZkDtKAHuwg=";
   postInstall = ''
     binary_path=$(readlink -f $out/bin/browser-use)
     rm -f $out/bin/browser-use

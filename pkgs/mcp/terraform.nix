@@ -1,7 +1,10 @@
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
+let
+  outputHash = (import ../hash.nix)."mcp/terraform.nix";
+in
 
 pkgs.lib.pip.mkPipGlobalPackageDerivation {
-  inherit pkgs;
+  inherit pkgs outputHash;
   name = "awslabs.terraform-mcp-serves";
   packages = [
     "awslabs.terraform-mcp-server==1.0.7"
@@ -9,5 +12,4 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   exposedBinaries = [
     "awslabs.terraform-mcp-server"
   ];
-  outputHash = "sha256-yhXLhjnovoOx1NQCOQvXZ4/8cq+9CR+1Et2111hQwuA=";
 }

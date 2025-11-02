@@ -20,34 +20,123 @@ if [[ ! -f "$TARGET_PATH" ]]; then
   exit 1
 fi
 
-PLACEHOLDER="pkgs.lib.fakeSha256"
+PKGS_DIR="$ROOT_DIR/pkgs"
+HASH_FILE="$PKGS_DIR/hash.nix"
+PLACEHOLDER_HASH="sha256-0000000000000000000000000000000000000000000="
 
-sed_inplace() {
-  local script="$1"
-  local file="$2"
-  if sed --version >/dev/null 2>&1; then
-    sed -i -e "$script" "$file"
-  else
-    sed -i '' -e "$script" "$file"
-  fi
+if [[ ! -f "$HASH_FILE" ]]; then
+  echo "Hash map not found: $HASH_FILE" >&2
+  exit 1
+fi
+
+case "$TARGET_PATH" in
+  "$PKGS_DIR"/*)
+    RELATIVE_PATH="${TARGET_PATH#${PKGS_DIR}/}"
+    ;;
+  *)
+    echo "Target file must be inside $PKGS_DIR" >&2
+    exit 1
+    ;;
+esac
+
+hash_map_helper() {
+  local action="$1"
+  shift
+  python3 - "$HASH_FILE" "$action" "$@" <<'PY'
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+action = sys.argv[2]
+args = sys.argv[3:]
+
+pattern = None
+
+def load_entries():
+    entries = {}
+    if path.exists():
+        for line in path.read_text().splitlines():
+            line = line.strip()
+            if not line or line in ('{', '}'):
+                continue
+            if line.startswith('#'):
+                continue
+            if line.endswith(';'):
+                line = line[:-1].strip()
+            if line:
+                if '=' not in line:
+                    continue
+                key_part, value_part = line.split('=', 1)
+                key = key_part.strip().strip('"')
+                value = value_part.strip().strip('"')
+                entries[key] = value
+    return entries
+
+def write_entries(entries):
+    lines = ['{']
+    for key in sorted(entries):
+        lines.append(f'  "{key}" = "{entries[key]}";')
+    lines.append('}')
+    path.write_text('\n'.join(lines) + '\n')
+
+entries = load_entries()
+
+if action == 'get':
+    key = args[0]
+    if key in entries:
+        sys.stdout.write(entries[key])
+        sys.exit(0)
+    sys.exit(2)
+
+if action == 'set':
+    key, value = args
+    entries[key] = value
+    write_entries(entries)
+    sys.exit(0)
+
+if action == 'remove':
+    key = args[0]
+    if key in entries:
+        del entries[key]
+    write_entries(entries)
+    sys.exit(0)
+
+sys.stderr.write(f'Unknown action: {action}\n')
+sys.exit(1)
+PY
 }
 
-mktemp_nix() {
-  local prefix="$1"
-  local tmp
-  if tmp=$(mktemp -t "${prefix}.XXXXXX" 2>/dev/null); then
-    printf '%s\n' "$tmp"
+set +e
+ORIGINAL_HASH=$(hash_map_helper get "$RELATIVE_PATH")
+GET_STATUS=$?
+set -e
+
+if [[ $GET_STATUS -eq 0 ]]; then
+  ENTRY_PRESENT=true
+elif [[ $GET_STATUS -eq 2 ]]; then
+  ENTRY_PRESENT=false
+  ORIGINAL_HASH=""
+else
+  echo "Failed to read existing hash entry" >&2
+  exit 1
+fi
+
+hash_map_helper set "$RELATIVE_PATH" "$PLACEHOLDER_HASH"
+
+RESTORE_NEEDED=true
+
+restore_hash() {
+  if [[ ${RESTORE_NEEDED:-false} != true ]]; then
     return
   fi
-  tmp=$(mktemp "/tmp/${prefix}.XXXXXX")
-  printf '%s\n' "$tmp"
+  if [[ $ENTRY_PRESENT == true ]]; then
+    hash_map_helper set "$RELATIVE_PATH" "$ORIGINAL_HASH"
+  else
+    hash_map_helper remove "$RELATIVE_PATH"
+  fi
 }
 
-TMP_FILE=$(mktemp_nix update-output-hash)
-trap 'rm -f "$TMP_FILE"' EXIT
-cp "$TARGET_PATH" "$TMP_FILE"
-
-sed_inplace "s/^\\([[:space:]]*outputHash[[:space:]]*=[[:space:]]*\).*$/\\1${PLACEHOLDER};/" "$TMP_FILE"
+trap restore_hash EXIT
 
 BUILD_EXPR=$(cat <<EXPR
 let
@@ -57,7 +146,7 @@ let
     overlays = flake.overlays;
     config.allowUnfree = true;
   };
-in pkgs.callPackage ${TMP_FILE} {}
+in pkgs.callPackage ${TARGET_PATH} {}
 EXPR
 )
 
@@ -86,15 +175,12 @@ if [[ -z "$NEW_HASH" ]]; then
   exit 1
 fi
 
-ESCAPED_HASH=$(printf '%s' "$NEW_HASH" | sed 's/[\/^&]/\\&/g')
-sed_inplace "s/^\\([[:space:]]*outputHash[[:space:]]*=[[:space:]]*\).*$/\\1\"${ESCAPED_HASH}\";/" "$TARGET_PATH"
+hash_map_helper set "$RELATIVE_PATH" "$NEW_HASH"
+RESTORE_NEEDED=false
 
-if ! grep -q "$NEW_HASH" "$TARGET_PATH"; then
-  echo "Hash update failed to apply." >&2
-  exit 1
-fi
+trap - EXIT
 
 cat <<MSG
-Updated outputHash in $TARGET_PATH
+Updated outputHash for $RELATIVE_PATH
   -> $NEW_HASH
 MSG

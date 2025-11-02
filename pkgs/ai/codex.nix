@@ -1,7 +1,10 @@
 { pkgs, ... }:
+let
+  outputHash = (import ../hash.nix)."ai/codex.nix";
+in
 
 pkgs.lib.npm.mkNpmGlobalPackageDerivation {
-  inherit pkgs;
+  inherit pkgs outputHash;
   name = "openai-codex";
   packages = [
     "@openai/codex@0.53.0"
@@ -9,5 +12,4 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   exposedBinaries = [
     "codex"
   ];
-  outputHash = "sha256-iBiPSZe5Cwew3G1em2enQPh1FoNRmzwUKZ+JCVZfVSQ=";
 }

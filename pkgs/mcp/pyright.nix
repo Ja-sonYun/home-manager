@@ -1,7 +1,10 @@
 { pkgs, lib, ... }:
+let
+  outputHash = (import ../hash.nix)."mcp/pyright.nix";
+in
 
 pkgs.lib.pip.mkPipGlobalPackageDerivation {
-  inherit pkgs;
+  inherit pkgs outputHash;
   name = "pyright";
   pythonVersion = "311";
   packages = [
@@ -10,5 +13,4 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   exposedBinaries = [
     "pyright"
   ];
-  outputHash = "sha256-0000000000000000000000000000000000000000000=";
 }
