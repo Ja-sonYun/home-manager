@@ -1,6 +1,6 @@
-{ pkgs, ... }:
+{ pkgs, hashfile, ... }:
 let
-  outputHash = (import ../hash.nix)."mcp/terraform.nix";
+  outputHash = hashfile."mcp/terraform.nix";
 in
 
 pkgs.lib.pip.mkPipGlobalPackageDerivation {

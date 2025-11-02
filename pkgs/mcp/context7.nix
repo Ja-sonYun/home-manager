@@ -1,6 +1,6 @@
-{ pkgs, lib, ... }:
+{ pkgs, hashfile, ... }:
 let
-  outputHash = (import ../hash.nix)."mcp/context7.nix";
+  outputHash = hashfile."mcp/context7.nix";
 in
 
 pkgs.lib.npm.mkNpmGlobalPackageDerivation {

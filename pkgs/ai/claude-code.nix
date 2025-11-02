@@ -1,6 +1,6 @@
-{ pkgs, lib, ... }:
+{ pkgs, hashfile, ... }:
 let
-  outputHash = (import ../hash.nix)."ai/claude-code.nix";
+  outputHash = hashfile."ai/claude-code.nix";
 in
 
 pkgs.lib.npm.mkNpmGlobalPackageDerivation {

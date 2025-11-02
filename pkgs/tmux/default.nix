@@ -1,5 +1,5 @@
-{ pkgs, lib, system, ... }:
+args@{ pkgs, ... }:
 
 {
-  tmux-menu = pkgs.callPackage ./tmux-menu.nix { inherit system; };
+  tmux-menu = pkgs.callPackage ./tmux-menu.nix args;
 }

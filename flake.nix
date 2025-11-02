@@ -146,10 +146,10 @@
         };
 
       mkPkgsProvider =
-        system:
+        system: hostname:
         import nixpkgs {
           inherit system;
-          overlays = self.overlays;
+          overlays = builtins.attrValues (import ./overlays { inherit inputs hostname; });
           config.allowUnfree = true;
         };
 
@@ -189,7 +189,7 @@
           isVM ? false,
         }:
         let
-          pkgs = mkPkgsProvider system;
+          pkgs = mkPkgsProvider system hostname;
           extraSpecialArgs = (mkSpecialArgs hostname pkgs) // opts;
           system = extraSpecialArgs.system;
         in
@@ -208,7 +208,7 @@
           machine ? "main", # "main" or "server"
         }:
         let
-          pkgs = mkPkgsProvider system;
+          pkgs = mkPkgsProvider system hostname;
           specialArgs = (mkSpecialArgs hostname pkgs) // opts;
           system = specialArgs.system;
         in
@@ -269,7 +269,5 @@
         useNvidia = true;
         isVM = false;
       };
-
-      overlays = builtins.attrValues (import ./overlays { inherit inputs; });
     };
 }

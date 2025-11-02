@@ -1,6 +1,6 @@
-{ pkgs, lib, ... }:
+{ pkgs, hashfile, ... }:
 let
-  outputHash = (import ../hash.nix)."mcp/aws-pricing.nix";
+  outputHash = hashfile."mcp/aws-pricing.nix";
 in
 
 pkgs.lib.pip.mkPipGlobalPackageDerivation {

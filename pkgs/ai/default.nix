@@ -1,6 +1,5 @@
-{ pkgs, lib, ... }:
-
+args@{ pkgs, ... }:
 {
-  codex = pkgs.callPackage ./codex.nix {};
-  claude-code = pkgs.callPackage ./claude-code.nix {};
+  codex = pkgs.callPackage ./codex.nix args;
+  claude-code = pkgs.callPackage ./claude-code.nix args;
 }

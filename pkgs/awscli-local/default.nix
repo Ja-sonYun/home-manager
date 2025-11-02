@@ -1,6 +1,6 @@
-{ pkgs, ... }:
+{ pkgs, hashfile }:
 let
-  outputHash = (import ../hash.nix)."awscli-local/default.nix";
+  outputHash = hashfile."awscli-local/default.nix";
 in
 
 pkgs.lib.pip.mkPipGlobalPackageDerivation {

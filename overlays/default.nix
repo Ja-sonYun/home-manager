@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, hostname, ... }:
 {
   stable-packages = final: prev: rec {
     # Allow access stable package via `pkgs.stable.<package>`
@@ -35,17 +35,23 @@
   custom-packages =
     final: prev:
     let
-      userhome = "/Users/jasonyun";
+      allhashfile = builtins.fromJSON (builtins.readFile ../pkgs/hashfile.json);
+      hashfile = allhashfile."${hostname}";
+      callCustomPkg =
+        pkgPath:
+        final.callPackage pkgPath {
+          inherit hashfile;
+        };
     in
     {
       custom = {
-        ai = final.callPackage ../pkgs/ai { };
-        mac = final.callPackage ../pkgs/mac { };
-        mcp = final.callPackage ../pkgs/mcp { inherit userhome; };
-        tmux = final.callPackage ../pkgs/tmux { system = final.stdenv.hostPlatform.system; };
+        ai = callCustomPkg ../pkgs/ai;
+        mac = callCustomPkg ../pkgs/mac;
+        mcp = callCustomPkg ../pkgs/mcp;
+        tmux = callCustomPkg ../pkgs/tmux;
       };
-      awscli-local = final.callPackage ../pkgs/awscli-local { };
-      git-wrapped = final.callPackage ../pkgs/git-wrapped { };
+      awscli-local = callCustomPkg ../pkgs/awscli-local;
+      git-wrapped = callCustomPkg ../pkgs/git-wrapped;
     };
 
   # Override upstream packages using our local pkgs/* definitions

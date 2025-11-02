@@ -1,6 +1,6 @@
-{ pkgs, ... }:
+{ pkgs, hashfile, ... }:
 let
-  outputHash = (import ../hash.nix)."mcp/sequential-thinking.nix";
+  outputHash = hashfile."mcp/sequential-thinking.nix";
 in
 
 pkgs.lib.npm.mkNpmGlobalPackageDerivation {

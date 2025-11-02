@@ -1,6 +1,6 @@
-{ pkgs, lib, ... }:
+{ pkgs, hashfile, ... }:
 let
-  outputHash = (import ../hash.nix)."mcp/playwright.nix";
+  outputHash = hashfile."mcp/playwright.nix";
 in
 
 pkgs.lib.npm.mkNpmGlobalPackageDerivation {

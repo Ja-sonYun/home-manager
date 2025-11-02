@@ -1,6 +1,7 @@
-{ pkgs, system, ... }:
+{ pkgs, hashfile, ... }:
 let
-  outputHash = (import ../hash.nix)."tmux/tmux-menu.nix";
+  system = pkgs.lib.systems.hostPlatform;
+  outputHash = hashfile."tmux/tmux-menu.nix";
 in
 
 pkgs.lib.cargo.mkCargoGlobalPackageDerivation {
