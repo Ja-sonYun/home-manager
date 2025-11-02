@@ -13,7 +13,7 @@
       flock
       yabai
       taskwarrior3
-      pkgs.custom.mac.icalPal
+      icalPal
     ];
 
     environment = {

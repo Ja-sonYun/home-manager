@@ -1,11 +1,11 @@
-{ pkgs, hashfile }:
+{ pkgs, ... }:
 let
-  outputHash = hashfile."awscli-local/default.nix";
+  outputHash = pkgs.hashfile."awscli-local";
 in
 
 pkgs.lib.pip.mkPipGlobalPackageDerivation {
   inherit pkgs outputHash;
-  name = "awscli";
+  name = "awscli-local";
   pythonVersion = "312";
   packages = [
     "setuptools>=40.8.0"

@@ -6,7 +6,7 @@ let
   # So just replace the path directly
   configFileContent = builtins.replaceStrings
     [ "%yabai%" "%skhd%" "%inputSourceSelector%" ]
-    [ "${pkgs.yabai}/bin/yabai" "${pkgs.skhd}/bin/skhd" "${pkgs.custom.mac.inputSourceSelector}/bin/InputSourceSelector" ]
+    [ "${pkgs.yabai}/bin/yabai" "${pkgs.skhd}/bin/skhd" "${pkgs.inputSourceSelector}/bin/InputSourceSelector" ]
     originalConfigFile;
   configFile = pkgs.writeScript "skhdrc" configFileContent;
 in

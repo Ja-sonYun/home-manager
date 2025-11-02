@@ -9,7 +9,7 @@
   home.packages = with pkgs; [
     tmux
     pstree
-    custom.tmux.tmux-menu
+    tmux-menu
   ];
   home.file.tmuxconf = {
     target = ".tmux.conf";

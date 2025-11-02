@@ -32,27 +32,30 @@
     });
   };
 
-  custom-packages =
+  custom-packages-hashfile =
     final: prev:
     let
-      allhashfile = builtins.fromJSON (builtins.readFile ../pkgs/hashfile.json);
-      hashfile = allhashfile."${hostname}";
-      callCustomPkg =
-        pkgPath:
-        final.callPackage pkgPath {
-          inherit hashfile;
-        };
+      rawhashfile = builtins.readFile ../pkgs/hashfile.json;
+      allhashfile = builtins.fromJSON rawhashfile;
     in
     {
-      custom = {
-        ai = callCustomPkg ../pkgs/ai;
-        mac = callCustomPkg ../pkgs/mac;
-        mcp = callCustomPkg ../pkgs/mcp;
-        tmux = callCustomPkg ../pkgs/tmux;
-      };
-      awscli-local = callCustomPkg ../pkgs/awscli-local;
-      git-wrapped = callCustomPkg ../pkgs/git-wrapped;
+      hashfile = allhashfile."${hostname}";
     };
+  custom-packages = final: prev: {
+    # Local custom packages
+    git-wrapped = final.callPackage ../pkgs/git-wrapped { };
+    awscli-local = final.callPackage ../pkgs/awscli-local { };
+
+    # Npm
+    codex = final.callPackage ../pkgs/codex { };
+
+    # Cargo
+    tmux-menu = final.callPackage ../pkgs/tmux-menu { };
+
+    # Mac
+    icalPal = final.callPackage ../pkgs/icalPal { };
+    inputSourceSelector = final.callPackage ../pkgs/inputSourceSelector { };
+  };
 
   # Override upstream packages using our local pkgs/* definitions
   unstable-pkgs-override = final: prev: {
