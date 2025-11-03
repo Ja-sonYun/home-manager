@@ -33,7 +33,8 @@ add:
 	git add .
 
 lock: add
-	nix flake lock --update-input vim
+	nix flake update vim
+	nix flake update server
 
 ifeq ($(SYSTEM),Darwin)
 build: add lock
