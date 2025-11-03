@@ -632,6 +632,7 @@
         "nixpkgs-stable": "nixpkgs-stable",
         "plot": "plot",
         "say": "say",
+        "server": "server",
         "vim": "vim"
       }
     },
@@ -649,6 +650,18 @@
       },
       "original": {
         "path": "portable/say",
+        "type": "path"
+      },
+      "parent": []
+    },
+    "server": {
+      "flake": false,
+      "locked": {
+        "path": "hosts/aarch64-darwin/server",
+        "type": "path"
+      },
+      "original": {
+        "path": "hosts/aarch64-darwin/server",
         "type": "path"
       },
       "parent": []

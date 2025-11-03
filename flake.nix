@@ -53,6 +53,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # My personal server stuffs
+    server = {
+      url = ./hosts/aarch64-darwin/server;
+      flake = false;
+    };
+
     # Agenix for secret management
     agenix = {
       url = "github:ryantm/agenix";

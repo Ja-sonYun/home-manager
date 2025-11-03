@@ -8,6 +8,10 @@
         ./yabai/service.nix
         ./skhd/service.nix
       ]
+    else if machine == "server" then
+      [
+        ./server/service
+      ]
     else
       [ ]
   );

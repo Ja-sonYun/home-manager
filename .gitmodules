@@ -10,3 +10,6 @@
 [submodule "shell/secrets/agenix"]
 	path = shell/secrets/agenix
 	url = git@github.com:Ja-sonYun/agenix-secrets.git
+[submodule "hosts/aarch64-darwin/server"]
+	path = hosts/aarch64-darwin/server
+	url = git@github.com:Ja-sonYun/server.git
