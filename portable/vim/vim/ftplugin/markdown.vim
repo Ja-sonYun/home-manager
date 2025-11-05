@@ -5,6 +5,6 @@ let b:did_user_ftplugin = 1
 
 let b:indent = 2
 let b:autorel = 1
-let b:trimtrail = v:true
+let b:trimtrail = v:false
 
 Formatter prettier

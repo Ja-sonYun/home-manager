@@ -24,7 +24,7 @@ execute 'set undodir=' . fnameescape(undodir)
 set undofile
 
 " ----- timing / editing -----
-set timeoutlen=250
+set timeoutlen=400
 set hidden
 set history=500
 set lazyredraw
@@ -190,9 +190,6 @@ nnoremap dm :delmarks<Space>
 nnoremap <silent> qu <Cmd>UndotreeToggle<CR>
 
 nnoremap <leader>y <Cmd>let @*=expand('%:p')<CR>:echo 'Copied to clipboard'<CR>
-
-" delete to black-hole, then put before cursor
-xnoremap p "_dP
 
 " commandline
 cnoremap <C-a> <Home>
