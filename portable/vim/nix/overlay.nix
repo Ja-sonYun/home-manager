@@ -66,14 +66,15 @@ let
     ]
     ++ [
       # Plugins from flake inputs
-      (mkVimPlugin inputs.vim-lsp "vim-lsp")
     ]
     ++ pkgs.lib.optionals config.useCopilot [
       copilot-vim
     ];
 
   # TODO:
-  myPluginsFromGit = [ ];
+  myPluginsFromGit = [
+    (mkVimPlugin inputs.vim-lsp "vim-lsp")
+  ];
 
   # Aggregate plugin set for packaged Vim
   packagedPlugins = allPlugins ++ myPluginsFromGit;
@@ -113,7 +114,7 @@ let
       python312
       python312Packages.black
       python312Packages.isort
-      pyrefly
+      pyright
     ]
   );
 
@@ -261,7 +262,7 @@ let
 
       " Optional development packpath for local plugins
       ${pkgs.lib.optionalString dev ''
-        set packpath^=~/.vim-plugins/site
+        set packpath^=~/.config/vim-plugins/site
       ''}
     '';
 

@@ -118,6 +118,8 @@ def LspMakeBufMaps(): void
   nnoremap <buffer><silent> [d <Cmd>LspDiag prev<CR>
   nnoremap <buffer><silent> g== <Cmd>LspFormat<CR>
   inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
+
+  setlocal tagfunc=lsp#lsp#TagFunc
 enddef
 
 augroup LspSetup

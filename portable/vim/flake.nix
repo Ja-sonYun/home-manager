@@ -6,7 +6,7 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     vim-lsp = {
-      url = "github:yegappan/lsp";
+      url = "github:Ja-sonYun/lsp";
       flake = false;
     };
   };
@@ -153,7 +153,7 @@
               ln -Tfns "$PWD/vim" ~/.config/vim-dev
 
               mkdir -p ~/.config/vim-plugins/site/pack/dev/start
-              for p in "$PWD"/plugins/*; do
+              for p in "$PWD"/dev/*; do
                 ln -sfn "$p" ~/.config/vim-plugins/site/pack/dev/start/$(basename "$p")
               done
 

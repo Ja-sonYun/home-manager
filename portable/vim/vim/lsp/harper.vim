@@ -8,12 +8,12 @@ def g:LspConfig_harper(): dict<any>
   return {
     name: 'harper-ls',
     filetype: [
-      'gitcommit', 'python', 'markdown', 'text', 'latex', 'tex', 'html', 'xml',
-      'json', 'yaml', 'toml', 'javascript', 'javascriptreact', 'typescript',
-      'typescriptreact', 'vue', 'css', 'scss', 'less', 'php', 'ruby', 'go',
-      'rust', 'hcl', 'terraform', 'shell', 'bash', 'fish', 'powershell', 'sql',
-      'lua', 'elixir', 'erlang', 'swift', 'kotlin', 'java', 'c', 'cpp',
-      'csharp', 'objective-c', 'dart', 'vim'
+      # 'gitcommit', 'python', 'markdown', 'text', 'latex', 'tex', 'html', 'xml',
+      # 'json', 'yaml', 'toml', 'javascript', 'javascriptreact', 'typescript',
+      # 'typescriptreact', 'vue', 'css', 'scss', 'less', 'php', 'ruby', 'go',
+      # 'rust', 'hcl', 'terraform', 'shell', 'bash', 'fish', 'powershell', 'sql',
+      # 'lua', 'elixir', 'erlang', 'swift', 'kotlin', 'java', 'c', 'cpp',
+      # 'csharp', 'objective-c', 'dart', 'vim'
     ],
     path: exepath('harper-ls'),
     args: ['--stdio'],
