@@ -1,5 +1,5 @@
 {
-  description = "A Nix-flake-based Python3.12 development environment";
+  description = "A Nix-flake-based Python3.13 development environment";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
@@ -32,15 +32,15 @@
             ];
             shellHook = ''
               if [ ! -d .venv ]; then
-                echo "Creating virtual environment in .venv using Python 3.12..."
-                ${pkgs.python312}/bin/python3 -m venv .venv
+                echo "Creating virtual environment in .venv using Python 3.13..."
+                ${pkgs.python313}/bin/python3 -m venv .venv
               fi
 
               source .venv/bin/activate
             '';
             env = {
-              # UVからPython3.12を使用するように設定
-              UV_PYTHON = "${pkgs.python312}/bin/python3";
+              # UVからPython3.13を使用するように設定
+              UV_PYTHON = "${pkgs.python313}/bin/python3";
               UV_NO_SYNC = "1";
               UV_PYTHON_DOWNLOADS = "never";
             };

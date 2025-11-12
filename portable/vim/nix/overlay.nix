@@ -66,6 +66,7 @@ let
     ]
     ++ [
       # Plugins from flake inputs
+      (mkVimPlugin inputs.vim-lsp "vim-lsp")
     ]
     ++ pkgs.lib.optionals config.useCopilot [
       copilot-vim
@@ -73,7 +74,7 @@ let
 
   # TODO:
   myPluginsFromGit = [
-    (mkVimPlugin inputs.vim-lsp "vim-lsp")
+    # (mkVimPlugin inputs.vim-lsp "vim-lsp")
   ];
 
   # Aggregate plugin set for packaged Vim

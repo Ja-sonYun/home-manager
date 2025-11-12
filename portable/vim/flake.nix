@@ -6,7 +6,7 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     vim-lsp = {
-      url = "github:Ja-sonYun/lsp";
+      url = "github:yegappan/lsp";
       flake = false;
     };
   };
