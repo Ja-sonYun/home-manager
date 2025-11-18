@@ -12,6 +12,17 @@
     jujutsu = stable.jujutsu;
   };
 
+  # prev-packages =
+  #   final: prev:
+  #   let
+  #     prev = import inputs.nixpkgs-prev {
+  #       system = final.system;
+  #     };
+  #   in
+  #   {
+  #     skhd = prev.skhd;
+  #   };
+
   lib-injection = final: prev: {
     # Inject custom libs into the lib namespace
     lib =

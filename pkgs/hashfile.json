@@ -1,9 +1,9 @@
 {
   "JasonYuns-MacBook-Pro": {
-    "codex": "sha256-u5gLhJSDn/iCOEqjTH3yUYnGleUGlthd+DhwXeNu0xE=",
+    "codex": "sha256-JPYUFLkMQkYymDOYlD+Z9U4kodx4EnH+AnvGc4kEh2k=",
     "claude-code": "sha256-IenRrOYlGXM4tA7YHF+8E70NrB+ZoQcZPQhFvFQ0JEI=",
     "awscli-local": "sha256-WwzVwPdgTBpDIGoQ6cyDBlylAqYYdCPBYbGNOnFczZY=",
-    "tmux-menu": "sha256-KlGZbS5OuPVNRvDGkaS+2SubbjTsyS0CzdnLtphrryw="
+    "tmux-menu": "sha256-tk3sbwujvXTeLMRhYw4gxTKBeI7eswndDcav3hnT08Q="
   },
   "Jasons-MacBook-Server": {
     "codex": "sha256-pUcuGPi3hO9Ooj1ckylDD7kom6kabYTvpRfwQ95MEV8=",
