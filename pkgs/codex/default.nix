@@ -7,7 +7,7 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   inherit pkgs outputHash;
   name = "openai-codex";
   packages = [
-    "@openai/codex@0.58.0"
+    "@openai/codex@0.61.0"
   ];
   exposedBinaries = [
     "codex"

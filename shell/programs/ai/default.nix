@@ -44,9 +44,8 @@ in
 
   home.file."codex-config.toml" = {
     target = ".codex/config.toml";
+    force = true;
     text = ''
-      model = "gpt-5-codex"
-
       approval_policy = "untrusted"
       sandbox_mode = "workspace-write"
 
