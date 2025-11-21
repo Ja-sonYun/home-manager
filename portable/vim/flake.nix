@@ -124,6 +124,10 @@
       overlays.default = import ./nix/overlay.nix {
         inputs = self.inputs;
         config = cfg;
+        vim = {
+          rev = "master";
+          sha256 = "sha256-SIi1xtWrTYL2tzHyABUlPySoi12CLX9AhVdd2Y7b/RI=";
+        };
       };
 
       packages = forAllSystems (

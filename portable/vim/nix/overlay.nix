@@ -39,13 +39,24 @@ let
       });
 
   effectiveVim =
-    if vim != null then
-      vim
-    else
-      unstable.vim-full.override {
+    let
+      vim-full-base = unstable.vim-full.override {
         darwinSupport = pkgs.stdenv.hostPlatform.isDarwin;
         guiSupport = "none";
       };
+    in
+    if vim == null then
+      vim-full-base
+    else
+      vim-full-base.overrideAttrs (old: {
+        version = vim.rev;
+        src = pkgs.fetchFromGitHub {
+          owner = "vim";
+          repo = "vim";
+          rev = vim.rev;
+          sha256 = vim.sha256;
+        };
+      });
 
   allPlugins =
     with unstable.vimPlugins;
