@@ -1,15 +1,15 @@
 { pkgs, ... }:
 let
-  outputHash = pkgs.hashfile."codex";
+  outputHash = pkgs.hashfile."playwright-mcp";
 in
 
 pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   inherit pkgs outputHash;
-  name = "openai-codex";
+  name = "playwright-mcp";
   packages = [
-    "@openai/codex@0.63.0"
+    "@playwright/mcp@0.0.48"
   ];
   exposedBinaries = [
-    "codex"
+    "mcp-server-playwright"
   ];
 }

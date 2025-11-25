@@ -1,15 +1,15 @@
 { pkgs, ... }:
 let
-  outputHash = pkgs.hashfile."codex";
+  outputHash = pkgs.hashfile."context7-mcp";
 in
 
 pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   inherit pkgs outputHash;
-  name = "openai-codex";
+  name = "context7-mcp";
   packages = [
-    "@openai/codex@0.63.0"
+    "@upstash/context7-mcp@1.0.30"
   ];
   exposedBinaries = [
-    "codex"
+    "context7-mcp"
   ];
 }

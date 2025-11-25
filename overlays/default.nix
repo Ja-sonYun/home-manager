@@ -60,6 +60,12 @@
 
     # Npm
     codex = final.callPackage ../pkgs/codex { };
+    claude-code = final.callPackage ../pkgs/claude-code { };
+    context7 = final.callPackage ../pkgs/context7 { };
+    playwright-mcp = final.callPackage ../pkgs/playwright-mcp { };
+
+    # Pypi
+    aws-documentation = final.callPackage ../pkgs/aws-documentation { };
 
     # Cargo
     tmux-menu = final.callPackage ../pkgs/tmux-menu { };

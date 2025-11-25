@@ -29,7 +29,7 @@ let
     if machine == "main" then
       [
         "keycastr" # Show keystroke realtime
-        "chatgpt"
+        "claude"
         "gimp"
         "sf-symbols"
         "discord"
