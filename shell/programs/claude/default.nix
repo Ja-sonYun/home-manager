@@ -15,9 +15,16 @@ let
         "Read(**)"
         "Bash(git status:*)"
         "Bash(git diff:*)"
+        "Bash(git log:*)"
+        "Bash(git show:*)"
         "Bash(ls :*:*)"
         "Bash(cat :*:*)"
         "Base(rg :*:*)"
+        "Bash(find :*:*)"
+        "Bash(grep :*:*)"
+        "Bash(tail :*:*)"
+        "Bash(head :*:*)"
+        "Bash(echo :*:*)"
       ];
       deny = [
         "Read(./.env)"

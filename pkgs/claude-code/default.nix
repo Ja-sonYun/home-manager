@@ -7,7 +7,7 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   inherit pkgs outputHash;
   name = "claude-code";
   packages = [
-    "@anthropic-ai/claude-code@2.0.53"
+    "@anthropic-ai/claude-code@2.0.54"
   ];
   exposedBinaries = [
     "claude"
