@@ -1,6 +1,3 @@
-[submodule "pkgs/yabai/yabai"]
-	path = pkgs/yabai/yabai
-	url = git@github.com:koekeishiya/yabai.git
 [submodule "portable/plot"]
 	path = portable/plot
 	url = git@github.com:Ja-sonYun/plot.git

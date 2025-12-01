@@ -7,7 +7,7 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
   inherit pkgs outputHash;
   name = "context7-mcp";
   packages = [
-    "@upstash/context7-mcp@1.0.30"
+    "@upstash/context7-mcp@1.0.31"
   ];
   exposedBinaries = [
     "context7-mcp"
