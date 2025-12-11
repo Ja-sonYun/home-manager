@@ -674,11 +674,11 @@
     "server": {
       "flake": false,
       "locked": {
-        "path": "hosts/aarch64-darwin/server",
+        "path": "infra",
         "type": "path"
       },
       "original": {
-        "path": "hosts/aarch64-darwin/server",
+        "path": "infra",
         "type": "path"
       },
       "parent": []

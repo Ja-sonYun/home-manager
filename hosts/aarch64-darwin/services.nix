@@ -10,7 +10,7 @@
       ]
     else if machine == "server" then
       [
-        ./server/service
+        ../../infra/service/aarch64-darwin
       ]
     else
       [ ]

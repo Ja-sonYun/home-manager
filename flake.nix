@@ -56,7 +56,7 @@
 
     # My personal server stuffs
     server = {
-      url = ./hosts/aarch64-darwin/server;
+      url = ./infra;
       flake = false;
     };
 

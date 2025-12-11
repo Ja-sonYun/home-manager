@@ -8,7 +8,7 @@
 	path = shell/secrets/agenix
 	url = git@github.com:Ja-sonYun/agenix-secrets.git
 [submodule "hosts/aarch64-darwin/server"]
-	path = hosts/aarch64-darwin/server
+	path = infra
 	url = git@github.com:Ja-sonYun/server.git
 [submodule "portable/vim/dev/lsp"]
 	path = portable/vim/dev/lsp
