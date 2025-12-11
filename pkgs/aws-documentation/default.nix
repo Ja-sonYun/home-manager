@@ -7,7 +7,7 @@ pkgs.lib.pip.mkPipGlobalPackageDerivation {
   inherit pkgs outputHash;
   name = "awslabs.aws-documentation-mcp-server";
   packages = [
-    "awslabs.aws-documentation-mcp-server==1.1.11"
+    "awslabs.aws-documentation-mcp-server==1.1.12"
   ];
   exposedBinaries = [
     "awslabs.aws-documentation-mcp-server"
