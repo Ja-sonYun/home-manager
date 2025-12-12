@@ -18,6 +18,7 @@ def g:LspConfig_yaml(): dict<any>
           'https://json.schemastore.org/github-action.json': ['action.{yml,yaml}'],
           'https://json.schemastore.org/ansible-playbook.json': ['**/playbook*.{yml,yaml}', '**/ansible/**/*.yaml'],
           'https://json.schemastore.org/cloudformation.json': ['**/cf-*.{yml,yaml}', '**/cfn*.{yml,yaml}'],
+          'https://github.com/rendercv/rendercv/raw/main/schema.json': ['**/*_cv.yaml', '**/*rendercv*.yaml'],
         },
       },
     },
