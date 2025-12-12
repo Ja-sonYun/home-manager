@@ -18,6 +18,7 @@
     useMakefile = false;
     useCopilot = false;
     useHarper = false;
+    useSkk = false;
   },
 }:
 final: prev:
@@ -78,6 +79,7 @@ let
     ++ [
       # Plugins from flake inputs
       (mkVimPlugin inputs.vim-lsp "vim-lsp")
+      (mkVimPlugin inputs.vim-eskk "vim-eskk")
     ]
     ++ pkgs.lib.optionals config.useCopilot [
       copilot-vim
@@ -104,6 +106,13 @@ let
       gawk
     ]
     ++ pkgs.lib.optionals config.useCopilot [ (nodejs_22.override { enableNpm = false; }) ];
+
+  skkPackagesOpt = pkgs.lib.optionals config.useSkk (
+    with pkgs;
+    [
+      skkDictionaries.l
+    ]
+  );
 
   makefilePackagesOpt = pkgs.lib.optionals config.useMakefile (
     with unstable;
@@ -242,6 +251,7 @@ let
 
   extraPackages = pkgs.lib.concatLists [
     commonPackages
+    skkPackagesOpt
     nodePackagesOpt
     pythonPackagesOpt
     luaPackagesOpt
@@ -275,6 +285,15 @@ let
       " Optional development packpath for local plugins
       ${pkgs.lib.optionalString dev ''
         set packpath^=~/.config/vim-plugins/site
+      ''}
+
+      " Optional ekk dictionary path
+      ${pkgs.lib.optionalString config.useSkk ''
+        let g:eskk#large_dictionary = {
+        \   'path': expand('${pkgs.skkDictionaries.l}/share/skk/SKK-JISYO.L'),
+        \   'sorted': 1,
+        \   'encoding': 'euc-jp',
+        \}
       ''}
     '';
 

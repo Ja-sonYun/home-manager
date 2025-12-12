@@ -45,7 +45,7 @@ let
           hooks = [
             {
               type = "command";
-              command = "${pkgs.terminal-notifier}/bin/terminal-notifier -title 'cc'p -message 'Awaiting your input' -sound default";
+              command = "${pkgs.terminal-notifier}/bin/terminal-notifier -title 'cc' -message 'Permission requested' -sound Funk";
             }
           ];
         }
@@ -54,7 +54,7 @@ let
           hooks = [
             {
               type = "command";
-              command = "${pkgs.terminal-notifier}/bin/terminal-notifier -title 'cci' -message 'Awaiting your input' -sound default";
+              command = "${pkgs.terminal-notifier}/bin/terminal-notifier -title 'cci' -message 'Awaiting your input' -sound Funk";
             }
           ];
         }

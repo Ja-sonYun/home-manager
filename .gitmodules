@@ -13,3 +13,6 @@
 [submodule "portable/vim/dev/lsp"]
 	path = portable/vim/dev/lsp
 	url = git@github.com:Ja-sonYun/lsp.git
+[submodule ".mkutils"]
+	path = .mkutils
+	url = https://github.com/Ja-sonYun/mkutils

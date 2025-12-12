@@ -1,0 +1,9 @@
+pub fun get_placeholder_hash(): Text {
+    return "sha256-0000000000000000000000000000000000000000000="
+}
+
+pub fun get_root_dir(): Text {
+    let script_dir = trust $ cd "\$(dirname "\$0")" && pwd $
+    let root = trust $ cd "{script_dir}/.." && pwd $
+    return root
+}

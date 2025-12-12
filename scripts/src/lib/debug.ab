@@ -1,0 +1,11 @@
+let g_debug = false
+
+pub fun set_debug(val: Bool): Null {
+    g_debug = val
+}
+
+pub fun debug(msg: Text): Null {
+    if g_debug {
+        trust $ echo "[DEBUG] {msg}" >&2 $
+    }
+}

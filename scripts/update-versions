@@ -1,365 +1,582 @@
 #!/usr/bin/env bash
+# Written in [Amber](https://amber-lang.com/)
+# version: 0.4.0-alpha
+# date: 2025-12-12 20:53:46
+replace__0_v0() {
+    local source=$1
+    local search=$2
+    local replace=$3
+    __AF_replace0_v0="${source//${search}/${replace}}";
+    return 0
+}
+split__3_v0() {
+    local text=$1
+    local delimiter=$2
+    __AMBER_ARRAY_0=();
+    local result=("${__AMBER_ARRAY_0[@]}")
+     IFS="${delimiter}" read -rd '' -a result < <(printf %s "$text") ;
+    __AS=$?
+    __AF_split3_v0=("${result[@]}");
+    return 0
+}
+text_contains__14_v0() {
+    local text=$1
+    local phrase=$2
+    __AMBER_VAL_1=$( if [[ "${text}" == *"${phrase}"* ]]; then
+    echo 1
+  fi );
+    __AS=$?;
+    local result="${__AMBER_VAL_1}"
+    __AF_text_contains14_v0=$([ "_${result}" != "_1" ]; echo $?);
+    return 0
+}
+starts_with__20_v0() {
+    local text=$1
+    local prefix=$2
+    __AMBER_VAL_2=$( if [[ "${text}" == "${prefix}"* ]]; then
+    echo 1
+  fi );
+    __AS=$?;
+    local result="${__AMBER_VAL_2}"
+    __AF_starts_with20_v0=$([ "_${result}" != "_1" ]; echo $?);
+    return 0
+}
+echo_info__29_v0() {
+    local msg=$1
+     tput bold; tput setaf 4; echo "${msg}"; tput sgr0 ;
+    __AS=$?
+}
+echo_warning__31_v0() {
+    local msg=$1
+     tput bold; tput setaf 3; echo "${msg}"; tput sgr0 ;
+    __AS=$?
+}
+get_placeholder_hash__34_v0() {
+    __AF_get_placeholder_hash34_v0="sha256-0000000000000000000000000000000000000000000=";
+    return 0
+}
+get_root_dir__35_v0() {
+    __AMBER_VAL_3=$( cd "$(dirname "$0")" && pwd );
+    __AS=$?;
+    local script_dir="${__AMBER_VAL_3}"
+    __AMBER_VAL_4=$( cd "${script_dir}/.." && pwd );
+    __AS=$?;
+    local root="${__AMBER_VAL_4}"
+    __AF_get_root_dir35_v0="${root}";
+    return 0
+}
 
-set -euo pipefail
-
-# Config
-ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
-PLACEHOLDER_HASH="sha256-0000000000000000000000000000000000000000000="
-
-RUN_BUILD=1
-DEBUG=0
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-    --no-build)
-        RUN_BUILD=0
-        shift
-        ;;
-    --debug)
-        DEBUG=1
-        shift
-        ;;
-    *)
-        echo "Unknown option: $1" >&2
-        exit 1
-        ;;
-    esac
-done
-
-require_cmd() { command -v "$1" >/dev/null 2>&1 || {
-    echo "Missing command: $1" >&2
-    exit 1
-}; }
-require_cmd rg
-require_cmd sed
-require_cmd jq
-require_cmd nix
-require_cmd curl
-
-# Debug logger
-debug() { if [[ "$DEBUG" -eq 1 ]]; then echo "[DEBUG] $*" >&2; fi; }
-
-# Enable xtrace when debugging
-if [[ "$DEBUG" -eq 1 ]]; then
-    set -x
+is_command__103_v0() {
+    local command=$1
+     [ -x "$(command -v ${command})" ] ;
+    __AS=$?;
+if [ $__AS != 0 ]; then
+        __AF_is_command103_v0=0;
+        return 0
 fi
-
-# Escape helpers for safe sed usage (kept for future use, not needed with current patterns)
-escape_sed_pat() { printf '%s' "$1" | sed -e 's/[\/&]/\\&/g'; }
-escape_sed_repl() { printf '%s' "$1" | sed -e 's/[\/&]/\\&/g'; }
-
-# Cross-platform in-place sed (GNU/BSD)
-sed_inplace() {
-    local script="$1"
-    shift
-    local file="$1"
-    debug "sed_inplace on ${file}: ${script}"
-    if sed --version >/dev/null 2>&1; then
-        sed -i -e "$script" "$file"
-    else
-        sed -i '' -e "$script" "$file"
-    fi
+    __AF_is_command103_v0=1;
+    return 0
 }
-
-# Choose a sed delimiter that doesn't appear in pattern or replacement
-pick_delim() {
-    local a="$1" b="$2"
-    local candidates='|#~%^:@,;!/+'
-    local i ch
-    for ((i = 0; i < ${#candidates}; i++)); do
-        ch="${candidates:i:1}"
-        case "$a$b" in
-        *"$ch"*) ;;
-        *)
-            printf '%s' "$ch"
+printf__109_v0() {
+    local format=$1
+    local args=("${!2}")
+     args=("${format}" "${args[@]}") ;
+    __AS=$?
+     printf "${args[@]}" ;
+    __AS=$?
+}
+echo_error__119_v0() {
+    local message=$1
+    local exit_code=$2
+    __AMBER_ARRAY_5=("${message}");
+    printf__109_v0 "\x1b[1;3;97;41m%s\x1b[0m
+" __AMBER_ARRAY_5[@];
+    __AF_printf109_v0__162_5="$__AF_printf109_v0";
+    echo "$__AF_printf109_v0__162_5" > /dev/null 2>&1
+    if [ $(echo ${exit_code} '>' 0 | bc -l | sed '/\./ s/\.\{0,1\}0\{1,\}$//') != 0 ]; then
+        exit ${exit_code}
+fi
+}
+require_cmd__122_v0() {
+    local name=$1
+    is_command__103_v0 "${name}";
+    __AF_is_command103_v0__5_12="$__AF_is_command103_v0";
+    if [ $(echo  '!' "$__AF_is_command103_v0__5_12" | bc -l | sed '/\./ s/\.\{0,1\}0\{1,\}$//') != 0 ]; then
+        echo_error__119_v0 "Missing command: ${name}" 1;
+        __AF_echo_error119_v0__6_9="$__AF_echo_error119_v0";
+        echo "$__AF_echo_error119_v0__6_9" > /dev/null 2>&1
+        exit 1
+fi
+}
+urlencode_npm_pkg__123_v0() {
+    local name=$1
+    replace__0_v0 "${name}" "@" "%40";
+    __AF_replace0_v0__12_19="${__AF_replace0_v0}";
+    local encoded="${__AF_replace0_v0__12_19}"
+    replace__0_v0 "${encoded}" "/" "%2F";
+    __AF_replace0_v0__13_19="${__AF_replace0_v0}";
+    local encoded="${__AF_replace0_v0__13_19}"
+    __AF_urlencode_npm_pkg123_v0="${encoded}";
+    return 0
+}
+__0_g_debug=0
+set_debug__125_v0() {
+    local val=$1
+    __0_g_debug=${val}
+}
+debug__126_v0() {
+    local msg=$1
+    if [ ${__0_g_debug} != 0 ]; then
+         echo "[DEBUG] ${msg}" >&2 ;
+        __AS=$?
+fi
+}
+__1_g_debug=0
+debug__135_v0() {
+    local msg=$1
+    if [ ${__1_g_debug} != 0 ]; then
+         echo "[DEBUG] ${msg}" >&2 ;
+        __AS=$?
+fi
+}
+sed_inplace__137_v0() {
+    local script=$1
+    local file=$2
+    debug__135_v0 "sed_inplace on ${file}: ${script}";
+    __AF_debug135_v0__5_5="$__AF_debug135_v0";
+    echo "$__AF_debug135_v0__5_5" > /dev/null 2>&1
+    __AMBER_VAL_6=$( sed --version 2>&1 | head -1 || echo "" );
+    __AS=$?;
+    local gnu_check="${__AMBER_VAL_6}"
+    if [ $([ "_${gnu_check}" == "_" ]; echo $?) != 0 ]; then
+         sed -i -e "${script}" "${file}" ;
+        __AS=$?;
+if [ $__AS != 0 ]; then
+__AF_sed_inplace137_v0=''
+return $__AS
+fi
+else
+         sed -i '' -e "${script}" "${file}" ;
+        __AS=$?;
+if [ $__AS != 0 ]; then
+__AF_sed_inplace137_v0=''
+return $__AS
+fi
+fi
+}
+pick_delim__138_v0() {
+    local a=$1
+    local b=$2
+    local combined="${a}${b}"
+    local candidates="|#~%^:@,;"'!'"/+"
+    local i=0
+    while :
+do
+        if [ $(echo ${i} '>=' 12 | bc -l | sed '/\./ s/\.\{0,1\}0\{1,\}$//') != 0 ]; then
+            break
+fi
+        __AMBER_VAL_7=$( echo "${candidates}" | cut -c$(echo ${i} '+' 1 | bc -l | sed '/\./ s/\.\{0,1\}0\{1,\}$//') );
+        __AS=$?;
+        local ch="${__AMBER_VAL_7}"
+        text_contains__14_v0 "${combined}" "${ch}";
+        __AF_text_contains14_v0__23_16="$__AF_text_contains14_v0";
+        if [ $(echo  '!' "$__AF_text_contains14_v0__23_16" | bc -l | sed '/\./ s/\.\{0,1\}0\{1,\}$//') != 0 ]; then
+            __AF_pick_delim138_v0="${ch}";
             return 0
-            ;;
-        esac
-    done
-    printf '|'
+fi
+        i=$(echo ${i} '+' 1 | bc -l | sed '/\./ s/\.\{0,1\}0\{1,\}$//')
+done
+    __AF_pick_delim138_v0="|";
+    return 0
 }
-
-# URL-encode npm package path component (scope/name)
-urlencode_npm_pkg() {
-    # encode '@' and '/' for npm registry path
-    printf '%s' "$1" | sed -e 's/@/%40/g' -e 's/\//%2F/g'
+latest_npm_version__142_v0() {
+    local name=$1
+    urlencode_npm_pkg__123_v0 "${name}";
+    __AF_urlencode_npm_pkg123_v0__9_15="${__AF_urlencode_npm_pkg123_v0}";
+    local enc="${__AF_urlencode_npm_pkg123_v0__9_15}"
+    __AMBER_VAL_8=$( curl -sL "https://registry.npmjs.org/${enc}" | jq -r '."dist-tags".latest' );
+    __AS=$?;
+    local result="${__AMBER_VAL_8}"
+    __AF_latest_npm_version142_v0="${result}";
+    return 0
 }
-
-latest_pypi_version() {
-    local name="$1"
-    curl -sL "https://pypi.org/pypi/${name}/json" | jq -r '.info.version'
+prefetch_npm_hash__143_v0() {
+    local root_dir=$1
+    local pkgs=("${!2}")
+    get_placeholder_hash__34_v0 ;
+    __AF_get_placeholder_hash34_v0__15_23="${__AF_get_placeholder_hash34_v0}";
+    local placeholder="${__AF_get_placeholder_hash34_v0__15_23}"
+    __AMBER_VAL_9=$( nix eval --raw --impure --expr 'builtins.currentSystem' );
+    __AS=$?;
+    local system="${__AMBER_VAL_9}"
+    __AMBER_VAL_10=$( mktemp /tmp/prefetch-npm.XXXXXX.nix );
+    __AS=$?;
+    local tmpfile="${__AMBER_VAL_10}"
+    local pkg_str=""
+    for p in "${pkgs[@]}"; do
+        pkg_str="${pkg_str} \"${p}\""
+done
+    local nix_content="let
+  pkgs = import <nixpkgs> { \};
+  npmLib = import ${root_dir}/libs/npm { inherit pkgs system; \};
+in npmLib.mkNpmGlobalPackageDerivation {
+  inherit pkgs;
+  name = \"prefetch\";
+  packages = [${pkg_str} ];
+  exposedBinaries = [ ];
+  outputHash = \"${placeholder}\";
+\}"
+     echo '${nix_content}' > "${tmpfile}" ;
+    __AS=$?
+    __AMBER_VAL_11=$( nix build --impure --expr "(import ${tmpfile})" -L 2>&1 || true );
+    __AS=$?;
+    local out="${__AMBER_VAL_11}"
+     rm -f "${tmpfile}" ;
+    __AS=$?
+    __AMBER_VAL_12=$( echo "${out}" | sed -n 's/.*got: *\(sha256-[A-Za-z0-9+/=]\+\).*/\1/p' | tail -n1 );
+    __AS=$?;
+    local hash="${__AMBER_VAL_12}"
+    __AF_prefetch_npm_hash143_v0="${hash}";
+    return 0
 }
-
-latest_npm_version() {
-    local name="$1"
-    local enc
-    enc=$(urlencode_npm_pkg "$name")
-    curl -sL "https://registry.npmjs.org/${enc}" | jq -r '."dist-tags".latest'
-}
-
-prefetch_npm_hash() {
-    local name="$1"
-    shift
-    local -a pkgs=("$@")
-    local system
-    system=$(nix eval --raw --impure --expr 'builtins.currentSystem')
-
-    local tmpfile
-    tmpfile=$(mktemp /tmp/prefetch-npm.XXXXXX.nix)
-
-    {
-        echo "let"
-        echo "  pkgs = import <nixpkgs> { };"
-        echo "  npmLib = import ${ROOT_DIR}/libs/npm { inherit pkgs system; };"
-        echo "in npmLib.mkNpmGlobalPackageDerivation {"
-        echo "  inherit pkgs;"
-        echo "  name = \"prefetch\";"
-        printf "  packages = ["
-        for p in "${pkgs[@]}"; do printf " \"%s\"" "$p"; done
-        echo " ];"
-        echo "  exposedBinaries = [ ];"
-        echo "  outputHash = \"${PLACEHOLDER_HASH}\";"
-        echo "}"
-    } >"$tmpfile"
-
-    set +e
-    local out
-    out=$(nix build --impure --expr "(import ${tmpfile})" -L 2>&1)
-    local status=$?
-    rm -f "$tmpfile"
-    set -e
-
-    if [[ $status -eq 0 ]]; then
-        echo "" # should not happen with placeholder
-        return 0
-    fi
-
-    # parse 'got:    sha256-...'
-    printf '%s\n' "$out" | sed -n 's/.*got: *\(sha256-[A-Za-z0-9+/=]\+\).*/\1/p' | tail -n1
-}
-
-prefetch_pip_hash() {
-    local pythonVersion="$1"
-    shift
-    local -a preInstall=()
-    if [[ "$1" == "--pre" ]]; then
-        shift
-        preInstall=("$1")
-        shift
-    fi
-    local -a pkgs=("$@")
-
-    local tmpfile
-    tmpfile=$(mktemp /tmp/prefetch-pip.XXXXXX.nix)
-
-    {
-        echo "let"
-        echo "  pkgs = import <nixpkgs> { };"
-        echo "  pipLib = import ${ROOT_DIR}/libs/pip { inherit pkgs; };"
-        echo "in pipLib.mkPipGlobalPackageDerivation {"
-        echo "  inherit pkgs;"
-        echo "  name = \"prefetch\";"
-        echo "  pythonVersion = \"${pythonVersion}\";"
-        if [[ ${#preInstall[@]} -gt 0 ]]; then
-            printf "  preInstall = ["
-            for p in "${preInstall[@]}"; do printf " \"%s\"" "$p"; done
-            echo " ];"
-        fi
-        printf "  packages = ["
-        for p in "${pkgs[@]}"; do printf " \"%s\"" "$p"; done
-        echo " ];"
-        echo "  exposedBinaries = [ ];"
-        echo "  outputHash = \"${PLACEHOLDER_HASH}\";"
-        echo "}"
-    } >"$tmpfile"
-
-    set +e
-    local out
-    out=$(nix build --impure --expr "(import ${tmpfile})" -L 2>&1)
-    local status=$?
-    rm -f "$tmpfile"
-    set -e
-
-    if [[ $status -eq 0 ]]; then
-        echo ""
-        return 0
-    fi
-
-    printf '%s\n' "$out" | sed -n 's/.*got: *\(sha256-[A-Za-z0-9+/=]\+\).*/\1/p' | tail -n1
-}
-
-# Extract array items from a Nix list string region
-extract_nix_string_array() {
-    # expects content between brackets containing quoted strings
-    sed -n 's/.*\"\(.*\)\".*/\1/p' | sed 's/\"\s\+\"/\n/g'
-}
-
-update_happened=0
-
-process_npm_file() {
-    local file="$1"
-    local content packages_block
-    packages_block=$(awk '/packages\s*=\s*\[/{flag=1;next}/\]/{flag=0}flag' "$file" | sed -n 's/.*"\(.*\)".*/\1/p')
-
-    local -a pkgs=()
-    while IFS= read -r line; do
-        [[ -z "$line" ]] && continue
-        pkgs+=("$line")
-    done <<<"$packages_block"
-
-    debug "npm pkgs parsed from ${file}: ${#pkgs[@]} items -> ${pkgs[*]}"
-
+process_npm_file__144_v0() {
+    local update_flag=$1
+    local root_dir=$2
+    local file=$3
+    get_placeholder_hash__34_v0 ;
+    __AF_get_placeholder_hash34_v0__45_23="${__AF_get_placeholder_hash34_v0}";
+    local placeholder="${__AF_get_placeholder_hash34_v0__45_23}"
+    __AMBER_VAL_13=$( awk '/packages[[:space:]]*=[[:space:]]*\[/{flag=1;next}/\]/{flag=0}flag' "${file}" | sed -n 's/.*"\(.*\)".*/\1/p' );
+    __AS=$?;
+    local packages_block="${__AMBER_VAL_13}"
+    split__3_v0 "${packages_block}" "
+";
+    __AF_split3_v0__47_16=("${__AF_split3_v0[@]}");
+    local pkgs=("${__AF_split3_v0__47_16[@]}")
+    debug__126_v0 "npm pkgs parsed from ${file}: ${#pkgs[@]} items";
+    __AF_debug126_v0__49_5="$__AF_debug126_v0";
+    echo "$__AF_debug126_v0__49_5" > /dev/null 2>&1
     local changed=0
-    for i in "${!pkgs[@]}"; do
-        local full="${pkgs[$i]}"
-        # split by last '@'
-        local base ver
-        base="${full%@*}"
-        ver="${full##*@}"
-        # skip if no version
-        if [[ "$base" == "$full" ]]; then
+    __AMBER_ARRAY_14=();
+    local new_pkgs=("${__AMBER_ARRAY_14[@]}")
+    i=0;
+for full in "${pkgs[@]}"; do
+        if [ $([ "_${full}" != "_" ]; echo $?) != 0 ]; then
             continue
-        fi
-        local latest
-        latest=$(latest_npm_version "$base" || true)
-        if [[ -n "$latest" && "$latest" != "$ver" ]]; then
-            # replace version part within quotes to avoid complex escaping
-            local sed_script
-            sed_script="s|\"${base}@[^\"]*\"|\"${base}@${latest}\"|"
-            debug "npm sed: base=${base} ver=${ver} latest=${latest} script='${sed_script}' file='${file}'"
-            sed_inplace "$sed_script" "$file"
+fi
+        __AMBER_VAL_15=$( echo "${full}" | sed 's/@[^@]*$//' );
+        __AS=$?;
+        local base="${__AMBER_VAL_15}"
+        __AMBER_VAL_16=$( echo "${full}" | sed 's/.*@//' );
+        __AS=$?;
+        local ver="${__AMBER_VAL_16}"
+        if [ $([ "_${base}" != "_${full}" ]; echo $?) != 0 ]; then
+            __AMBER_ARRAY_17=("${full}");
+            new_pkgs+=("${__AMBER_ARRAY_17[@]}")
+            continue
+fi
+        latest_npm_version__142_v0 "${base}";
+        __AF_latest_npm_version142_v0__66_22="${__AF_latest_npm_version142_v0}";
+        local latest="${__AF_latest_npm_version142_v0__66_22}"
+        if [ $(echo $([ "_${latest}" == "_" ]; echo $?) '&&' $([ "_${latest}" == "_${ver}" ]; echo $?) | bc -l | sed '/\./ s/\.\{0,1\}0\{1,\}$//') != 0 ]; then
+            local sed_script="s|\"${base}@[^\"]*\"|\"${base}@${latest}\"|"
+            debug__126_v0 "npm sed: base=${base} ver=${ver} latest=${latest}";
+            __AF_debug126_v0__70_13="$__AF_debug126_v0";
+            echo "$__AF_debug126_v0__70_13" > /dev/null 2>&1
+            sed_inplace__137_v0 "${sed_script}" "${file}";
+            __AS=$?;
+            __AF_sed_inplace137_v0__71_19="$__AF_sed_inplace137_v0";
+            echo "$__AF_sed_inplace137_v0__71_19" > /dev/null 2>&1
             changed=1
-            update_happened=1
-            pkgs[$i]="${base}@${latest}"
+            eval "${update_flag}=1"
+            __AMBER_ARRAY_18=("${base}@${latest}");
+            new_pkgs+=("${__AMBER_ARRAY_18[@]}")
             echo "Updated npm ${base}: ${ver} -> ${latest} in ${file}"
-        fi
-    done
-
-    if [[ $changed -eq 1 ]]; then
-        # reset outputHash to placeholder
-        local d1
-        d1=$(pick_delim "${PLACEHOLDER_HASH}" "")
-        local script1="s${d1}outputHash = \"sha256-[A-Za-z0-9+/=]\\+\";${d1}outputHash = \"${PLACEHOLDER_HASH}\";${d1}"
-        debug "reset outputHash with delim='${d1}' script='${script1}' file='${file}'"
-        sed_inplace "${script1}" "$file"
-
-        # prefetch new hash for current list
-        local got
-        got=$(prefetch_npm_hash "prefetch" "${pkgs[@]}")
-        if [[ -n "$got" ]]; then
-            local d2
-            d2=$(pick_delim "${got}" "")
-            local script2="s${d2}outputHash = \"${PLACEHOLDER_HASH}\";${d2}outputHash = \"${got}\";${d2}"
-            debug "apply outputHash with delim='${d2}' script='${script2}' file='${file}'"
-            sed_inplace "${script2}" "$file"
+else
+            __AMBER_ARRAY_19=("${full}");
+            new_pkgs+=("${__AMBER_ARRAY_19[@]}")
+fi
+    (( i++ )) || true
+done
+    if [ ${changed} != 0 ]; then
+        pick_delim__138_v0 "${placeholder}" "";
+        __AF_pick_delim138_v0__82_18="${__AF_pick_delim138_v0}";
+        local d1="${__AF_pick_delim138_v0__82_18}"
+        local script1="s${d1}outputHash = \"sha256-[A-Za-z0-9+/=]\\+\";${d1}outputHash = \"${placeholder}\";${d1}"
+        debug__126_v0 "reset outputHash with delim='${d1}'";
+        __AF_debug126_v0__84_9="$__AF_debug126_v0";
+        echo "$__AF_debug126_v0__84_9" > /dev/null 2>&1
+        sed_inplace__137_v0 "${script1}" "${file}";
+        __AS=$?;
+        __AF_sed_inplace137_v0__85_15="$__AF_sed_inplace137_v0";
+        echo "$__AF_sed_inplace137_v0__85_15" > /dev/null 2>&1
+        prefetch_npm_hash__143_v0 "${root_dir}" new_pkgs[@];
+        __AF_prefetch_npm_hash143_v0__87_19="${__AF_prefetch_npm_hash143_v0}";
+        local got="${__AF_prefetch_npm_hash143_v0__87_19}"
+        if [ $([ "_${got}" == "_" ]; echo $?) != 0 ]; then
+            pick_delim__138_v0 "${got}" "";
+            __AF_pick_delim138_v0__90_22="${__AF_pick_delim138_v0}";
+            local d2="${__AF_pick_delim138_v0__90_22}"
+            local script2="s${d2}outputHash = \"${placeholder}\";${d2}outputHash = \"${got}\";${d2}"
+            debug__126_v0 "apply outputHash with delim='${d2}'";
+            __AF_debug126_v0__92_13="$__AF_debug126_v0";
+            echo "$__AF_debug126_v0__92_13" > /dev/null 2>&1
+            sed_inplace__137_v0 "${script2}" "${file}";
+            __AS=$?;
+            __AF_sed_inplace137_v0__93_19="$__AF_sed_inplace137_v0";
+            echo "$__AF_sed_inplace137_v0__93_19" > /dev/null 2>&1
             echo "Updated outputHash for ${file}: ${got}"
-        else
-            echo "WARN: Could not prefetch hash for ${file}" >&2
-        fi
-    fi
+else
+            echo_warning__31_v0 "Could not prefetch hash for ${file}";
+            __AF_echo_warning31_v0__96_13="$__AF_echo_warning31_v0";
+            echo "$__AF_echo_warning31_v0__96_13" > /dev/null 2>&1
+fi
+fi
 }
-
-process_pip_file() {
-    local file="$1"
-    # get pythonVersion if present
-    local pyv
-    pyv=$(sed -n 's/.*pythonVersion\s*=\s*\"\([0-9]\+\)\".*/\1/p' "$file" | head -n1 || true)
-    [[ -z "$pyv" ]] && pyv="312"
-
-    # preInstall (optional, single-line support)
-    local pre
-    pre=$(awk '/preInstall\s*=\s*\[/{flag=1;next}/\]/{if(flag){print;};flag=0}flag' "$file" | sed -n 's/.*"\(.*\)".*/\1/p' | head -n1 || true)
-
-    # extract package list
-    local packages_block
-    packages_block=$(awk '/packages\s*=\s*\[/{flag=1;next}/\]/{flag=0}flag' "$file" | sed -n 's/.*"\(.*\)".*/\1/p')
-
-    local -a pkgs=()
-    while IFS= read -r p; do
-        [[ -z "$p" ]] && continue
-        pkgs+=("$p")
-    done <<<"$packages_block"
-
-    debug "pip pkgs parsed from ${file}: ${#pkgs[@]} items -> ${pkgs[*]}"
-
+latest_pypi_version__154_v0() {
+    local name=$1
+    __AMBER_VAL_20=$( curl -sL "https://pypi.org/pypi/${name}/json" | jq -r '.info.version' );
+    __AS=$?;
+    local result="${__AMBER_VAL_20}"
+    __AF_latest_pypi_version154_v0="${result}";
+    return 0
+}
+prefetch_pip_hash__155_v0() {
+    local root_dir=$1
+    local python_version=$2
+    local pkgs=("${!3}")
+    local pre_install=$4
+    get_placeholder_hash__34_v0 ;
+    __AF_get_placeholder_hash34_v0__13_23="${__AF_get_placeholder_hash34_v0}";
+    local placeholder="${__AF_get_placeholder_hash34_v0__13_23}"
+    __AMBER_VAL_21=$( mktemp /tmp/prefetch-pip.XXXXXX.nix );
+    __AS=$?;
+    local tmpfile="${__AMBER_VAL_21}"
+    local pkg_str=""
+    for p in "${pkgs[@]}"; do
+        pkg_str="${pkg_str} \"${p}\""
+done
+    local pre_str=""
+    if [ $([ "_${pre_install}" == "_" ]; echo $?) != 0 ]; then
+        pre_str="preInstall = [ \"${pre_install}\" ];"
+fi
+    local nix_content="let
+  pkgs = import <nixpkgs> { \};
+  pipLib = import ${root_dir}/libs/pip { inherit pkgs; \};
+in pipLib.mkPipGlobalPackageDerivation {
+  inherit pkgs;
+  name = \"prefetch\";
+  pythonVersion = \"${python_version}\";
+  ${pre_str}
+  packages = [${pkg_str} ];
+  exposedBinaries = [ ];
+  outputHash = \"${placeholder}\";
+\}"
+     echo '${nix_content}' > "${tmpfile}" ;
+    __AS=$?
+    __AMBER_VAL_22=$( nix build --impure --expr "(import ${tmpfile})" -L 2>&1 || true );
+    __AS=$?;
+    local out="${__AMBER_VAL_22}"
+     rm -f "${tmpfile}" ;
+    __AS=$?
+    __AMBER_VAL_23=$( echo "${out}" | sed -n 's/.*got: *\(sha256-[A-Za-z0-9+/=]\+\).*/\1/p' | tail -n1 );
+    __AS=$?;
+    local hash="${__AMBER_VAL_23}"
+    __AF_prefetch_pip_hash155_v0="${hash}";
+    return 0
+}
+process_pip_file__156_v0() {
+    local update_flag=$1
+    local root_dir=$2
+    local file=$3
+    get_placeholder_hash__34_v0 ;
+    __AF_get_placeholder_hash34_v0__49_23="${__AF_get_placeholder_hash34_v0}";
+    local placeholder="${__AF_get_placeholder_hash34_v0__49_23}"
+    __AMBER_VAL_24=$( sed -n 's/.*pythonVersion\s*=\s*"\([0-9]\+\)".*/\1/p' "${file}" | head -n1 );
+    __AS=$?;
+    local pyv="${__AMBER_VAL_24}"
+    if [ $([ "_${pyv}" != "_" ]; echo $?) != 0 ]; then
+        pyv="312"
+fi
+    __AMBER_VAL_25=$( awk '/preInstall[[:space:]]*=[[:space:]]*\[/{flag=1;next}/\]/{if(flag){print}; flag=0}flag' "${file}" | sed -n 's/.*"\(.*\)".*/\1/p' | head -n1 );
+    __AS=$?;
+    local pre="${__AMBER_VAL_25}"
+    __AMBER_VAL_26=$( awk '/packages[[:space:]]*=[[:space:]]*\[/{flag=1;next}/\]/{flag=0}flag' "${file}" | sed -n 's/.*"\(.*\)".*/\1/p' );
+    __AS=$?;
+    local packages_block="${__AMBER_VAL_26}"
+    split__3_v0 "${packages_block}" "
+";
+    __AF_split3_v0__58_16=("${__AF_split3_v0[@]}");
+    local pkgs=("${__AF_split3_v0__58_16[@]}")
+    debug__126_v0 "pip pkgs parsed from ${file}: ${#pkgs[@]} items";
+    __AF_debug126_v0__60_5="$__AF_debug126_v0";
+    echo "$__AF_debug126_v0__60_5" > /dev/null 2>&1
     local changed=0
-    for i in "${!pkgs[@]}"; do
-        local full="${pkgs[$i]}"
-        # skip VCS or url installs
-        if [[ "$full" == git+* ]]; then
+    __AMBER_ARRAY_27=();
+    local new_pkgs=("${__AMBER_ARRAY_27[@]}")
+    i=0;
+for full in "${pkgs[@]}"; do
+        if [ $([ "_${full}" != "_" ]; echo $?) != 0 ]; then
             continue
-        fi
-        if [[ "$full" == *"=="* ]]; then
-            local name="${full%%==*}"
-            local ver="${full##*==}"
-            local latest
-            latest=$(latest_pypi_version "$name" || true)
-            if [[ -n "$latest" && "$latest" != "$ver" ]]; then
+fi
+        starts_with__20_v0 "${full}" "git+";
+        __AF_starts_with20_v0__70_12="$__AF_starts_with20_v0";
+        if [ "$__AF_starts_with20_v0__70_12" != 0 ]; then
+            __AMBER_ARRAY_28=("${full}");
+            new_pkgs+=("${__AMBER_ARRAY_28[@]}")
+            continue
+fi
+        text_contains__14_v0 "${full}" "==";
+        __AF_text_contains14_v0__75_12="$__AF_text_contains14_v0";
+        if [ "$__AF_text_contains14_v0__75_12" != 0 ]; then
+            __AMBER_VAL_29=$( echo "${full}" | sed 's/==.*//' );
+            __AS=$?;
+            local name="${__AMBER_VAL_29}"
+            __AMBER_VAL_30=$( echo "${full}" | sed 's/.*==//' );
+            __AS=$?;
+            local ver="${__AMBER_VAL_30}"
+            latest_pypi_version__154_v0 "${name}";
+            __AF_latest_pypi_version154_v0__79_26="${__AF_latest_pypi_version154_v0}";
+            local latest="${__AF_latest_pypi_version154_v0__79_26}"
+            if [ $(echo $([ "_${latest}" == "_" ]; echo $?) '&&' $([ "_${latest}" == "_${ver}" ]; echo $?) | bc -l | sed '/\./ s/\.\{0,1\}0\{1,\}$//') != 0 ]; then
                 local pscript="s|\"${name}==[^\"]*\"|\"${name}==${latest}\"|"
-                debug "pip sed: name=${name} ver=${ver} latest=${latest} script='${pscript}' file='${file}'"
-                sed_inplace "${pscript}" "$file"
+                debug__126_v0 "pip sed: name=${name} ver=${ver} latest=${latest}";
+                __AF_debug126_v0__83_17="$__AF_debug126_v0";
+                echo "$__AF_debug126_v0__83_17" > /dev/null 2>&1
+                sed_inplace__137_v0 "${pscript}" "${file}";
+                __AS=$?;
+                __AF_sed_inplace137_v0__84_23="$__AF_sed_inplace137_v0";
+                echo "$__AF_sed_inplace137_v0__84_23" > /dev/null 2>&1
                 changed=1
-                update_happened=1
-                pkgs[$i]="${name}==${latest}"
+                eval "${update_flag}=1"
+                __AMBER_ARRAY_31=("${name}==${latest}");
+                new_pkgs+=("${__AMBER_ARRAY_31[@]}")
                 echo "Updated pip ${name}: ${ver} -> ${latest} in ${file}"
-            fi
-        fi
-    done
-
-    if [[ $changed -eq 1 ]]; then
-        local d3
-        d3=$(pick_delim "${PLACEHOLDER_HASH}" "")
-        local script3="s${d3}outputHash = \"sha256-[A-Za-z0-9+/=]\\+\";${d3}outputHash = \"${PLACEHOLDER_HASH}\";${d3}"
-        debug "reset outputHash (pip) delim='${d3}' script='${script3}' file='${file}'"
-        sed_inplace "${script3}" "$file"
-        local got
-        if [[ -n "$pre" ]]; then
-            got=$(prefetch_pip_hash "$pyv" --pre "$pre" "${pkgs[@]}")
-        else
-            got=$(prefetch_pip_hash "$pyv" "${pkgs[@]}")
-        fi
-        if [[ -n "$got" ]]; then
-            local d4
-            d4=$(pick_delim "${got}" "")
-            local script4="s${d4}outputHash = \"${PLACEHOLDER_HASH}\";${d4}outputHash = \"${got}\";${d4}"
-            debug "apply outputHash (pip) delim='${d4}' script='${script4}' file='${file}'"
-            sed_inplace "${script4}" "$file"
+else
+                __AMBER_ARRAY_32=("${full}");
+                new_pkgs+=("${__AMBER_ARRAY_32[@]}")
+fi
+else
+            __AMBER_ARRAY_33=("${full}");
+            new_pkgs+=("${__AMBER_ARRAY_33[@]}")
+fi
+    (( i++ )) || true
+done
+    if [ ${changed} != 0 ]; then
+        pick_delim__138_v0 "${placeholder}" "";
+        __AF_pick_delim138_v0__98_18="${__AF_pick_delim138_v0}";
+        local d3="${__AF_pick_delim138_v0__98_18}"
+        local script3="s${d3}outputHash = \"sha256-[A-Za-z0-9+/=]\\+\";${d3}outputHash = \"${placeholder}\";${d3}"
+        debug__126_v0 "reset outputHash (pip) delim='${d3}'";
+        __AF_debug126_v0__100_9="$__AF_debug126_v0";
+        echo "$__AF_debug126_v0__100_9" > /dev/null 2>&1
+        sed_inplace__137_v0 "${script3}" "${file}";
+        __AS=$?;
+        __AF_sed_inplace137_v0__101_15="$__AF_sed_inplace137_v0";
+        echo "$__AF_sed_inplace137_v0__101_15" > /dev/null 2>&1
+        prefetch_pip_hash__155_v0 "${root_dir}" "${pyv}" new_pkgs[@] "${pre}";
+        __AF_prefetch_pip_hash155_v0__103_19="${__AF_prefetch_pip_hash155_v0}";
+        local got="${__AF_prefetch_pip_hash155_v0__103_19}"
+        if [ $([ "_${got}" == "_" ]; echo $?) != 0 ]; then
+            pick_delim__138_v0 "${got}" "";
+            __AF_pick_delim138_v0__106_22="${__AF_pick_delim138_v0}";
+            local d4="${__AF_pick_delim138_v0__106_22}"
+            local script4="s${d4}outputHash = \"${placeholder}\";${d4}outputHash = \"${got}\";${d4}"
+            debug__126_v0 "apply outputHash (pip) delim='${d4}'";
+            __AF_debug126_v0__108_13="$__AF_debug126_v0";
+            echo "$__AF_debug126_v0__108_13" > /dev/null 2>&1
+            sed_inplace__137_v0 "${script4}" "${file}";
+            __AS=$?;
+            __AF_sed_inplace137_v0__109_19="$__AF_sed_inplace137_v0";
+            echo "$__AF_sed_inplace137_v0__109_19" > /dev/null 2>&1
             echo "Updated outputHash for ${file}: ${got}"
-        else
-            echo "WARN: Could not prefetch hash for ${file}" >&2
-        fi
-    fi
+else
+            echo_warning__31_v0 "Could not prefetch hash for ${file}";
+            __AF_echo_warning31_v0__112_13="$__AF_echo_warning31_v0";
+            echo "$__AF_echo_warning31_v0__112_13" > /dev/null 2>&1
+fi
+fi
 }
-
-main() {
-    local -a files=()
-    # find candidate files (skip tmux-menu); avoid bash 4+ mapfile for macOS
-    while IFS= read -r f; do
-        files+=("$f")
-    done < <(rg -l "pkgs\\.lib\\.(pip|npm|cargo)\\.mk(.*)GlobalPackageDerivation" -g '!**/tmux-menu/**' "$ROOT_DIR")
-
+declare -r argv=("$0" "$@")
+    debug_mode=0
+    for arg in "${argv[@]}"; do
+        if [ $([ "_${arg}" != "_--debug" ]; echo $?) != 0 ]; then
+            debug_mode=1
+fi
+        if [ $(echo $([ "_${arg}" == "_--debug" ]; echo $?) '&&' $([ "_${arg}" == "_${argv[0]}" ]; echo $?) | bc -l | sed '/\./ s/\.\{0,1\}0\{1,\}$//') != 0 ]; then
+             echo "Unknown option: ${arg}" >&2 ;
+            __AS=$?
+            echo "Usage: ${argv[0]} [--debug]"
+            exit 1
+fi
+done
+    if [ ${debug_mode} != 0 ]; then
+        set_debug__125_v0 1;
+        __AF_set_debug125_v0__24_9="$__AF_set_debug125_v0";
+        echo "$__AF_set_debug125_v0__24_9" > /dev/null 2>&1
+fi
+    require_cmd__122_v0 "rg";
+    __AF_require_cmd122_v0__27_5="$__AF_require_cmd122_v0";
+    echo "$__AF_require_cmd122_v0__27_5" > /dev/null 2>&1
+    require_cmd__122_v0 "sed";
+    __AF_require_cmd122_v0__28_5="$__AF_require_cmd122_v0";
+    echo "$__AF_require_cmd122_v0__28_5" > /dev/null 2>&1
+    require_cmd__122_v0 "jq";
+    __AF_require_cmd122_v0__29_5="$__AF_require_cmd122_v0";
+    echo "$__AF_require_cmd122_v0__29_5" > /dev/null 2>&1
+    require_cmd__122_v0 "nix";
+    __AF_require_cmd122_v0__30_5="$__AF_require_cmd122_v0";
+    echo "$__AF_require_cmd122_v0__30_5" > /dev/null 2>&1
+    require_cmd__122_v0 "curl";
+    __AF_require_cmd122_v0__31_5="$__AF_require_cmd122_v0";
+    echo "$__AF_require_cmd122_v0__31_5" > /dev/null 2>&1
+    get_root_dir__35_v0 ;
+    __AF_get_root_dir35_v0__33_20="${__AF_get_root_dir35_v0}";
+    root_dir="${__AF_get_root_dir35_v0__33_20}"
+    debug__126_v0 "ROOT_DIR: ${root_dir}";
+    __AF_debug126_v0__34_5="$__AF_debug126_v0";
+    echo "$__AF_debug126_v0__34_5" > /dev/null 2>&1
+    __AMBER_VAL_34=$( rg -l "pkgs\.lib\.(pip|npm|cargo)\.mk(.*)GlobalPackageDerivation" -g '!**/tmux-menu/**' "${root_dir}" );
+    __AS=$?;
+    files_raw="${__AMBER_VAL_34}"
+    split__3_v0 "${files_raw}" "
+";
+    __AF_split3_v0__37_17=("${__AF_split3_v0[@]}");
+    files=("${__AF_split3_v0__37_17[@]}")
+    update_happened=0
     for f in "${files[@]}"; do
-        if rg -q "pkgs\\.lib\\.npm\\.mkNpmGlobalPackageDerivation" "$f"; then
-            debug "Processing NPM file: ${f}"
-            process_npm_file "$f"
-        elif rg -q "pkgs\\.lib\\.pip\\.mkPipGlobalPackageDerivation" "$f"; then
-            debug "Processing PIP file: ${f}"
-            process_pip_file "$f"
-        else
-            # cargo or others: skip per requirements
+        if [ $([ "_${f}" != "_" ]; echo $?) != 0 ]; then
             continue
-        fi
-    done
-
-    if [[ $RUN_BUILD -eq 1 ]]; then
-        echo "Running make build (this may stage files due to Makefile)..." >&2
-        make -C "$ROOT_DIR" build || true
-    fi
-
-    if [[ $update_happened -eq 1 ]]; then
-        echo "Updates applied. Review changes and commit if desired." >&2
-    else
-        echo "No updates necessary. All packages are current." >&2
-    fi
-}
-
-main "$@"
+fi
+        __AMBER_VAL_35=$( rg -c "pkgs\.lib\.npm\.mkNpmGlobalPackageDerivation" "${f}" 2>/dev/null || echo "0" );
+        __AS=$?;
+        npm_check="${__AMBER_VAL_35}"
+        __AMBER_VAL_36=$( rg -c "pkgs\.lib\.pip\.mkPipGlobalPackageDerivation" "${f}" 2>/dev/null || echo "0" );
+        __AS=$?;
+        pip_check="${__AMBER_VAL_36}"
+        if [ $([ "_${npm_check}" == "_0" ]; echo $?) != 0 ]; then
+            debug__126_v0 "Processing NPM file: ${f}";
+            __AF_debug126_v0__50_13="$__AF_debug126_v0";
+            echo "$__AF_debug126_v0__50_13" > /dev/null 2>&1
+            process_npm_file__144_v0 update_happened "${root_dir}" "${f}";
+            __AF_process_npm_file144_v0__51_13="$__AF_process_npm_file144_v0";
+            echo "$__AF_process_npm_file144_v0__51_13" > /dev/null 2>&1
+fi
+        if [ $([ "_${pip_check}" == "_0" ]; echo $?) != 0 ]; then
+            debug__126_v0 "Processing PIP file: ${f}";
+            __AF_debug126_v0__54_13="$__AF_debug126_v0";
+            echo "$__AF_debug126_v0__54_13" > /dev/null 2>&1
+            process_pip_file__156_v0 update_happened "${root_dir}" "${f}";
+            __AF_process_pip_file156_v0__55_13="$__AF_process_pip_file156_v0";
+            echo "$__AF_process_pip_file156_v0__55_13" > /dev/null 2>&1
+fi
+done
+    if [ ${update_happened} != 0 ]; then
+        echo_info__29_v0 "Updates applied. Review changes and commit if desired.";
+        __AF_echo_info29_v0__60_9="$__AF_echo_info29_v0";
+        echo "$__AF_echo_info29_v0__60_9" > /dev/null 2>&1
+else
+        echo_info__29_v0 "No updates necessary. All packages are current.";
+        __AF_echo_info29_v0__62_9="$__AF_echo_info29_v0";
+        echo "$__AF_echo_info29_v0__62_9" > /dev/null 2>&1
+fi

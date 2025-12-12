@@ -9,6 +9,10 @@
       url = "github:yegappan/lsp";
       flake = false;
     };
+    vim-eskk = {
+      url = "github:vim-skk/eskk.vim";
+      flake = false;
+    };
   };
 
   outputs =
@@ -62,6 +66,7 @@
             "USE_YAML"
             "USE_VIM"
             "USE_AWK"
+            "USE_SKK"
           ];
           hasVal = key: builtins.getEnv key != "";
         in
@@ -88,6 +93,7 @@
             useYaml = boolEnv "USE_YAML" false;
             useVim = boolEnv "USE_VIM" false;
             useAwk = boolEnv "USE_AWK" false;
+            useSkk = boolEnv "USE_SKK" false;
           }
         else
           {
@@ -109,6 +115,7 @@
             useYaml = true;
             useVim = true;
             useAwk = true;
+            useSkk = true;
           };
       mkPkgs =
         system:
