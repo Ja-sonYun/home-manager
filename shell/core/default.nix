@@ -5,6 +5,8 @@
 }:
 {
   home.packages = with pkgs; [
+    amber-lang
+
     git-wrapped
 
     # archives

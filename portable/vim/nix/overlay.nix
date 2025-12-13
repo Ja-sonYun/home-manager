@@ -18,6 +18,7 @@
     useMakefile = false;
     useCopilot = false;
     useHarper = false;
+    useAmber = false;
     useSkk = false;
   },
 }:
@@ -106,6 +107,13 @@ let
       gawk
     ]
     ++ pkgs.lib.optionals config.useCopilot [ (nodejs_22.override { enableNpm = false; }) ];
+
+  amberPackagesOpt = pkgs.lib.optionals config.useAmber (
+    with pkgs;
+    [
+      amber-lang
+    ]
+  );
 
   skkPackagesOpt = pkgs.lib.optionals config.useSkk (
     with pkgs;
@@ -251,6 +259,7 @@ let
 
   extraPackages = pkgs.lib.concatLists [
     commonPackages
+    amberPackagesOpt
     skkPackagesOpt
     nodePackagesOpt
     pythonPackagesOpt

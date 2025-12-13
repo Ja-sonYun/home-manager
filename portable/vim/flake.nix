@@ -66,6 +66,7 @@
             "USE_YAML"
             "USE_VIM"
             "USE_AWK"
+            "USE_AMBER"
             "USE_SKK"
           ];
           hasVal = key: builtins.getEnv key != "";
@@ -93,6 +94,7 @@
             useYaml = boolEnv "USE_YAML" false;
             useVim = boolEnv "USE_VIM" false;
             useAwk = boolEnv "USE_AWK" false;
+            useAmber = boolEnv "USE_AMBER" false;
             useSkk = boolEnv "USE_SKK" false;
           }
         else
@@ -115,6 +117,7 @@
             useYaml = true;
             useVim = true;
             useAwk = true;
+            useAmber = true;
             useSkk = true;
           };
       mkPkgs =
@@ -132,8 +135,8 @@
         inputs = self.inputs;
         config = cfg;
         vim = {
-          rev = "master";
-          sha256 = "sha256-SIi1xtWrTYL2tzHyABUlPySoi12CLX9AhVdd2Y7b/RI=";
+          rev = "v9.1.1975";
+          sha256 = "sha256-8/xtpRQU/IKu98HSHBNdKzOsv7wDcUi2Z8k+WW5k7Fs=";
         };
       };
 
