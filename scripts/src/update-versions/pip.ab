@@ -1,66 +1,20 @@
 import { split, text_contains, starts_with } from "std/text"
-import { echo_warning } from "../lib/echo.ab"
-import { get_placeholder_hash } from "./config.ab"
+import { echo_info } from "../lib/echo.ab"
 import { debug } from "../lib/debug.ab"
-import { sed_inplace, pick_delim } from "../lib/sed.ab"
+import { sed_inplace } from "../lib/sed.ab"
 
 pub fun latest_pypi_version(name: Text): Text {
     let result = trust $ curl -sL "https://pypi.org/pypi/{name}/json" | jq -r '.info.version' $
     return result
 }
 
-pub fun prefetch_pip_hash(root_dir: Text, python_version: Text, pkgs: [Text], pre_install: Text = ""): Text {
-    let placeholder = get_placeholder_hash()
-    let tmpfile = trust $ mktemp /tmp/prefetch-pip.XXXXXX.nix $
-
-    let pkg_str = ""
-    for p in pkgs {
-        pkg_str = "{pkg_str} \"{p}\""
-    }
-
-    let pre_str = ""
-    if pre_install != "" {
-        pre_str = "preInstall = [ \"{pre_install}\" ];"
-    }
-
-    let nix_content = "let
-  pkgs = import <nixpkgs> \{ \};
-  pipLib = import {root_dir}/libs/pip \{ inherit pkgs; \};
-in pipLib.mkPipGlobalPackageDerivation \{
-  inherit pkgs;
-  name = \"prefetch\";
-  pythonVersion = \"{python_version}\";
-  {pre_str}
-  packages = [{pkg_str} ];
-  exposedBinaries = [ ];
-  outputHash = \"{placeholder}\";
-\}"
-
-    trust $ echo '{nix_content}' > "{tmpfile}" $
-
-    let out = trust $ nix build --impure --expr "(import {tmpfile})" -L 2>&1 || true $
-    trust $ rm -f "{tmpfile}" $
-
-    let hash = trust $ echo "{out}" | sed -n 's/.*got: *\(sha256-[A-Za-z0-9+/=]\+\).*/\1/p' | tail -n1 $
-    return hash
-}
-
-pub fun process_pip_file(ref update_flag: Bool, root_dir: Text, file: Text): Null {
-    let placeholder = get_placeholder_hash()
-    let pyv = trust $ sed -n 's/.*pythonVersion\s*=\s*"\([0-9]\+\)".*/\1/p' "{file}" | head -n1 $
-    if pyv == "" {
-        pyv = "312"
-    }
-
-    let pre = trust $ awk '/preInstall[[:space:]]*=[[:space:]]*\[/\{flag=1;next}/\]/\{if(flag)\{print}; flag=0}flag' "{file}" | sed -n 's/.*"\(.*\)".*/\1/p' | head -n1 $
-
+pub fun process_pip_file(ref update_flag: Bool, file: Text): Null {
     let packages_block = trust $ awk '/packages[[:space:]]*=[[:space:]]*\[/\{flag=1;next}/\]/\{flag=0}flag' "{file}" | sed -n 's/.*"\(.*\)".*/\1/p' $
     let pkgs = split(packages_block, "\n")
 
     debug("pip pkgs parsed from {file}: {len(pkgs)} items")
 
     let changed = false
-    let new_pkgs = [Text]
 
     for i, full in pkgs {
         if full == "" {
@@ -68,7 +22,6 @@ pub fun process_pip_file(ref update_flag: Bool, root_dir: Text, file: Text): Nul
         }
 
         if starts_with(full, "git+") {
-            new_pkgs += [full]
             continue
         }
 
@@ -84,32 +37,15 @@ pub fun process_pip_file(ref update_flag: Bool, root_dir: Text, file: Text): Nul
                 trust sed_inplace(pscript, file)
                 changed = true
                 update_flag = true
-                new_pkgs += ["{name}=={latest}"]
                 echo "Updated pip {name}: {ver} -> {latest} in {file}"
-            } else {
-                new_pkgs += [full]
             }
-        } else {
-            new_pkgs += [full]
         }
     }
 
     if changed {
-        let d3 = pick_delim(placeholder, "")
-        let script3 = "s{d3}outputHash = \"sha256-[A-Za-z0-9+/=]\\+\";{d3}outputHash = \"{placeholder}\";{d3}"
-        debug("reset outputHash (pip) delim='{d3}'")
-        trust sed_inplace(script3, file)
-
-        let got = prefetch_pip_hash(root_dir, pyv, new_pkgs, pre)
-
-        if got != "" {
-            let d4 = pick_delim(got, "")
-            let script4 = "s{d4}outputHash = \"{placeholder}\";{d4}outputHash = \"{got}\";{d4}"
-            debug("apply outputHash (pip) delim='{d4}'")
-            trust sed_inplace(script4, file)
-            echo "Updated outputHash for {file}: {got}"
-        } else {
-            echo_warning("Could not prefetch hash for {file}")
-        }
+        let script_dir = trust $ cd "\$(dirname "\$0")" && pwd $
+        let build_pkg = "{script_dir}/build-pkg"
+        echo_info("Running build-pkg for {file}...")
+        trust $ "{build_pkg}" "{file}" $
     }
 }

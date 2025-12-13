@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Written in [Amber](https://amber-lang.com/)
 # version: 0.4.0-alpha
-# date: 2025-12-12 20:53:47
+# date: 2025-12-13 10:06:14
 echo_info__0_v0() {
     local msg=$1
      tput bold; tput setaf 4; echo "${msg}"; tput sgr0 ;

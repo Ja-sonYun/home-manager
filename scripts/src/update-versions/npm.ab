@@ -1,8 +1,7 @@
 import { split } from "std/text"
-import { echo_warning } from "../lib/echo.ab"
-import { get_placeholder_hash } from "./config.ab"
+import { echo_info } from "../lib/echo.ab"
 import { debug } from "../lib/debug.ab"
-import { sed_inplace, pick_delim } from "../lib/sed.ab"
+import { sed_inplace } from "../lib/sed.ab"
 import { urlencode_npm_pkg } from "../lib/cmd.ab"
 
 pub fun latest_npm_version(name: Text): Text {
@@ -11,45 +10,13 @@ pub fun latest_npm_version(name: Text): Text {
     return result
 }
 
-pub fun prefetch_npm_hash(root_dir: Text, pkgs: [Text]): Text {
-    let placeholder = get_placeholder_hash()
-    let system = trust $ nix eval --raw --impure --expr 'builtins.currentSystem' $
-    let tmpfile = trust $ mktemp /tmp/prefetch-npm.XXXXXX.nix $
-
-    let pkg_str = ""
-    for p in pkgs {
-        pkg_str = "{pkg_str} \"{p}\""
-    }
-
-    let nix_content = "let
-  pkgs = import <nixpkgs> \{ \};
-  npmLib = import {root_dir}/libs/npm \{ inherit pkgs system; \};
-in npmLib.mkNpmGlobalPackageDerivation \{
-  inherit pkgs;
-  name = \"prefetch\";
-  packages = [{pkg_str} ];
-  exposedBinaries = [ ];
-  outputHash = \"{placeholder}\";
-\}"
-
-    trust $ echo '{nix_content}' > "{tmpfile}" $
-
-    let out = trust $ nix build --impure --expr "(import {tmpfile})" -L 2>&1 || true $
-    trust $ rm -f "{tmpfile}" $
-
-    let hash = trust $ echo "{out}" | sed -n 's/.*got: *\(sha256-[A-Za-z0-9+/=]\+\).*/\1/p' | tail -n1 $
-    return hash
-}
-
-pub fun process_npm_file(ref update_flag: Bool, root_dir: Text, file: Text): Null {
-    let placeholder = get_placeholder_hash()
+pub fun process_npm_file(ref update_flag: Bool, file: Text): Null {
     let packages_block = trust $ awk '/packages[[:space:]]*=[[:space:]]*\[/\{flag=1;next}/\]/\{flag=0}flag' "{file}" | sed -n 's/.*"\(.*\)".*/\1/p' $
     let pkgs = split(packages_block, "\n")
 
     debug("npm pkgs parsed from {file}: {len(pkgs)} items")
 
     let changed = false
-    let new_pkgs = [Text]
 
     for i, full in pkgs {
         if full == "" {
@@ -59,7 +26,6 @@ pub fun process_npm_file(ref update_flag: Bool, root_dir: Text, file: Text): Nul
         let ver = trust $ echo "{full}" | sed 's/.*@//' $
 
         if base == full {
-            new_pkgs += [full]
             continue
         }
 
@@ -71,29 +37,14 @@ pub fun process_npm_file(ref update_flag: Bool, root_dir: Text, file: Text): Nul
             trust sed_inplace(sed_script, file)
             changed = true
             update_flag = true
-            new_pkgs += ["{base}@{latest}"]
             echo "Updated npm {base}: {ver} -> {latest} in {file}"
-        } else {
-            new_pkgs += [full]
         }
     }
 
     if changed {
-        let d1 = pick_delim(placeholder, "")
-        let script1 = "s{d1}outputHash = \"sha256-[A-Za-z0-9+/=]\\+\";{d1}outputHash = \"{placeholder}\";{d1}"
-        debug("reset outputHash with delim='{d1}'")
-        trust sed_inplace(script1, file)
-
-        let got = prefetch_npm_hash(root_dir, new_pkgs)
-
-        if got != "" {
-            let d2 = pick_delim(got, "")
-            let script2 = "s{d2}outputHash = \"{placeholder}\";{d2}outputHash = \"{got}\";{d2}"
-            debug("apply outputHash with delim='{d2}'")
-            trust sed_inplace(script2, file)
-            echo "Updated outputHash for {file}: {got}"
-        } else {
-            echo_warning("Could not prefetch hash for {file}")
-        }
+        let script_dir = trust $ cd "\$(dirname "\$0")" && pwd $
+        let build_pkg = "{script_dir}/build-pkg"
+        echo_info("Running build-pkg for {file}...")
+        trust $ "{build_pkg}" "{file}" $
     }
 }

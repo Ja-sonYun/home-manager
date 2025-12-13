@@ -48,11 +48,11 @@ main (argv) {
 
         if npm_check != "0" {
             debug("Processing NPM file: {f}")
-            process_npm_file(update_happened, root_dir, f)
+            process_npm_file(update_happened, f)
         }
         if pip_check != "0" {
             debug("Processing PIP file: {f}")
-            process_pip_file(update_happened, root_dir, f)
+            process_pip_file(update_happened, f)
         }
     }
 
