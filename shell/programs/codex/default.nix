@@ -79,7 +79,7 @@ in
   };
 
   age.secrets.codex = {
-    file = "${agenix-secrets}/agent.age";
+    file = "${agenix-secrets}/encrypted/agent.age";
     path = "${userhome}/.codex/AGENTS.md";
   };
 }
