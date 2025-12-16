@@ -61,6 +61,7 @@ let
       ];
     };
   };
+  managedSettingsFile = pkgs.writeText "claude-managed-settings.json" (builtins.toJSON settings);
   mcpServers = {
     github = {
       command = pkgs.writeShellScript "github-mcp-wrapper" ''
@@ -120,10 +121,10 @@ in
     pkgs.claude-code
   ];
 
-  home.file."claude/settings.json" = {
-    target = ".claude/settings.json";
-    force = true;
+  home.file."claude/settings.nix.json" = {
+    target = ".claude/settings.nix.json";
     text = builtins.toJSON settings;
+    force = true;
   };
   home.file."Library/Application Support/Claude/claude_desktop_config.json" = {
     target = "Library/Application Support/Claude/claude_desktop_config.json";
@@ -140,6 +141,13 @@ in
         '(try input catch {}) | .mcpServers = $new[0].mcpServers'          \
         ~/.claude.json > temp.json                                         \
       && mv temp.json ~/.claude.json
+  '';
+
+  home.activation.inject-claude-code-settings = lib.hm.dag.entryBefore [ "writeBoundary" ] ''
+    ${pkgs.python3}/bin/python3 ${./merge-claude-settings.py} \
+      ~/.claude/settings.json \
+      ${managedSettingsFile} \
+      ~/.claude/settings.nix.json
   '';
 
   age.secrets.claude = {
