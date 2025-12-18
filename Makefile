@@ -22,12 +22,15 @@ update-vim:
 update-raw: update-vim
 	nix flake update
 
+update-pkgs: update-raw
+	./scripts/update-versions
+
 update:
 	@sh -c 'set -eu; \
 	orig_ulimit=$$(ulimit -n || echo 0); \
 	trap "ulimit -n $$orig_ulimit >/dev/null 2>&1 || true" EXIT; \
 	if [ "$$orig_ulimit" -lt 65536 ] 2>/dev/null; then ulimit -n 65536 || true; fi; \
-		$(MAKE) update-raw'
+		$(MAKE) update-raw update-pkgs'
 
 add:
 	git add .
