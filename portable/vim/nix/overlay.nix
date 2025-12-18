@@ -84,6 +84,9 @@ let
     ]
     ++ pkgs.lib.optionals config.useCopilot [
       copilot-vim
+    ]
+    ++ pkgs.lib.optionals config.useMarkdown [
+      markdown-preview-nvim
     ];
 
   # TODO:
