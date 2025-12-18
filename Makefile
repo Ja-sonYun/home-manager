@@ -1,4 +1,10 @@
-.DEFAULT_GOAL := deploy
+MAKEFLAGS += --no-print-directory
+
+include .mkutils/colors.mk
+include .mkutils/help.mk
+
+HELP_PROJECT_NAME := Dotfiles
+HELP_WIDTH := 20
 
 HOSTNAME := $(shell hostname -s)
 SYSTEM := $(shell uname -s)
@@ -16,21 +22,70 @@ ifdef TRACE
 NIX_TRACE_ARGS := --show-trace
 endif
 
-update-vim:
+
+# ==================================================================================
+##@ Update
+
+update-vim: ## Update vim flake
 	cd ./portable/vim && nix flake update
 
-update-raw: update-vim
+update-raw: update-vim ## Update all flakes
 	nix flake update
 
-update-pkgs: update-raw
+update-pkgs: update-raw ## Update flakes and package versions
 	./scripts/update-versions
 
-update:
+update: ## Full update with ulimit fix
 	@sh -c 'set -eu; \
 	orig_ulimit=$$(ulimit -n || echo 0); \
 	trap "ulimit -n $$orig_ulimit >/dev/null 2>&1 || true" EXIT; \
 	if [ "$$orig_ulimit" -lt 65536 ] 2>/dev/null; then ulimit -n 65536 || true; fi; \
 		$(MAKE) update-raw update-pkgs'
+# ==================================================================================
+
+
+
+# ==================================================================================
+ifeq ($(SYSTEM),Linux)
+##@ Linux
+
+install: ## Install nix daemon
+	sh <(curl -L https://nixos.org/nix/install) --daemon
+
+deploy: add lock ## Deploy home-manager config
+	nix run nixpkgs#nh home switch .#homeConfigurations.$(HOSTNAME)
+endif
+# ==================================================================================
+
+
+
+# ==================================================================================
+ifeq ($(SYSTEM),Darwin)
+##@ Darwin
+
+build: add lock ## Build nix-darwin config
+	$(NIX) build .#darwinConfigurations.$(HOSTNAME).system $(NIX_TRACE_ARGS)
+
+show-derivations: ## Show derivation details
+	nix show-derivation .#darwinConfigurations.$(HOSTNAME).system
+
+deploy: build ## Deploy nix-darwin config
+	nix run nixpkgs#nh darwin switch .#darwinConfigurations.$(HOSTNAME)
+endif
+# ==================================================================================
+
+
+
+# ==================================================================================
+##@ Maintenance
+
+clean: ## Clean nix store
+	nix run nixpkgs#nh clean
+# ==================================================================================
+
+
+
+#---
 
 add:
 	git add .
@@ -39,24 +94,3 @@ lock: add
 	nix flake update vim
 	nix flake update server
 
-ifeq ($(SYSTEM),Darwin)
-build: add lock
-	$(NIX) build .#darwinConfigurations.$(HOSTNAME).system $(NIX_TRACE_ARGS)
-
-deploy: build
-	nix run nixpkgs#nh darwin switch .#darwinConfigurations.$(HOSTNAME)
-
-show-derivations:
-	nix show-derivation .#darwinConfigurations.$(HOSTNAME).system
-endif
-
-ifeq ($(SYSTEM),Linux)
-install:
-	sh <(curl -L https://nixos.org/nix/install) --daemon
-
-deploy: add lock
-	nix run nixpkgs#nh home switch .#homeConfigurations.$(HOSTNAME)
-endif
-
-clean:
-	nix run nixpkgs#nh clean
