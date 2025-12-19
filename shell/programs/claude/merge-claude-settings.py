@@ -66,4 +66,5 @@ if __name__ == "__main__":
     settings = remove_deleted(settings, prev, managed)
     settings = merge_dicts(settings, managed)
 
+    settings_path.parent.mkdir(parents=True, exist_ok=True)
     settings_path.write_text(json.dumps(settings, indent=2))
