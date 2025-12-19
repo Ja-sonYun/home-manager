@@ -12,10 +12,15 @@
       term = "xterm-256color";
 
       # Font
-      font-family = [
-        "BigBlue_TerminalPlus Nerd Font"
-        "Hiragino Sans"
+      font-family = "BigBlue_TerminalPlus Nerd Font";
+      font-codepoint-map = [
+        "U+3040-U+309F=Hiragino Sans"
+        "U+30A0-U+30FF=Hiragino Sans"
+        "U+4E00-U+9FFF=Hiragino Sans"
+        "U+3400-U+4DBF=Hiragino Sans"
+        "U+FF00-U+FFEF=Hiragino Sans"
       ];
+
       font-family-bold = "BigBlue_TerminalPlus Nerd Font";
       font-family-italic = "BigBlue_TerminalPlus Nerd Font";
       font-family-bold-italic = "BigBlue_TerminalPlus Nerd Font";
