@@ -85,6 +85,22 @@ clean: ## Clean nix store
 
 
 
+# ==================================================================================
+##@ Git
+
+init-submodules: ## Initialize all submodules
+	git submodule update --init --recursive
+
+fix-submodules: ## Fix broken submodules (deinit + reinit)
+	git submodule deinit --all -f
+	git submodule update --init --recursive
+
+update-submodules: ## Update all submodules to latest
+	git submodule update --remote --recursive
+# ==================================================================================
+
+
+
 #---
 
 add:
