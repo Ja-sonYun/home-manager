@@ -10,11 +10,11 @@
   },
   "Jasons-MacBook-Server": {
     "codex": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-    "claude-code": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-    "awscli-local": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-    "tmux-menu": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-    "context7-mcp": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-    "playwright-mcp": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-    "aws-documentation": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    "claude-code": "sha256-UgeXGz96rfkvgVt3agNLQvQ6/JUUN6isCh2JBhmcqQ4=",
+    "awscli-local": "sha256-g+hS6GlybNrvfSUH7TNzACNlbsCj4auMY0au5+sMh6E=",
+    "tmux-menu": "sha256-aPxtJE4YI4wZWvpIQ7Qv31gH8tDwGklt3isWNTZ/Adw=",
+    "context7-mcp": "sha256-8ZpuEppidVkrbS6hlrtKFxwWeui5cDOsJT0di1L7gcA=",
+    "playwright-mcp": "sha256-KnHOzDHyysAxl2196/nwl5t3E9IVHBZrUCivVLfZSDI=",
+    "aws-documentation": "sha256-yE2kddJNSGSvLBdKmIwA4/m+ed55YUEWy1/DYyxb6do="
   }
 }
