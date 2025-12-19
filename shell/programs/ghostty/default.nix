@@ -12,7 +12,13 @@
       term = "xterm-256color";
 
       # Font
-      font-family = "BigBlue_TerminalPlus Nerd Font";
+      font-family = [
+        "BigBlue_TerminalPlus Nerd Font"
+        "Hiragino Sans"
+      ];
+      font-family-bold = "BigBlue_TerminalPlus Nerd Font";
+      font-family-italic = "BigBlue_TerminalPlus Nerd Font";
+      font-family-bold-italic = "BigBlue_TerminalPlus Nerd Font";
       font-style = "Book";
       font-size = 11;
 
