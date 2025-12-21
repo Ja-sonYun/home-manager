@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
   issues: write
   id-token: write
 
@@ -22,11 +22,39 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.client_payload.sha || github.sha }}
 
+      - name: Get last review commit
+        id: last-review
+        run: |
+          if git rev-parse last-security-review >/dev/null 2>&1; then
+            echo "sha=$(git rev-parse last-security-review)" >> $GITHUB_OUTPUT
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "sha=$(git rev-list --max-parents=0 HEAD)" >> $GITHUB_OUTPUT
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get diff summary
+        id: diff
+        run: |
+          CURRENT_SHA="${{ github.event.client_payload.sha || github.sha }}"
+          DIFF=$(git diff --stat ${{ steps.last-review.outputs.sha }}..$CURRENT_SHA)
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          echo "$DIFF" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
-            Review this dotfiles repository for security risks. Use multiple agents to thoroughly analyze:
+            Review ONLY the changes since the last security review.
+
+            Last reviewed commit: ${{ steps.last-review.outputs.sha }}
+            Current commit: ${{ github.event.client_payload.sha || github.sha }}
+
+            Changes to review:
+            ${{ steps.diff.outputs.changes }}
+
+            Use: git diff ${{ steps.last-review.outputs.sha }}..${{ github.event.client_payload.sha || github.sha }}
 
             Repository visibility:
             - home-manager (this repo): PUBLIC
@@ -44,8 +72,6 @@ jobs:
             4. Overly permissive file permissions
             5. Hardcoded sensitive information that shouldn't be public
 
-            Commit SHA: ${{ github.event.client_payload.sha || github.sha }}
-
             If you find ANY security issues:
             - Create a GitHub Issue with title "[Security] Potential vulnerabilities found in commit"
             - Label it with "security"
@@ -53,3 +79,12 @@ jobs:
 
             If no issues found, just output "No security issues found" to the summary.
           claude_args: "--max-turns 40"
+
+      - name: Update last review tag
+        if: success()
+        run: |
+          CURRENT_SHA="${{ github.event.client_payload.sha || github.sha }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f last-security-review $CURRENT_SHA
+          git push origin last-security-review --force
