@@ -1,0 +1,30 @@
+name: Nix Flake Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - '**.nix'
+      - 'flake.lock'
+      - '.github/workflows/nix-check.yml'
+
+concurrency:
+  group: nix-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flake-check:
+    name: Nix Flake Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Run flake check
+        run: nix flake check --all-systems --no-build
