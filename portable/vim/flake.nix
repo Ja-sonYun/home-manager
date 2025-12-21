@@ -13,11 +13,17 @@
       url = "github:vim-skk/eskk.vim";
       flake = false;
     };
+
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     { self
     , nixpkgs
+    , git-hooks
     , ...
     }:
     let
@@ -141,6 +147,15 @@
         };
       };
 
+      checks = forAllSystems (
+        system: {
+          pre-commit-check = git-hooks.lib.${system}.run {
+            src = ./.;
+            hooks.nixpkgs-fmt.enable = true;
+          };
+        }
+      );
+
       packages = forAllSystems (
         system:
         let
@@ -163,8 +178,9 @@
             name = "vim-devshell";
             buildInputs = [
               pkgs.vim-dev
-            ];
+            ] ++ self.checks.${system}.pre-commit-check.enabledPackages;
             shellHook = ''
+              ${self.checks.${system}.pre-commit-check.shellHook}
               ln -Tfns "$PWD/vim" ~/.config/vim-dev
 
               mkdir -p ~/.config/vim-plugins/site/pack/dev/start
