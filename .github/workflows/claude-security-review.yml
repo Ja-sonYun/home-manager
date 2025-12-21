@@ -79,7 +79,7 @@ jobs:
             - Do NOT ask for permission, just create the issue directly.
             - Do NOT write a report or summary. Only create issues.
             - If no issues found, just output "No security issues found".
-          claude_args: "--max-turns 10"
+          claude_args: "--max-turns 50"
 
       - name: Update last review tag
         if: success()
