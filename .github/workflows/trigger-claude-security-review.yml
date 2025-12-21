@@ -1,4 +1,4 @@
-name: Trigger Claude
+name: Trigger Claude Security Review
 
 on:
   push:
