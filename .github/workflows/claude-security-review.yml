@@ -21,6 +21,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.client_payload.sha || github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get last review commit
         id: last-review
@@ -45,8 +46,9 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          allowed_tools: "Bash(gh issue create:*),Bash(gh issue list:*),Bash(git diff:*),Bash(git log:*),Read,Glob,Grep"
           prompt: |
-            Review ONLY the changes since the last security review.
+            Review ONLY the changes since the last security review. DO NOT write a report.
 
             Last reviewed commit: ${{ steps.last-review.outputs.sha }}
             Current commit: ${{ github.event.client_payload.sha || github.sha }}
@@ -72,19 +74,21 @@ jobs:
             4. Overly permissive file permissions
             5. Hardcoded sensitive information that shouldn't be public
 
-            If you find ANY security issues:
-            - Create a GitHub Issue with title "[Security] Potential vulnerabilities found in commit"
-            - Label it with "security"
-            - Include detailed findings and recommendations
-
-            If no issues found, just output "No security issues found" to the summary.
+            IMPORTANT:
+            - If you find security issues, IMMEDIATELY create a GitHub Issue using: gh issue create --title "[Security] ..." --label "security" --body "..."
+            - Do NOT ask for permission, just create the issue directly.
+            - Do NOT write a report or summary. Only create issues.
+            - If no issues found, just output "No security issues found".
           claude_args: "--max-turns 40"
 
       - name: Update last review tag
         if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           CURRENT_SHA="${{ github.event.client_payload.sha || github.sha }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           git tag -f last-security-review $CURRENT_SHA
           git push origin last-security-review --force
