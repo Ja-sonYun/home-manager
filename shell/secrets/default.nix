@@ -24,6 +24,9 @@
     deepseek-api-key = {
       file = "${agenix-secrets}/encrypted/deepseek-api-key.age";
     };
+    claude-bundle = {
+      file = "${agenix-secrets}/encrypted/claude-bundle.age";
+    };
   };
 
   home.sessionVariables = {

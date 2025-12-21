@@ -155,4 +155,13 @@ in
     file = "${agenix-secrets}/encrypted/agent.age";
     path = "${userhome}/.claude/CLAUDE.md";
   };
+
+  home.activation.extract-claude-bundle = lib.hm.dag.entryAfter [ "agenix" ] ''
+    ARCHIVE="${config.age.secrets.claude-bundle.path}"
+    CLAUDE_DIR="${userhome}/.claude"
+
+    if [ -f "$ARCHIVE" ]; then
+      ${pkgs.gnutar}/bin/tar -xf "$ARCHIVE" -C "$CLAUDE_DIR"
+    fi
+  '';
 }
