@@ -122,6 +122,7 @@
       ".hooks"
       "pyrefly.toml"
       ".vim_vars.json"
+      ".playwright-mcp"
     ];
 
     includes = [
