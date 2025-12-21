@@ -79,6 +79,12 @@ endif
 # ==================================================================================
 ##@ Maintenance
 
+fmt: ## Format nix files
+	nixpkgs-fmt .
+
+check: ## Run pre-commit checks
+	pre-commit run --all-files
+
 clean: ## Clean nix store
 	nix run nixpkgs#nh clean
 # ==================================================================================

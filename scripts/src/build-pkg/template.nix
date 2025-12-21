@@ -8,4 +8,5 @@ let
     hashfile = hashfile."${hostname}";
     lib = pkgs.lib // customLibs;
   };
-in pkgs.callPackage __FILE__ { pkgs = finalPkgs; }
+in
+pkgs.callPackage __FILE__ { pkgs = finalPkgs; }

@@ -11,46 +11,46 @@ let
       "aarch64-darwin" = "aarch64-apple-darwin";
       "x86_64-darwin" = "x86_64-apple-darwin";
       "x86_64-linux" = "x86_64-unknown-linux-gnu";
-    }
-    ."${system}";
+    }."${system}";
   sha256 = {
     "https://static.rust-lang.org/dist/rust-1.75.0-aarch64-apple-darwin.tar.xz" =
       "sha256-aQmjlCw6uW0IBNuuC2or5CAa/3MJEcM9XD3HTtWgwNU=";
   };
   mkRustUrl =
     version: targetSystem: "https://static.rust-lang.org/dist/rust-${version}-${targetSystem}.tar.xz";
-  rustBinary = pkgs.lib.mapAttrs (
-    edition: version:
-    pkgs.stdenv.mkDerivation {
-      name = "rust-${version}";
-      src = pkgs.fetchurl {
-        url = mkRustUrl version targetSystem;
-        sha256 = sha256."${mkRustUrl version targetSystem}";
-      };
-      nativeBuildInputs = [ pkgs.xz ];
-      dontConfigure = true;
-      dontBuild = true;
-      installPhase = ''
-        tar xf $src
-        cd rust-${version}-${targetSystem}
-        ./install.sh \
-          --prefix=$out \
-          --components=rustc,rust-std-${targetSystem},cargo
-      '';
-    }
-  ) targetRustVersion;
+  rustBinary = pkgs.lib.mapAttrs
+    (
+      edition: version:
+        pkgs.stdenv.mkDerivation {
+          name = "rust-${version}";
+          src = pkgs.fetchurl {
+            url = mkRustUrl version targetSystem;
+            sha256 = sha256."${mkRustUrl version targetSystem}";
+          };
+          nativeBuildInputs = [ pkgs.xz ];
+          dontConfigure = true;
+          dontBuild = true;
+          installPhase = ''
+            tar xf $src
+            cd rust-${version}-${targetSystem}
+            ./install.sh \
+              --prefix=$out \
+              --components=rustc,rust-std-${targetSystem},cargo
+          '';
+        }
+    )
+    targetRustVersion;
 in
 {
   mkCargoGlobalPackageDerivation =
-    {
-      pkgs,
-      name,
-      version ? "latest",
-      rustEdition ? "2021",
-      outputHash ? null,
-      postBuild ? "",
-      postInstall ? "",
-      ...
+    { pkgs
+    , name
+    , version ? "latest"
+    , rustEdition ? "2021"
+    , outputHash ? null
+    , postBuild ? ""
+    , postInstall ? ""
+    , ...
     }:
 
     let

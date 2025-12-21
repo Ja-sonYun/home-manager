@@ -9,3 +9,4 @@ result/
 .direnv
 .pycache
 __pycache__
+.pre-commit-config.yaml

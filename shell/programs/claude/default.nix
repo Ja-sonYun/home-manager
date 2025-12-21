@@ -1,10 +1,9 @@
-{
-  pkgs,
-  lib,
-  config,
-  agenix-secrets,
-  userhome,
-  ...
+{ pkgs
+, lib
+, config
+, agenix-secrets
+, userhome
+, ...
 }:
 let
   settings = {

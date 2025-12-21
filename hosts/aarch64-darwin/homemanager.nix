@@ -1,8 +1,7 @@
-{
-  username,
-  userhome,
-  machine,
-  ...
+{ username
+, userhome
+, machine
+, ...
 }:
 {
   imports = (

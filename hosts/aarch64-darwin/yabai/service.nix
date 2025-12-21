@@ -1,8 +1,7 @@
-{
-  cacheDir,
-  pkgs,
-  config,
-  ...
+{ cacheDir
+, pkgs
+, config
+, ...
 }:
 let
   originalConfigFile = builtins.readFile ./yabairc;

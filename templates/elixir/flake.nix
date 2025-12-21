@@ -80,25 +80,25 @@
                 nodejs_20
               ]
               ++
-                # Linux only
-                pkgs.lib.optionals pkgs.stdenv.isLinux (
-                  with pkgs;
-                  [
-                    gigalixir
-                    inotify-tools
-                    libnotify
-                  ]
-                )
+              # Linux only
+              pkgs.lib.optionals pkgs.stdenv.isLinux (
+                with pkgs;
+                [
+                  gigalixir
+                  inotify-tools
+                  libnotify
+                ]
+              )
               ++
-                # macOS only
-                pkgs.lib.optionals pkgs.stdenv.isDarwin (
-                  with pkgs;
-                  [
-                    terminal-notifier
-                    darwin.apple_sdk.frameworks.CoreFoundation
-                    darwin.apple_sdk.frameworks.CoreServices
-                  ]
-                );
+              # macOS only
+              pkgs.lib.optionals pkgs.stdenv.isDarwin (
+                with pkgs;
+                [
+                  terminal-notifier
+                  darwin.apple_sdk.frameworks.CoreFoundation
+                  darwin.apple_sdk.frameworks.CoreServices
+                ]
+              );
           };
         }
       );

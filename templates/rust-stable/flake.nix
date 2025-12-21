@@ -10,10 +10,10 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      rust-overlay,
+    { self
+    , nixpkgs
+    , rust-overlay
+    ,
     }:
     let
       supportedSystems = [

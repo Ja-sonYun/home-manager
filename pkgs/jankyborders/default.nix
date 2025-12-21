@@ -1,12 +1,11 @@
 # https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/by-name/ja/jankyborders/package.nix#L43
-{
-  lib,
-  stdenv,
-  fetchFromGitHub,
-  pkg-config,
-  testers ? null,
-  nix-update-script ? null,
-  ...
+{ lib
+, stdenv
+, fetchFromGitHub
+, pkg-config
+, testers ? null
+, nix-update-script ? null
+, ...
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "JankyBorders";

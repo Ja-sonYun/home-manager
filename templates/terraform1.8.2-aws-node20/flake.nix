@@ -5,10 +5,10 @@
   inputs.nixpkgs-terraform.url = "github:NixOS/nixpkgs/0c19708cf035f50d28eb4b2b8e7a79d4dc52f6bb";
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      nixpkgs-terraform,
+    { self
+    , nixpkgs
+    , nixpkgs-terraform
+    ,
     }:
     let
       supportedSystems = [
@@ -40,9 +40,9 @@
     in
     {
       devShells = forEachSupportedSystem (
-        {
-          pkgs,
-          pkgs-terraform,
+        { pkgs
+        , pkgs-terraform
+        ,
         }:
         {
           default = pkgs.mkShell {

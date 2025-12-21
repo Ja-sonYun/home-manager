@@ -1,6 +1,5 @@
-{
-  pkgs,
-  # userhome,
+{ pkgs
+, # userhome,
   ...
 }:
 #let

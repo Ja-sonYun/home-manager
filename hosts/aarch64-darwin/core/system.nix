@@ -1,8 +1,7 @@
-{
-  configDir,
-  machine,
-  username,
-  ...
+{ configDir
+, machine
+, username
+, ...
 }:
 
 let
@@ -17,13 +16,13 @@ let
 in
 
 ###################################################################################
-#
-#  macOS's System configuration
-#
-#  All the configuration options are documented here:
-#    https://daiderd.com/nix-darwin/manual/index.html#sec-options
-#
-###################################################################################
+  #
+  #  macOS's System configuration
+  #
+  #  All the configuration options are documented here:
+  #    https://daiderd.com/nix-darwin/manual/index.html#sec-options
+  #
+  ###################################################################################
 {
   system = {
     stateVersion = 5;

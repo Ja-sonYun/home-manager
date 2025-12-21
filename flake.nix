@@ -69,30 +69,31 @@
       url = ./shell/secrets/agenix;
       flake = false;
     };
+
+    # Git hooks for pre-commit
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    inputs@{
-      self,
-
-      nixpkgs,
-      home-manager,
-
-      nixpkgs-stable,
-      home-manager-stable,
-
-      darwin,
-      nix-homebrew,
-      homebrew-bundle,
-      homebrew-core,
-      homebrew-cask,
-
-      vim,
-      say,
-
-      agenix,
-      agenix-secrets,
-      ...
+    inputs@{ self
+    , nixpkgs
+    , home-manager
+    , nixpkgs-stable
+    , home-manager-stable
+    , darwin
+    , nix-homebrew
+    , homebrew-bundle
+    , homebrew-core
+    , homebrew-cask
+    , vim
+    , say
+    , agenix
+    , agenix-secrets
+    , git-hooks
+    , ...
     }:
     let
       specialArgsPrepared = {
@@ -191,9 +192,9 @@
 
       mkX86_64LinuxHomeConfiguration =
         hostname:
-        opts@{
-          useNvidia ? false,
-          isVM ? false,
+        opts@{ useNvidia ? false
+        , isVM ? false
+        ,
         }:
         let
           pkgs = mkPkgsProvider system hostname;
@@ -211,8 +212,8 @@
 
       mkAarch64DarwinHomeConfiguration =
         hostname:
-        opts@{
-          machine ? "main", # "main" or "server"
+        opts@{ machine ? "main"
+        , # "main" or "server"
         }:
         let
           pkgs = mkPkgsProvider system hostname;
@@ -255,8 +256,31 @@
             }
           ];
         };
+
+      supportedSystems = [ "aarch64-darwin" "x86_64-linux" ];
+      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     in
     {
+      checks = forAllSystems (system: {
+        pre-commit-check = git-hooks.lib.${system}.run {
+          src = ./.;
+          hooks = {
+            nixpkgs-fmt.enable = true;
+          };
+        };
+      });
+      devShells = forAllSystems (system:
+        let pkgs = nixpkgs.legacyPackages.${system};
+        in {
+          default = pkgs.mkShell {
+            inherit (self.checks.${system}.pre-commit-check) shellHook;
+            buildInputs = self.checks.${system}.pre-commit-check.enabledPackages ++ [
+              pkgs.amber-lang
+            ];
+          };
+        }
+      );
+
       darwinConfigurations."JasonYuns-MacBook-Pro" =
         mkAarch64DarwinHomeConfiguration "JasonYuns-MacBook-Pro"
           {

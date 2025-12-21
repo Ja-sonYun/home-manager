@@ -16,10 +16,9 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      ...
+    { self
+    , nixpkgs
+    , ...
     }:
     let
       systems = [
@@ -31,10 +30,12 @@
       forAllSystems =
         f:
         builtins.listToAttrs (
-          map (system: {
-            name = system;
-            value = f system;
-          }) systems
+          map
+            (system: {
+              name = system;
+              value = f system;
+            })
+            systems
         );
 
       # env-driven toggles

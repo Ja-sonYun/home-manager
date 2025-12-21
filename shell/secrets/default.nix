@@ -1,9 +1,8 @@
-{
-  config,
-  pkgs,
-  agenix-secrets,
-  agenix,
-  ...
+{ config
+, pkgs
+, agenix-secrets
+, agenix
+, ...
 }:
 {
   home.packages = [ agenix.packages.${pkgs.system}.default ];

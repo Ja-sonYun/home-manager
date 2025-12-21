@@ -1,7 +1,6 @@
-{
-  pkgs,
-  configDir,
-  ...
+{ pkgs
+, configDir
+, ...
 }:
 {
   home.packages = with pkgs; [

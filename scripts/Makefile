@@ -8,8 +8,6 @@ HELP_WIDTH := 20
 
 include ../.mkutils/help.mk
 
-AMBER := nix run nixpkgs\#amber-lang --
-
 SCRIPTS := update-versions build-pkg
 
 ##@ Build
@@ -17,16 +15,16 @@ SCRIPTS := update-versions build-pkg
 build:: $(SCRIPTS) ## Compile all amber scripts
 
 update-versions:: ## Compile update-versions
-	@$(AMBER) build src/update-versions/main.ab $@
+	@amber build src/update-versions/main.ab $@
 	$(call print_success,"Built $@")
 
 build-pkg:: ## Compile build-pkg
-	@$(AMBER) build src/build-pkg/main.ab $@
+	@amber build src/build-pkg/main.ab $@
 	$(call print_success,"Built $@")
 
 check:: ## Check amber syntax for all scripts
-	@$(AMBER) check src/update-versions/main.ab
-	@$(AMBER) check src/build-pkg/main.ab
+	@amber check src/update-versions/main.ab
+	@amber check src/build-pkg/main.ab
 	$(call print_success,"Syntax OK")
 
 clean:: ## Remove compiled scripts
@@ -36,7 +34,7 @@ clean:: ## Remove compiled scripts
 ##@ Run
 
 run-update-versions:: ## Run update-versions directly
-	@$(AMBER) run src/update-versions/main.ab -- $(RUN_ARGS)
+	@amber run src/update-versions/main.ab -- $(RUN_ARGS)
 
 run-build-pkg:: ## Run build-pkg directly
-	@$(AMBER) run src/build-pkg/main.ab -- $(RUN_ARGS)
+	@amber run src/build-pkg/main.ab -- $(RUN_ARGS)

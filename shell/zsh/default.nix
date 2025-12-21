@@ -1,8 +1,7 @@
-{
-  pkgs,
-  cacheDir,
-  configDir,
-  ...
+{ pkgs
+, cacheDir
+, configDir
+, ...
 }:
 {
   imports = [

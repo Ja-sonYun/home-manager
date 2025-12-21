@@ -8,8 +8,7 @@ let
       "aarch64-darwin" = "darwin-arm64";
       "x86_64-darwin" = "darwin-x64";
       "x86_64-linux" = "linux-x64";
-    }
-    ."${system}";
+    }."${system}";
   sha256 = {
     "https://nodejs.org/dist/v22.15.1/node-v22.15.1-darwin-arm64.tar.gz" =
       "sha256-0mibhrF+G1Hnb4Af/i2azKQiXnbtpLhDw9hDjUp81v4=";
@@ -17,43 +16,44 @@ let
   mkNpmUrl =
     version: targetSystem:
     "https://nodejs.org/dist/v${version}/node-v${version}-${targetSystem}.tar.gz";
-  nodeBinary = pkgs.lib.mapAttrs (
-    name: version:
-    pkgs.stdenv.mkDerivation {
-      name = "node-${version}";
-      src = pkgs.fetchurl {
-        url = mkNpmUrl version targetSystem;
-        sha256 = sha256."${mkNpmUrl version targetSystem}";
-      };
-      installPhase = ''
-        runHook preInstall
+  nodeBinary = pkgs.lib.mapAttrs
+    (
+      name: version:
+        pkgs.stdenv.mkDerivation {
+          name = "node-${version}";
+          src = pkgs.fetchurl {
+            url = mkNpmUrl version targetSystem;
+            sha256 = sha256."${mkNpmUrl version targetSystem}";
+          };
+          installPhase = ''
+            runHook preInstall
 
-        mkdir -p $out
-        tar -C $out --strip-components=1 -xzf $src
+            mkdir -p $out
+            tar -C $out --strip-components=1 -xzf $src
 
-        runHook postInstall
-      '';
-    }
-  ) targetNodeVersion;
+            runHook postInstall
+          '';
+        }
+    )
+    targetNodeVersion;
 in
 {
   mkNpmGlobalPackageDerivation =
-    {
-      pkgs,
-      name,
-      packages ? [ ], # List of packages to install, e.g. ["npm" "yarn" "express@latest"]
-      exposedBinaries ? [ ],
-      buildInputs ? [ ],
-      postFixup ?
-        {
-          node ? null,
-        }:
-        "",
-      postBuild ? "",
-      postInstall ? "",
-      outputHash ? null,
-      nodeVersion ? "22",
-      ...
+    { pkgs
+    , name
+    , packages ? [ ]
+    , # List of packages to install, e.g. ["npm" "yarn" "express@latest"]
+      exposedBinaries ? [ ]
+    , buildInputs ? [ ]
+    , postFixup ? { node ? null
+                  ,
+                  }:
+        ""
+    , postBuild ? ""
+    , postInstall ? ""
+    , outputHash ? null
+    , nodeVersion ? "22"
+    , ...
     }:
     let
       packagesRequirements = pkgs.lib.concatStringsSep " " packages;

@@ -1,8 +1,7 @@
-{
-  cacheDir,
-  pkgs,
-  config,
-  ...
+{ cacheDir
+, pkgs
+, config
+, ...
 }:
 {
   launchd.user.agents.sketchybar = {

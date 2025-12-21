@@ -21,8 +21,8 @@ pkgs.lib.npm.mkNpmGlobalPackageDerivation {
       --set DISABLE_TELEMETRY       1
   '';
   postFixup =
-    {
-      node,
+    { node
+    ,
     }:
     ''
       # Use global env rather than coreutils's env

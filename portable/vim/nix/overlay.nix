@@ -1,8 +1,6 @@
-{
-  inputs,
-  vim ? null,
-
-  config ? {
+{ inputs
+, vim ? null
+, config ? {
     useGo = false;
     useRust = false;
     usePython = false;
@@ -20,7 +18,8 @@
     useHarper = false;
     useAmber = false;
     useSkk = false;
-  },
+  }
+,
 }:
 final: prev:
 let
@@ -284,9 +283,9 @@ let
   ];
 
   mkRC =
-    {
-      cfgDir,
-      dev ? false,
+    { cfgDir
+    , dev ? false
+    ,
     }:
     ''
       " Load user runtime
@@ -310,12 +309,12 @@ let
     '';
 
   mkVim =
-    {
-      name,
-      cfgDir,
-      plugins,
-      paths ? [ ],
-      dev ? false,
+    { name
+    , cfgDir
+    , plugins
+    , paths ? [ ]
+    , dev ? false
+    ,
     }:
     let
       vimPkg = (

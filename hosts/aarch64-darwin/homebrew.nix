@@ -91,8 +91,7 @@ in
       { }
       // (
         if machine == "main" then
-          {
-          }
+          { }
         else
           {
             Amphetamine = 937984704;
