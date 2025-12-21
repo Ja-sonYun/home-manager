@@ -1,8 +1,8 @@
 name: Claude Security Review
 
 on:
-  push:
-    branches: [main]
+  repository_dispatch:
+    types: [claude-security-review]
 
 concurrency:
   group: claude-security-review
@@ -19,11 +19,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: false
+          ref: ${{ github.event.client_payload.sha || github.sha }}
 
       - uses: anthropics/claude-code-action@v1
         with:
-          use_oauth: true
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             Review this dotfiles repository for security risks. Use multiple agents to thoroughly analyze:
 
@@ -43,15 +43,12 @@ jobs:
             4. Overly permissive file permissions
             5. Hardcoded sensitive information that shouldn't be public
 
-            Focus on the changes in this push.
+            Commit SHA: ${{ github.event.client_payload.sha || github.sha }}
 
             If you find ANY security issues:
-            - Create a GitHub Issue with title "[Security] Potential vulnerabilities found in commit <short-sha>"
+            - Create a GitHub Issue with title "[Security] Potential vulnerabilities found in commit"
             - Label it with "security"
             - Include detailed findings and recommendations
 
             If no issues found, just output "No security issues found" to the summary.
           claude_args: "--max-turns 10"
-        env:
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
