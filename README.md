@@ -39,5 +39,6 @@ git submodule update --init --recursive
 ## Usage
 
 ```sh
-make apply
+make deploy  # Apply configuration
+make update  # Update flakes and packages
 ```
