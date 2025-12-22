@@ -150,17 +150,12 @@ in
       ~/.claude/settings.nix.json
   '';
 
-  age.secrets.claude = {
-    file = "${agenix-secrets}/encrypted/agent.age";
-    path = "${userhome}/.claude/CLAUDE.md";
-  };
-
   home.activation.extract-claude-bundle = lib.hm.dag.entryAfter [ "agenix" ] ''
     ARCHIVE="${config.age.secrets.claude-bundle.path}"
-    CLAUDE_DIR="${userhome}/.claude"
-
     if [ -f "$ARCHIVE" ]; then
-      ${pkgs.gnutar}/bin/tar -xf "$ARCHIVE" -C "$CLAUDE_DIR"
+      ${pkgs.python3}/bin/python3 ${./extract-claude-bundle.py} \
+        "$ARCHIVE" \
+        "${userhome}/.claude"
     fi
   '';
 }
