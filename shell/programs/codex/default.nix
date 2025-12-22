@@ -28,14 +28,12 @@ let
       command = "${pkgs.playwright-mcp}/bin/mcp-server-playwright";
       args = [ ];
       env = { };
-      enabled = false;
     }
     {
       name = "aws-documentation";
       command = "${pkgs.aws-documentation}/bin/awslabs.aws-documentation-mcp-server";
       args = [ ];
       env = { };
-      enabled = false;
     }
     {
       name = "terraform";
