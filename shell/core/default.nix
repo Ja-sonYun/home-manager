@@ -41,6 +41,7 @@
     # productivity
     glow # markdown previewer in terminal
     viu
+    mermaid-ascii
 
     lazygit
     lazysql

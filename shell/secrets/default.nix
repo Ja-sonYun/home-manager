@@ -4,6 +4,9 @@
 , agenix
 , ...
 }:
+let
+  bundleHash = builtins.substring 0 8 (builtins.hashFile "sha256" "${agenix-secrets}/encrypted/claude-bundle.age");
+in
 {
   home.packages = [ agenix.packages.${pkgs.system}.default ];
 
@@ -25,6 +28,7 @@
     };
     claude-bundle = {
       file = "${agenix-secrets}/encrypted/claude-bundle.age";
+      path = "${config.home.homeDirectory}/.claude/nix/.secret.${bundleHash}";
     };
   };
 

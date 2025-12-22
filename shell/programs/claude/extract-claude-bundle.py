@@ -71,7 +71,7 @@ def remove_path(path: Path) -> None:
 if __name__ == "__main__":
     archive_path = Path(sys.argv[1])
     claude_dir = Path(sys.argv[2])
-    manifest_path = claude_dir / "nix-managed.json"
+    manifest_path = claude_dir / "nix" / "managed.json"
 
     if not archive_path.exists():
         sys.exit(0)

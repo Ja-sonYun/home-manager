@@ -78,6 +78,9 @@
     # Cargo
     tmux-menu = final.callPackage ../pkgs/tmux-menu { };
 
+    # Go
+    mermaid-ascii = final.callPackage ../pkgs/mermaid-ascii { };
+
     # Mac
     icalPal = final.callPackage ../pkgs/icalPal { };
     inputSourceSelector = final.callPackage ../pkgs/inputSourceSelector { };
