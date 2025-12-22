@@ -1,7 +1,6 @@
 { pkgs
 , lib
 , config
-, agenix-secrets
 , userhome
 , ...
 }:
@@ -11,18 +10,37 @@ let
     command = "${server.command}"
     args = ${builtins.replaceStrings [ ''":"'' ] [ ''"="'' ] (builtins.toJSON server.args)}
     env = ${builtins.replaceStrings [ ''":"'' ] [ ''"="'' ] (builtins.toJSON server.env)}
+    ${lib.optionalString (server ? enabled) "enabled = ${lib.boolToString server.enabled}"}
   '';
 
   mcpServers = [
     {
-      name = "github";
-      command = pkgs.writeShellScript "github-mcp-wrapper" ''
-        export GITHUB_PERSONAL_ACCESS_TOKEN=$(cat ${config.age.secrets.github-token.path})
-        exec docker run -i --rm \
-          -e GITHUB_PERSONAL_ACCESS_TOKEN \
-          ghcr.io/github/github-mcp-server
+      name = "context7";
+      command = pkgs.writeShellScript "context7-mcp-wrapper" ''
+        ${pkgs.context7}/bin/context7-mcp \
+          --api-key "$(cat ${config.age.secrets.context7-api-key.path})"
       '';
       args = [ ];
+      env = { };
+    }
+    {
+      name = "playwright";
+      command = "${pkgs.playwright-mcp}/bin/mcp-server-playwright";
+      args = [ ];
+      env = { };
+      enabled = false;
+    }
+    {
+      name = "aws-documentation";
+      command = "${pkgs.aws-documentation}/bin/awslabs.aws-documentation-mcp-server";
+      args = [ ];
+      env = { };
+      enabled = false;
+    }
+    {
+      name = "terraform";
+      command = "${pkgs.terraform-mcp-server}/bin/terraform-mcp-server";
+      args = [ "stdio" ];
       env = { };
     }
   ];
@@ -31,54 +49,108 @@ let
 
   notifierScript = pkgs.writeShellScript "codex-notifier-script" ''
     export PATH="$PATH:${pkgs.terminal-notifier}/bin"
-    ${toString ./check-codex-window}
     ${pkgs.python312}/bin/python3 ${toString ./notify.py} "$@"
   '';
+
+  extractScriptPath = "${config.home.homeDirectory}/.codex/nix/extract-bundle";
 in
-{
-  home.packages = [
-    pkgs.ollama
-    pkgs.codex
-  ];
+lib.mkMerge [
+  {
+    home.packages = [
+      pkgs.codex
+    ];
 
-  home.file."codex-config.toml" = {
-    target = ".codex/config.toml";
-    force = true;
-    text = ''
-      approval_policy = "untrusted"
-      sandbox_mode = "workspace-write"
+    home.file."codex-config.toml" = {
+      target = ".codex/config.toml";
+      force = true;
+      text = ''
+        model = "gpt-5.2-codex"
 
-      hide_agent_reasoning = false
-      model_reasoning_effort = "medium"
+        approval_policy = "untrusted"
+        sandbox_mode = "workspace-write"
 
-      notify = ["${notifierScript}"]
-      file_opener = "none"
+        hide_agent_reasoning = false
+        model_reasoning_effort = "high"
+        model_reasoning_summary = "detailed"
 
-      [sandbox_workspace_write]
-      network_access = true
-      exclude_tmpdir_env_var = false
-      exclude_slash_tmp = false
-      writable_roots = []
+        project_doc_fallback_filenames = ["CLAUDE.md"]
 
-      [tui]
-      notifications = true
+        notify = ["${notifierScript}"]
+        file_opener = "none"
 
-      [shell_environment_policy]
-      inherit = "all"
-      ignore_default_excludes = false
-      exclude = []
-      set = {}
-      include_only = []
+        [sandbox_workspace_write]
+        network_access = true
+        exclude_tmpdir_env_var = false
+        exclude_slash_tmp = false
+        writable_roots = []
 
-      [features]
-      web_search_request = true
+        [tui]
+        notifications = true
+        animations = true
 
-      ${codexMcpServersConfig}
-    '';
-  };
+        [shell_environment_policy]
+        inherit = "all"
+        ignore_default_excludes = false
+        exclude = ["*SECRET*", "*TOKEN*", "*KEY*", "*PASSWORD*"]
+        set = {}
+        include_only = []
 
-  age.secrets.codex = {
-    file = "${agenix-secrets}/encrypted/agent.age";
-    path = "${userhome}/.codex/AGENTS.md";
-  };
-}
+        [features]
+        web_search_request = true
+        view_image_tool = true
+        skills = true
+        tui2 = true
+
+        [history]
+        persistence = "save-all"
+        max_bytes = 10485760
+
+        [profiles.fast]
+        model_reasoning_effort = "low"
+
+        [profiles.deep]
+        model_reasoning_effort = "high"
+
+        ${codexMcpServersConfig}
+      '';
+    };
+
+    home.file.".codex/nix/extract-bundle" = {
+      executable = true;
+      text = ''
+        #!/bin/sh
+        [ -f "${config.age.secrets.codex-bundle.path}" ] || exit 0
+        ${pkgs.python3}/bin/python3 ${../claude/extract-claude-bundle.py} \
+          "${config.age.secrets.codex-bundle.path}" \
+          "${userhome}/.codex"
+      '';
+    };
+  }
+
+  (lib.mkIf pkgs.stdenv.isDarwin {
+    launchd.agents.extract-codex-bundle = {
+      enable = true;
+      config = {
+        Label = "org.nix-community.home.extract-codex-bundle";
+        WatchPaths = [ config.age.secrets.codex-bundle.path ];
+        ProgramArguments = [ extractScriptPath ];
+        RunAtLoad = true;
+      };
+    };
+  })
+
+  (lib.mkIf pkgs.stdenv.isLinux {
+    systemd.user.paths.extract-codex-bundle = {
+      Unit.Description = "Watch codex bundle secret";
+      Path.PathChanged = config.age.secrets.codex-bundle.path;
+      Install.WantedBy = [ "paths.target" ];
+    };
+    systemd.user.services.extract-codex-bundle = {
+      Unit.Description = "Extract codex bundle";
+      Service = {
+        Type = "oneshot";
+        ExecStart = extractScriptPath;
+      };
+    };
+  })
+]

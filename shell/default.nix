@@ -16,6 +16,7 @@
     ./programs/tmux
     ./programs/visidata
     ./programs/claude
+    ./programs/codex
     ./programs/direnv
     ./programs/navi
   ]
