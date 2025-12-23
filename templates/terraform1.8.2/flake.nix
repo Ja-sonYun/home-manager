@@ -5,21 +5,12 @@
     nixpkgs-terraform.url = "github:NixOS/nixpkgs/0c19708cf035f50d28eb4b2b8e7a79d4dc52f6bb";
   };
   outputs =
-    { self
-    , nixpkgs
-    , nixpkgs-terraform
-    ,
-    }:
+    { nixpkgs, nixpkgs-terraform, ... }:
     let
-      supportedSystems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
-      ];
-      forEachSupportedSystem =
+      systems = nixpkgs.lib.systems.flakeExposed;
+      forEachSystem =
         f:
-        nixpkgs.lib.genAttrs supportedSystems (
+        nixpkgs.lib.genAttrs systems (
           system:
           let
             pkgs = import nixpkgs {
@@ -32,6 +23,7 @@
           in
           f {
             inherit
+              system
               pkgs
               pkgs-terraform
               ;
@@ -39,11 +31,8 @@
         );
     in
     {
-      devShells = forEachSupportedSystem (
-        { pkgs
-        , pkgs-terraform
-        ,
-        }:
+      devShells = forEachSystem (
+        { pkgs, pkgs-terraform, ... }:
         {
           default = pkgs.mkShell {
             packages = with pkgs; [

@@ -4,19 +4,15 @@
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
   outputs =
-    { self, nixpkgs }:
+    { self, nixpkgs, ... }:
     let
-      supportedSystems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
-      ];
-      forEachSupportedSystem =
+      systems = nixpkgs.lib.systems.flakeExposed;
+      forEachSystem =
         f:
-        nixpkgs.lib.genAttrs supportedSystems (
+        nixpkgs.lib.genAttrs systems (
           system:
           f {
+            inherit system;
             pkgs = import nixpkgs {
               inherit system;
               overlays = [ self.overlays.default ];
@@ -63,8 +59,8 @@
         # };
       };
 
-      devShells = forEachSupportedSystem (
-        { pkgs }:
+      devShells = forEachSystem (
+        { pkgs, ... }:
         {
           default = pkgs.mkShell {
             packages =
@@ -95,8 +91,6 @@
                 with pkgs;
                 [
                   terminal-notifier
-                  darwin.apple_sdk.frameworks.CoreFoundation
-                  darwin.apple_sdk.frameworks.CoreServices
                 ]
               );
           };

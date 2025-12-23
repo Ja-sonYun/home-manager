@@ -1,5 +1,5 @@
 {
-  description = "A Nix-flake-based Python3.13 development environment";
+  description = "Python 3.13 development shell with uv";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 

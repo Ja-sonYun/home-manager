@@ -1,5 +1,5 @@
 {
-  description = "A Nix-flake-based Zig development environment";
+  description = "A Nix-flake-based Ruby 3.3 development environment";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
@@ -22,11 +22,7 @@
         { pkgs, ... }:
         {
           default = pkgs.mkShell {
-            packages = with pkgs; [
-              zig
-              zls
-              lldb
-            ];
+            packages = with pkgs; [ ruby_3_3 ];
           };
         }
       );

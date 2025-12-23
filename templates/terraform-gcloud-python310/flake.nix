@@ -5,21 +5,12 @@
   inputs.nixpkgs-terraform.url = "github:NixOS/nixpkgs/0c19708cf035f50d28eb4b2b8e7a79d4dc52f6bb";
 
   outputs =
-    { self
-    , nixpkgs
-    , nixpkgs-terraform
-    ,
-    }:
+    { nixpkgs, nixpkgs-terraform, ... }:
     let
-      supportedSystems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
-      ];
-      forEachSupportedSystem =
+      systems = nixpkgs.lib.systems.flakeExposed;
+      forEachSystem =
         f:
-        nixpkgs.lib.genAttrs supportedSystems (
+        nixpkgs.lib.genAttrs systems (
           system:
           let
             pkgs = import nixpkgs {
@@ -32,6 +23,7 @@
           in
           f {
             inherit
+              system
               pkgs
               pkgs-terraform
               ;
@@ -39,20 +31,12 @@
         );
     in
     {
-      devShells = forEachSupportedSystem (
-        { pkgs
-        , pkgs-terraform
-        ,
-        }:
+      devShells = forEachSystem (
+        { pkgs, pkgs-terraform, ... }:
         {
           default = pkgs.mkShell {
-            venvDir = ".venv";
             packages = with pkgs; [
               python310
-
-              (with pkgs.python310Packages; [
-                venvShellHook
-              ])
 
               # Packages manager
               (poetry.withPlugins (
@@ -74,6 +58,26 @@
               ))
               kubernetes-helm
             ];
+            shellHook = ''
+              # Load environment variables from .env if present.
+              set -a
+              if [ -f ".env" ]; then
+                source .env
+              fi
+              set +a
+
+              if [ ! -d "$UV_PROJECT_ENVIRONMENT" ]; then
+                uv venv "$UV_PROJECT_ENVIRONMENT" --python "$UV_PYTHON"
+              fi
+
+              source "$UV_PROJECT_ENVIRONMENT/bin/activate"
+            '';
+            env = {
+              UV_PROJECT_ENVIRONMENT = ".venv";
+              UV_PYTHON = "${pkgs.python310}/bin/python3";
+              UV_NO_SYNC = "1";
+              UV_PYTHON_DOWNLOADS = "never";
+            };
           };
         }
       );
