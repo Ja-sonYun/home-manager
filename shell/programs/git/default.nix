@@ -122,6 +122,10 @@
       "pyrefly.toml"
       ".vim_vars.json"
       ".playwright-mcp"
+      "AGENTS.md"
+      "AGENT.md"
+      ".codex"
+      ".codex*"
     ];
 
     includes = [
