@@ -82,7 +82,7 @@ shift + ctrl + lalt - k : %yabai% -m window --insert north
 shift + ctrl + lalt - l : %yabai% -m window --insert east
 
 # Float / Unfloat window
-shift + rcmd - space : \
+rcmd - f : \
     %yabai% -m window --toggle float; \
     %yabai% -m window --toggle border
 
@@ -93,22 +93,14 @@ shift + ctrl + rcmd - r : \
     launchctl kickstart -k "gui/${UID}/homebrew.mxcl.%yabai%"
 
 # Make window native fullscreen
-rcmd - f         : %yabai% -m window --toggle zoom-fullscreen
+ctrl + cmd - f  : %yabai% -m window --toggle zoom-fullscreen
 shift + rcmd - f : %yabai% -m window --toggle native-fullscreen
-
-
-# ----------------------------
-# LangSwitch
-
-lalt - 1 : im-select com.apple.keylayout.ABC
-lalt - 2 : im-select com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese
-lalt - 3 : im-select com.apple.inputmethod.Korean.2SetKorean
 
 # --------
 # Cmd
 rcmd - q : %inputSourceSelector% select "com.apple.keylayout.ABC"
 rcmd - e : %inputSourceSelector% select "com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"
-rcmd - r : %inputSourceSelector% select "com.apple.keylayout.2SetHangul"
+rcmd - r : %inputSourceSelector% select "com.apple.inputmethod.Korean.2SetKorean"
 
 
 rcmd - w : %skhd% -k "ctrl - up"

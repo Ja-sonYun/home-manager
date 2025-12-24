@@ -97,7 +97,7 @@ lib.mkMerge [
         web_search_request = true
         view_image_tool = true
         skills = true
-        tui2 = true
+        tui2 = false
 
         [history]
         persistence = "save-all"
