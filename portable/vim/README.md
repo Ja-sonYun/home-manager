@@ -7,7 +7,7 @@ To see all available features, check `flake.nix`.
 **With all features**
 
 ```sh
-nix run 'github:Ja-sonYun/home-manager?dir=portable/vim' \
+nix run 'github:Ja-sonYun/dotfiles?dir=portable/vim' \
     --extra-experimental-features nix-command \
     --extra-experimental-features flakes
 
@@ -19,7 +19,7 @@ docker run -it --rm \
   -v ${PWD}:/workspace \
   -w /workspace \
   nixos/nix \
-  nix run 'github:Ja-sonYun/home-manager?dir=portable/vim' \
+  nix run 'github:Ja-sonYun/dotfiles?dir=portable/vim' \
     --extra-experimental-features nix-command \
     --extra-experimental-features flakes
 ```
@@ -28,7 +28,7 @@ docker run -it --rm \
 
 ```sh
 USE_GO=1 USE_RUST=1 USE_COPILOT=1 \
-nix run 'github:Ja-sonYun/home-manager?dir=portable/vim' --impure \
+nix run 'github:Ja-sonYun/dotfiles?dir=portable/vim' --impure \
   --extra-experimental-features nix-command \
   --extra-experimental-features flakes
 
@@ -43,7 +43,7 @@ docker run -it --rm \
   -e USE_RUST=1 \
   -e USE_COPILOT=1 \
   nixos/nix \
-  nix run 'github:Ja-sonYun/home-manager?dir=portable/vim' \
+  nix run 'github:Ja-sonYun/dotfiles?dir=portable/vim' \
     --impure \
     --extra-experimental-features nix-command \
     --extra-experimental-features flakes

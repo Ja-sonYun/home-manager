@@ -1,4 +1,4 @@
-# home-manager
+# dotfiles
 
 Personal system configuration using Nix Flakes, Home Manager, and nix-darwin.
 
@@ -22,7 +22,7 @@ Personal system configuration using Nix Flakes, Home Manager, and nix-darwin.
 
 **portable/vim** - Standalone neovim with selective language support:
 ```sh
-nix run 'github:Ja-sonYun/home-manager?dir=portable/vim'
+nix run 'github:Ja-sonYun/dotfiles?dir=portable/vim'
 
 # With options to skip languages for faster builds
 USE_GO=1 USE_RUST=1 USE_COPILOT=1 nix run ... --impure
@@ -31,8 +31,8 @@ USE_GO=1 USE_RUST=1 USE_COPILOT=1 nix run ... --impure
 ## Setup
 
 ```sh
-git clone https://github.com/Ja-sonYun/home-manager.git
-cd home-manager
+git clone https://github.com/Ja-sonYun/dotfiles.git
+cd dotfiles
 git submodule update --init --recursive
 ```
 
