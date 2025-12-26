@@ -77,7 +77,6 @@ let
 
   codexBundleSrc = "${agenix-secrets}/codex-bundle";
   codexBundleEntries = builtins.readDir codexBundleSrc;
-  codexBundleKeep = lib.filterAttrs (_: t: t == "regular" || t == "directory") codexBundleEntries;
 
   codexBundleFiles = lib.listToAttrs (
     map
@@ -86,9 +85,9 @@ let
         value = {
           source = codexBundleSrc + "/${name}";
         }
-        // lib.optionalAttrs (codexBundleKeep.${name} == "directory") { recursive = true; };
+        // lib.optionalAttrs (codexBundleEntries.${name} == "directory") { recursive = true; };
       })
-      (builtins.attrNames codexBundleKeep)
+      (builtins.attrNames codexBundleEntries)
   );
 in
 {

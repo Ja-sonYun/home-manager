@@ -1,7 +1,6 @@
 { pkgs
 , lib
 , config
-, userhome
 , agenix-secrets
 , ...
 }:
@@ -128,16 +127,18 @@ let
 
   claudeBundleSrc = "${agenix-secrets}/claude-bundle";
   claudeBundleEntries = builtins.readDir claudeBundleSrc;
-  claudeBundleKeep = lib.filterAttrs (_: t: t == "regular" || t == "directory") claudeBundleEntries;
 
-  claudeBundleFiles = lib.listToAttrs (map
-    (name: {
-      name = ".claude/${name}";
-      value =
-        { source = claudeBundleSrc + "/${name}"; }
-        // lib.optionalAttrs (claudeBundleKeep.${name} == "directory") { recursive = true; };
-    })
-    (builtins.attrNames claudeBundleKeep));
+  claudeBundleFiles = lib.listToAttrs (
+    map
+      (name: {
+        name = ".claude/${name}";
+        value = {
+          source = claudeBundleSrc + "/${name}";
+        }
+        // lib.optionalAttrs (claudeBundleEntries.${name} == "directory") { recursive = true; };
+      })
+      (builtins.attrNames claudeBundleEntries)
+  );
 in
 {
   home.packages = [
