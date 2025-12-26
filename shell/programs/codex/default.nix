@@ -1,7 +1,7 @@
 { pkgs
 , lib
 , config
-, userhome
+, agenix-secrets
 , ...
 }:
 let
@@ -45,20 +45,59 @@ let
 
   codexMcpServersConfig = lib.concatMapStringsSep "\n" genCodexMcpServer mcpServers;
 
+  pythonWithPackages = pkgs.python313.withPackages (ps: [
+    ps.requests
+    ps.numpy
+  ]);
+
+  nodeOnly = pkgs.runCommand "nodejs-24-node-only" { } ''
+    mkdir -p $out/bin
+    ln -s ${pkgs.nodejs_24}/bin/node $out/bin/node
+  '';
+
+  codexWrapped = pkgs.symlinkJoin {
+    name = "codex-wrapped";
+    paths = [ pkgs.codex ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/codex \
+        --prefix PATH : ${
+          lib.makeBinPath [
+            nodeOnly
+            pythonWithPackages
+          ]
+        }
+    '';
+  };
+
   notifierScript = pkgs.writeShellScript "codex-notifier-script" ''
     export PATH="$PATH:${pkgs.terminal-notifier}/bin"
     ${pkgs.python312}/bin/python3 ${toString ./notify.py} "$@"
   '';
 
-  extractScriptPath = "${config.home.homeDirectory}/.codex/nix/extract-bundle";
-in
-lib.mkMerge [
-  {
-    home.packages = [
-      pkgs.codex
-    ];
+  codexBundleSrc = "${agenix-secrets}/codex-bundle";
+  codexBundleEntries = builtins.readDir codexBundleSrc;
+  codexBundleKeep = lib.filterAttrs (_: t: t == "regular" || t == "directory") codexBundleEntries;
 
-    home.file."codex-config.toml" = {
+  codexBundleFiles = lib.listToAttrs (
+    map
+      (name: {
+        name = ".codex/${name}";
+        value = {
+          source = codexBundleSrc + "/${name}";
+        }
+        // lib.optionalAttrs (codexBundleKeep.${name} == "directory") { recursive = true; };
+      })
+      (builtins.attrNames codexBundleKeep)
+  );
+in
+{
+  home.packages = [
+    codexWrapped
+  ];
+
+  home.file = codexBundleFiles // {
+    "codex-config.toml" = {
       target = ".codex/config.toml";
       force = true;
       text = ''
@@ -112,43 +151,5 @@ lib.mkMerge [
         ${codexMcpServersConfig}
       '';
     };
-
-    home.file.".codex/nix/extract-bundle" = {
-      executable = true;
-      text = ''
-        #!/bin/sh
-        [ -f "${config.age.secrets.codex-bundle.path}" ] || exit 0
-        ${pkgs.python3}/bin/python3 ${../claude/extract-claude-bundle.py} \
-          "${config.age.secrets.codex-bundle.path}" \
-          "${userhome}/.codex"
-      '';
-    };
-  }
-
-  (lib.mkIf pkgs.stdenv.isDarwin {
-    launchd.agents.extract-codex-bundle = {
-      enable = true;
-      config = {
-        Label = "org.nix-community.home.extract-codex-bundle";
-        WatchPaths = [ config.age.secrets.codex-bundle.path ];
-        ProgramArguments = [ extractScriptPath ];
-        RunAtLoad = true;
-      };
-    };
-  })
-
-  (lib.mkIf pkgs.stdenv.isLinux {
-    systemd.user.paths.extract-codex-bundle = {
-      Unit.Description = "Watch codex bundle secret";
-      Path.PathChanged = config.age.secrets.codex-bundle.path;
-      Install.WantedBy = [ "paths.target" ];
-    };
-    systemd.user.services.extract-codex-bundle = {
-      Unit.Description = "Extract codex bundle";
-      Service = {
-        Type = "oneshot";
-        ExecStart = extractScriptPath;
-      };
-    };
-  })
-]
+  };
+}

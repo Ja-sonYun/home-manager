@@ -2,6 +2,7 @@
 , lib
 , config
 , userhome
+, agenix-secrets
 , ...
 }:
 let
@@ -124,78 +125,53 @@ let
       disabled = false;
     };
   };
-  extractScriptPath = "${config.home.homeDirectory}/.claude/nix/extract-bundle";
-in
-lib.mkMerge [
-  {
-    home.packages = [
-      pkgs.claude-code
-    ];
 
-    home.file.".claude/nix/settings.json" = {
+  claudeBundleSrc = "${agenix-secrets}/claude-bundle";
+  claudeBundleEntries = builtins.readDir claudeBundleSrc;
+  claudeBundleKeep = lib.filterAttrs (_: t: t == "regular" || t == "directory") claudeBundleEntries;
+
+  claudeBundleFiles = lib.listToAttrs (map
+    (name: {
+      name = ".claude/${name}";
+      value =
+        { source = claudeBundleSrc + "/${name}"; }
+        // lib.optionalAttrs (claudeBundleKeep.${name} == "directory") { recursive = true; };
+    })
+    (builtins.attrNames claudeBundleKeep));
+in
+{
+  home.packages = [
+    pkgs.claude-code
+  ];
+
+  home.file = claudeBundleFiles // {
+    ".claude/nix/settings.json" = {
       text = builtins.toJSON settings;
       force = true;
     };
-    home.file."Library/Application Support/Claude/claude_desktop_config.json" = {
+    "Library/Application Support/Claude/claude_desktop_config.json" = {
       target = "Library/Application Support/Claude/claude_desktop_config.json";
       force = true;
       text = builtins.toJSON {
         inherit mcpServers;
       };
     };
-    home.file.".claude/nix/extract-bundle" = {
-      executable = true;
-      text = ''
-        #!/bin/sh
-        [ -f "${config.age.secrets.claude-bundle.path}" ] || exit 0
-        ${pkgs.python3}/bin/python3 ${./extract-claude-bundle.py} \
-          "${config.age.secrets.claude-bundle.path}" \
-          "${userhome}/.claude"
-      '';
-    };
-    home.activation.inject-claude-code-mcp = lib.hm.dag.entryAfter [ "installPackages" ] ''
-      ${pkgs.jq}/bin/jq                                                      \
-        -n                                                                   \
-        --slurpfile                                                          \
-        new ~/Library/Application\ Support/Claude/claude_desktop_config.json \
-          '(try input catch {}) | .mcpServers = $new[0].mcpServers'          \
-          ~/.claude.json > temp.json                                         \
-        && mv temp.json ~/.claude.json
-    '';
+  };
 
-    home.activation.inject-claude-code-settings = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-      ${pkgs.python3}/bin/python3 ${./merge-claude-settings.py} \
-        ~/.claude/settings.json \
-        ${managedSettingsFile} \
-        ~/.claude/nix/settings.json
-    '';
+  home.activation.inject-claude-code-mcp = lib.hm.dag.entryAfter [ "installPackages" ] ''
+    ${pkgs.jq}/bin/jq                                                      \
+      -n                                                                   \
+      --slurpfile                                                          \
+      new ~/Library/Application\ Support/Claude/claude_desktop_config.json \
+        '(try input catch {}) | .mcpServers = $new[0].mcpServers'          \
+        ~/.claude.json > temp.json                                         \
+      && mv temp.json ~/.claude.json
+  '';
 
-  }
-
-  (lib.mkIf pkgs.stdenv.isDarwin {
-    launchd.agents.extract-claude-bundle = {
-      enable = true;
-      config = {
-        Label = "org.nix-community.home.extract-claude-bundle";
-        WatchPaths = [ config.age.secrets.claude-bundle.path ];
-        ProgramArguments = [ extractScriptPath ];
-        RunAtLoad = true;
-      };
-    };
-  })
-
-  (lib.mkIf pkgs.stdenv.isLinux {
-    systemd.user.paths.extract-claude-bundle = {
-      Unit.Description = "Watch claude bundle secret";
-      Path.PathChanged = config.age.secrets.claude-bundle.path;
-      Install.WantedBy = [ "paths.target" ];
-    };
-    systemd.user.services.extract-claude-bundle = {
-      Unit.Description = "Extract claude bundle";
-      Service = {
-        Type = "oneshot";
-        ExecStart = extractScriptPath;
-      };
-    };
-  })
-]
+  home.activation.inject-claude-code-settings = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    ${pkgs.python3}/bin/python3 ${./merge-claude-settings.py} \
+      ~/.claude/settings.json \
+      ${managedSettingsFile} \
+      ~/.claude/nix/settings.json
+  '';
+}

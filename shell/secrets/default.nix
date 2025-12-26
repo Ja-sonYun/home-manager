@@ -5,8 +5,6 @@
 , ...
 }:
 let
-  bundleHash = builtins.substring 0 8 (builtins.hashFile "sha256" "${agenix-secrets}/encrypted/claude-bundle.age");
-  codexBundleHash = builtins.substring 0 8 (builtins.hashFile "sha256" "${agenix-secrets}/encrypted/codex-bundle.age");
 in
 {
   home.packages = [ agenix.packages.${pkgs.system}.default ];
@@ -26,14 +24,6 @@ in
     };
     deepseek-api-key = {
       file = "${agenix-secrets}/encrypted/deepseek-api-key.age";
-    };
-    claude-bundle = {
-      file = "${agenix-secrets}/encrypted/claude-bundle.age";
-      path = "${config.home.homeDirectory}/.claude/nix/.secret.${bundleHash}";
-    };
-    codex-bundle = {
-      file = "${agenix-secrets}/encrypted/codex-bundle.age";
-      path = "${config.home.homeDirectory}/.codex/nix/.secret.${codexBundleHash}";
     };
   };
 
