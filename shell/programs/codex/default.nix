@@ -46,8 +46,9 @@ let
   codexMcpServersConfig = lib.concatMapStringsSep "\n" genCodexMcpServer mcpServers;
 
   pythonWithPackages = pkgs.python313.withPackages (ps: [
-    ps.requests
-    ps.numpy
+    ps.libtmux
+    ps.pydantic
+    ps.pydantic-settings
   ]);
 
   nodeOnly = pkgs.runCommand "nodejs-24-node-only" { } ''
@@ -61,18 +62,21 @@ let
     nativeBuildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
       wrapProgram $out/bin/codex \
-        --prefix PATH : ${
+        --set PATH "${
           lib.makeBinPath [
             nodeOnly
             pythonWithPackages
+            pkgs.tmux
           ]
-        }
+        }:$PATH" \
+        --prefix PATH : "$out/bin" \
+        --prefix PYTHONPATH : "${pythonWithPackages}/${pythonWithPackages.sitePackages}"
     '';
   };
 
   notifierScript = pkgs.writeShellScript "codex-notifier-script" ''
     export PATH="$PATH:${pkgs.terminal-notifier}/bin"
-    ${pkgs.python312}/bin/python3 ${toString ./notify.py} "$@"
+    ${pythonWithPackages}/bin/python ${toString ./notify.py} "$@"
   '';
 
   codexBundleSrc = "${agenix-secrets}/codex-bundle";
@@ -84,6 +88,7 @@ let
         name = ".codex/${name}";
         value = {
           source = codexBundleSrc + "/${name}";
+          force = true;
         }
         // lib.optionalAttrs (codexBundleEntries.${name} == "directory") { recursive = true; };
       })
@@ -94,6 +99,25 @@ in
   home.packages = [
     codexWrapped
   ];
+
+  # Remove this when codex supports specifying skills directory via linking
+  home.activation.codexSkillsOverride = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    set -euo pipefail
+    target="$HOME/.codex/skills"
+    rm -rf "$target"
+    mkdir -p "$HOME/.codex"
+    ${pkgs.coreutils}/bin/cp -aL "${codexBundleSrc}/skills" "$target"
+    exec_list="$(${pkgs.coreutils}/bin/mktemp)"
+    ${pkgs.findutils}/bin/find "$target" -type f -perm /111 -print0 > "$exec_list"
+    ${pkgs.findutils}/bin/find "$target" -type d -exec ${pkgs.coreutils}/bin/chmod 0755 {} +
+    ${pkgs.findutils}/bin/find "$target" -type f -exec ${pkgs.coreutils}/bin/chmod 0444 {} +
+    if [ -s "$exec_list" ]; then
+      while IFS= read -r -d $'\0' file; do
+        ${pkgs.coreutils}/bin/chmod 0555 "$file"
+      done < "$exec_list"
+    fi
+    ${pkgs.coreutils}/bin/rm -f "$exec_list"
+  '';
 
   home.file = codexBundleFiles // {
     "codex-config.toml" = {
